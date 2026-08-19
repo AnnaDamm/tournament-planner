@@ -333,10 +333,59 @@ export const rerollRound = (players: Participant[], rounds: Round[], number: num
   )
 }
 
-export const getCurrentRoundNumber = (rounds: Round[]) => {
-  const currentRound = rounds.find((round) => !isRoundComplete(round))
+export const getCurrentRoundNumber = (rounds: Round[], defaultCourtCount = 1) => {
+  const currentRound = rounds.find(
+    (round) =>
+      (!round.startedAt && !isRoundComplete(round)) ||
+      getRunningMatchIds(round, defaultCourtCount).size > 0,
+  )
   return currentRound?.number ?? rounds.at(-1)?.number ?? 0
 }
 
 export const isRoundComplete = (round: Round) =>
   round.matches.every((match) => getMatchResult(match, Math.max(1, round.winningGames || 1)))
+
+export const getRoundCourtCount = (round: Round, defaultCourtCount = 1) => {
+  const value = round.courtCount ?? defaultCourtCount
+  return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1
+}
+
+export const getRunningMatchIds = (round: Round, defaultCourtCount = 1) => {
+  if (!round.startedAt) return new Set<string>()
+  const winningGames = Math.max(1, round.winningGames || 1)
+  const runningMatches = round.matches
+    .filter((match) => !getMatchResult(match, winningGames))
+    .slice(0, getRoundCourtCount(round, defaultCourtCount))
+  return new Set(runningMatches.map((match) => match.id))
+}
+
+export const startRoundInRounds = (
+  rounds: Round[],
+  number: number,
+  startedAt = new Date().toISOString(),
+) =>
+  rounds.map((round) =>
+    round.number === number && !round.startedAt ? { ...round, startedAt } : round,
+  )
+
+export const startReadyRounds = (
+  rounds: Round[],
+  defaultCourtCount = 1,
+  startedAt = new Date().toISOString(),
+) => {
+  let changed = false
+  const next = rounds.map((round, index) => {
+    const previousRound = rounds[index - 1]
+    if (
+      !round.startedAt &&
+      previousRound &&
+      isRoundComplete(previousRound) &&
+      getRunningMatchIds(previousRound, defaultCourtCount).size === 0
+    ) {
+      changed = true
+      return { ...round, startedAt }
+    }
+    return round
+  })
+  return changed ? next : rounds
+}

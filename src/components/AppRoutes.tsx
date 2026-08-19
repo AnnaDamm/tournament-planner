@@ -5,15 +5,19 @@ import { SettingsPage } from './SettingsPage'
 import { Table, type Stat } from './Table'
 import type { Match, Round } from '../storage'
 
-type Props = {
+export type AppRoutesProps = {
+  tournamentName: string
   players: Participant[]
   participantLabel: string
   participantPlural: string
   rounds: Round[]
   participantType: 'players' | 'teams'
+  courtCount: number
+  defaultWinningGames: number
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   sorted: Stat[]
+  sort: string
   desc: boolean
   onAdd: () => void
   onDeleteParticipant: (id: string) => void
@@ -21,25 +25,35 @@ type Props = {
   onToggleWithdraw: (id: string) => void
   onToggleSort: (key: string) => void
   onCreateRound: () => void
+  onStartRound: (number: number) => void
   onUpdateRound: (index: number, matches: Match[]) => void
-  onSetWinningGames: (number: number, value: number) => void
+  onSetRoundSettings: (number: number, winningGames: number, courtCount: number) => void
   onDeleteRound: (number: number) => void
   onFillUnknown: (number: number) => void
   onReroll: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   setParticipantType: (value: 'players' | 'teams') => void
+  setCourtCount: (value: number) => void
+  setDefaultWinningGames: (value: number) => void
+  setTournamentName: (value: string) => void
+  onExport: () => void
+  onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
 }
 
 export function AppRoutes({
+  tournamentName,
   players,
   participantLabel,
   participantPlural,
   rounds,
   participantType,
+  courtCount,
+  defaultWinningGames,
   name,
   record,
   sorted,
+  sort,
   desc,
   onAdd,
   onDeleteParticipant,
@@ -47,15 +61,21 @@ export function AppRoutes({
   onToggleWithdraw,
   onToggleSort,
   onCreateRound,
+  onStartRound,
   onUpdateRound,
-  onSetWinningGames,
+  onSetRoundSettings,
   onDeleteRound,
   onFillUnknown,
   onReroll,
   onSwapPlayers,
   setParticipantType,
+  setCourtCount,
+  setDefaultWinningGames,
+  setTournamentName,
+  onExport,
+  onImport,
   onDeleteAll,
-}: Props) {
+}: AppRoutesProps) {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/participants" replace />} />
@@ -77,7 +97,7 @@ export function AppRoutes({
       />
       <Route
         path="/table"
-        element={<Table sorted={sorted} toggleSort={onToggleSort} desc={desc} />}
+        element={<Table sorted={sorted} sort={sort} toggleSort={onToggleSort} desc={desc} />}
       />
       <Route
         path="/rounds"
@@ -87,9 +107,12 @@ export function AppRoutes({
             players={players}
             name={name}
             record={record}
+            defaultCourtCount={courtCount}
+            defaultWinningGames={defaultWinningGames}
             onCreate={onCreateRound}
+            onStart={onStartRound}
             onUpdate={onUpdateRound}
-            onSetWinningGames={onSetWinningGames}
+            onSetRoundSettings={onSetRoundSettings}
             onDelete={onDeleteRound}
             onFillUnknown={onFillUnknown}
             onReroll={onReroll}
@@ -101,8 +124,16 @@ export function AppRoutes({
         path="/settings"
         element={
           <SettingsPage
+            tournamentName={tournamentName}
+            setTournamentName={setTournamentName}
             participantType={participantType}
             setParticipantType={setParticipantType}
+            courtCount={courtCount}
+            setCourtCount={setCourtCount}
+            defaultWinningGames={defaultWinningGames}
+            setDefaultWinningGames={setDefaultWinningGames}
+            onExport={onExport}
+            onImport={onImport}
             onDeleteAll={onDeleteAll}
           />
         }

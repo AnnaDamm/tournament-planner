@@ -102,15 +102,13 @@ export function Players({
                 <td>{String(index + 1).padStart(2, '0')}</td>
                 <td>
                   {editing ? (
-                    <span
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(event) =>
-                        onRename(player, event.currentTarget.textContent?.trim() || player.name)
-                      }
-                    >
-                      {player.name}
-                    </span>
+                    <input
+                      className="player-name-input"
+                      type="text"
+                      value={player.name}
+                      aria-label={`${t('editName')}: ${player.name}`}
+                      onChange={(event) => onRename(player, event.target.value)}
+                    />
                   ) : (
                     <button className="player-name-button" onClick={() => setHistoryPlayer(player)}>
                       {player.name}

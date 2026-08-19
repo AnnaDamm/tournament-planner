@@ -26,6 +26,9 @@
 body {
   margin: 0;
 }
+body:has(dialog[open]) {
+  overflow: hidden;
+}
 .app-shell {
   min-height: 100vh;
 }
@@ -42,6 +45,8 @@ header {
   display: flex;
   align-items: center;
   gap: 11px;
+  flex: 1;
+  min-width: 0;
 }
 .brand-mark {
   background: #c9f268;
@@ -54,6 +59,10 @@ header {
 }
 .brand-title {
   font: 700 21px 'Space Grotesk';
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .brand-sub,
 .eyebrow,
@@ -69,12 +78,8 @@ header {
   align-items: center;
   gap: 20px;
   position: relative;
+  flex-shrink: 0;
 }
-.live {
-  font-size: 12px;
-  color: #718078;
-}
-.live i,
 .round-status i {
   display: inline-block;
   width: 7px;
@@ -134,29 +139,7 @@ aside {
   padding: 2px 7px;
   border-radius: 9px;
   font-size: 11px;
-}
-.side-card {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin: 40px 5px 0;
-  padding-top: 22px;
-  border-top: 1px solid #e4e9e5;
-  color: #31403a;
-}
-.side-card-icon {
-  width: 29px;
-  height: 29px;
-  background: #ebf2ec;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-}
-.side-card small {
-  display: block;
-  color: #8a958f;
-  font-size: 11px;
-  margin-top: 3px;
+  white-space: nowrap;
 }
 .content {
   padding: 53px 5vw;
@@ -168,6 +151,11 @@ aside {
   justify-content: space-between;
   align-items: end;
   margin-bottom: 40px;
+}
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .page-title h1 {
   font: 700 36px 'Space Grotesk';
@@ -331,6 +319,10 @@ th button {
   font: inherit;
   letter-spacing: inherit;
   cursor: pointer;
+}
+th button.sort-active {
+  color: #557238;
+  font-weight: 700;
 }
 th:first-child,
 td:first-child {
@@ -510,14 +502,19 @@ select {
 .round-head h2 {
   margin-top: 7px;
 }
+.round-title-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .bye-pill {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 11px;
   background: #fff4d7;
   color: #a27b31;
-  padding: 7px 11px;
+  padding: 5px 9px;
   border-radius: 14px;
 }
 .bye-pill.locked {
@@ -574,6 +571,9 @@ select {
   padding: 5px 7px;
   margin: -5px -7px;
 }
+.match.running {
+  background: #fffdf0;
+}
 .drag-hint.locked {
   cursor: default;
 }
@@ -590,6 +590,28 @@ select {
 .player-name-button:hover {
   color: #5d9e45;
   text-decoration: underline;
+}
+.table-player-name.withdrawn-name {
+  text-decoration: line-through;
+}
+.games-behind {
+  color: #a0aaa5;
+  font-size: 10px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.player-name-input {
+  width: min(100%, 280px);
+  border: 1px solid #b9c7bd;
+  border-radius: 5px;
+  background: #fff;
+  color: inherit;
+  padding: 6px 8px;
+  font: inherit;
+}
+.player-name-input:focus {
+  outline: 2px solid #90c74c;
+  outline-offset: 1px;
 }
 .player-actions {
   white-space: nowrap;
@@ -635,7 +657,32 @@ select {
   margin: 20px 0 !important;
 }
 .round-head .button.ghost {
-  margin-left: 12px;
+  margin-left: 0;
+}
+.round-head .button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.round-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.round-actions .round-games {
+  margin-left: 0;
+}
+.round-started {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 9px;
+  color: #718078;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .drag-hint svg {
   color: #c2cbc5;
@@ -681,9 +728,6 @@ select {
   }
   .nav-item svg {
     font-size: 18px;
-  }
-  .side-card {
-    display: none;
   }
   .content {
     padding: 35px 20px;
@@ -750,20 +794,21 @@ select {
   .match {
     border-color: #2c3931;
   }
+  .match.running {
+    background: #2d2c21;
+  }
   .dialog {
     background: #17201c;
     color: #edf4ef;
   }
   .dialog textarea,
+  .round-settings-fields input,
+  .settings-field input,
   select,
   .score input {
     background: #202c25;
     color: #edf4ef;
     border-color: #3d4b42;
-  }
-  .side-card {
-    border-color: #2c3931;
-    color: #dce9df;
   }
   .nav-item {
     color: #a8b5ac;
@@ -794,12 +839,17 @@ select {
   background: #b93636;
 }
 .settings-card {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
-.settings-card label {
+.settings-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  align-items: center;
+  gap: 20px;
+}
+.settings-field label {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -808,10 +858,62 @@ select {
   color: #8d9992;
   font-size: 12px;
 }
+.settings-field select,
+.settings-field input[type='number'],
+.settings-field input[type='text'] {
+  width: 100%;
+  border: 1px solid #b9c7bd;
+  border-radius: 7px;
+  background: #fff;
+  color: inherit;
+  padding: 10px;
+  font: inherit;
+}
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding-top: 4px;
+  border-top: 1px solid #e4e9e5;
+}
+.round-settings-fields {
+  display: grid;
+  gap: 16px;
+  margin-top: 3px;
+}
+.round-settings-fields label {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  align-items: center;
+  gap: 16px;
+  font-weight: 600;
+}
+.round-settings-fields input {
+  width: 100%;
+  border: 1px solid #b9c7bd;
+  border-radius: 7px;
+  background: #fff;
+  color: inherit;
+  padding: 10px;
+  font: inherit;
+}
+@media (prefers-color-scheme: dark) {
+  .settings-field select,
+  .settings-field input[type='number'],
+  .settings-field input[type='text'],
+  .round-settings-fields input {
+    background: #202c25;
+    border-color: #3d4b42;
+    color: #edf4ef;
+  }
+}
 .setting-status {
   font-size: 12px;
   color: #748078;
   margin: 0;
+}
+.setting-status.error {
+  color: #b94b4b;
 }
 .delete-all-button {
   margin-top: 16px;

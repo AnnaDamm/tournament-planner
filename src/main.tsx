@@ -1,45 +1,75 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './styles.css'
 import { locale, t } from './i18n'
-import { AppDialogs } from './components/AppDialogs'
+import { AppContent } from './components/AppContent'
 import { AppLayout } from './components/AppLayout'
-import { AppRoutes } from './components/AppRoutes'
 import type { Participant } from './components/Players'
-import { loadParticipantType, loadParticipants, loadRounds, type Round } from './storage'
+import {
+  loadCourtCount,
+  loadDefaultWinningGames,
+  loadParticipantType,
+  loadParticipants,
+  loadRounds,
+  loadTournamentName,
+  parseTournamentSnapshot,
+  type Round,
+} from './storage'
 import { useTournamentStorage } from './useTournamentStorage'
+import {
+  createParticipant,
+  swapRoundPlayers as swapRoundPlayersInRounds,
+  toggleParticipantWithdrawal,
+  updateRoundsForCourtCount,
+} from './tournamentActions'
+import { downloadTournament } from './tournamentExport'
+import { sortStats } from './tournamentStats'
 import {
   calculateStandings,
   createRoundPlan,
   fillUnknownRound,
   getCurrentRoundNumber,
-  hasEnteredScore,
-  isRoundComplete,
   isUnknownParticipantId,
   rerollRound,
+  startReadyRounds,
+  startRoundInRounds,
 } from './tournament'
 
-const uid = () => Math.random().toString(36).slice(2, 9)
-
-const toggleWithdrawal = (setPlayers: Dispatch<SetStateAction<Participant[]>>, id: string) =>
-  setPlayers((current) =>
-    current.map((player) =>
-      player.id === id ? { ...player, withdrawn: !player.withdrawn } : player,
-    ),
-  )
-
+if (typeof document !== 'undefined') document.documentElement.lang = locale
 function App() {
   const [players, setPlayers] = useState<Participant[]>(loadParticipants)
-  const [rounds, setRounds] = useState<Round[]>(loadRounds)
+  const [tournamentName, setTournamentName] = useState(loadTournamentName)
+  const [courtCount, setCourtCount] = useState(loadCourtCount)
+  const [defaultWinningGames, setDefaultWinningGames] = useState(loadDefaultWinningGames)
+  const [rounds, setRounds] = useState<Round[]>(() =>
+    startReadyRounds(loadRounds(), loadCourtCount()),
+  )
   const [participantType, setParticipantType] = useState<'players' | 'teams'>(loadParticipantType)
-  const [sort, setSort] = useState('wins')
+  const [sort, setSort] = useState('position')
   const [desc, setDesc] = useState(true)
   const [draft, setDraft] = useState('')
   const bulkRef = useRef<HTMLDialogElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
 
-  useTournamentStorage(players, setPlayers, rounds, setRounds, participantType, setParticipantType)
+  useTournamentStorage(
+    players,
+    setPlayers,
+    rounds,
+    setRounds,
+    participantType,
+    setParticipantType,
+    courtCount,
+    setCourtCount,
+    defaultWinningGames,
+    setDefaultWinningGames,
+    tournamentName,
+    setTournamentName,
+  )
+
+  useEffect(() => {
+    document.title = `${tournamentName} — Tournament Manager`
+  }, [tournamentName])
 
   const standings = useMemo(() => calculateStandings(players, rounds), [players, rounds])
   const standingsBeforeRounds = useMemo(
@@ -56,16 +86,18 @@ function App() {
       })),
     [standings],
   )
+  const positions = useMemo(
+    () =>
+      new Map(sortStats(stats, 'position', true).map((player, index) => [player.id, index + 1])),
+    [stats],
+  )
   const sorted = useMemo(
     () =>
-      [...stats].sort((a, b) => {
-        const value =
-          sort === 'name'
-            ? a.name.localeCompare(b.name)
-            : Number(a[sort as keyof typeof a]) - Number(b[sort as keyof typeof b])
-        return (desc ? -1 : 1) * (value || a.name.localeCompare(b.name))
-      }),
-    [stats, sort, desc],
+      sortStats(stats, sort, desc).map((player) => ({
+        ...player,
+        position: positions.get(player.id) ?? 0,
+      })),
+    [positions, sort, desc, stats],
   )
 
   const participantLabel = participantType === 'teams' ? t('teams') : t('players')
@@ -82,34 +114,14 @@ function App() {
     sort === key ? setDesc((value) => !value) : (setSort(key), setDesc(key !== 'name'))
   const updateRound = (index: number, matches: Round['matches']) =>
     setRounds((current) =>
-      current.map((round, roundIndex) => (roundIndex === index ? { ...round, matches } : round)),
+      startReadyRounds(
+        current.map((round, roundIndex) => (roundIndex === index ? { ...round, matches } : round)),
+        courtCount,
+      ),
     )
-  const swapRoundPlayers = (roundIndex: number, draggedId: string, targetId: string) => {
-    if (!draggedId || draggedId === targetId) return
-    setRounds((current) =>
-      current.map((round, index) => {
-        if (index !== roundIndex) return round
-        if (isRoundComplete(round)) return round
-        const draggedMatch = round.matches.find(
-          (match) => match.a === draggedId || match.b === draggedId,
-        )
-        const targetMatch = round.matches.find(
-          (match) => match.a === targetId || match.b === targetId,
-        )
-        if (draggedMatch && hasEnteredScore(draggedMatch)) return round
-        if (targetMatch && hasEnteredScore(targetMatch)) return round
-        return {
-          ...round,
-          bye: round.bye === draggedId ? targetId : round.bye === targetId ? draggedId : round.bye,
-          matches: round.matches.map((match) => ({
-            ...match,
-            a: match.a === draggedId ? targetId : match.a === targetId ? draggedId : match.a,
-            b: match.b === draggedId ? targetId : match.b === targetId ? draggedId : match.b,
-          })),
-        }
-      }),
-    )
-  }
+  const startRound = (number: number) => setRounds((current) => startRoundInRounds(current, number))
+  const swapRoundPlayers = (roundIndex: number, draggedId: string, targetId: string) =>
+    setRounds((current) => swapRoundPlayersInRounds(current, roundIndex, draggedId, targetId))
 
   const makeRound = () =>
     players.filter((player) => !player.withdrawn).length < 2
@@ -117,34 +129,28 @@ function App() {
       : setRounds((current) => {
           const number = current.length + 1
           const plan = createRoundPlan(players, current, number)
-          const winningGames = current.at(-1)?.winningGames ?? 1
-          return [
-            ...current,
-            {
-              number,
-              bye: plan.bye,
-              winningGames,
-              matches: plan.matches,
-              standings: plan.standings,
-            },
-          ]
+          const previousRound = current.at(-1)
+          return startReadyRounds(
+            [
+              ...current,
+              {
+                number,
+                bye: plan.bye,
+                winningGames: previousRound?.winningGames ?? defaultWinningGames,
+                courtCount: previousRound?.courtCount ?? courtCount,
+                matches: plan.matches,
+                standings: plan.standings,
+              },
+            ],
+            courtCount,
+          )
         })
   const addBulk = () => {
     const names = draft
       .split('\n')
       .map((nameValue) => nameValue.trim())
       .filter(Boolean)
-    setPlayers((current) => [
-      ...current,
-      ...names.map((nameValue) => ({
-        id: uid(),
-        name: nameValue,
-        wins: 0,
-        losses: 0,
-        scored: 0,
-        conceded: 0,
-      })),
-    ])
+    setPlayers((current) => [...current, ...names.map((nameValue) => createParticipant(nameValue))])
     setDraft('')
     bulkRef.current?.close()
   }
@@ -158,40 +164,71 @@ function App() {
     confirmRef.current?.close()
   }
 
-  useEffect(() => {
-    document.documentElement.lang = locale
-  }, [])
+  const exportTournament = () =>
+    downloadTournament({
+      version: 1,
+      tournamentName,
+      players,
+      rounds,
+      participantType,
+      courtCount,
+      defaultWinningGames,
+    })
+
+  const importTournament = async (file: File) => {
+    try {
+      const snapshot = parseTournamentSnapshot(JSON.parse(await file.text()))
+      if (!snapshot) return false
+      setTournamentName(snapshot.tournamentName)
+      setPlayers(snapshot.players)
+      setRounds(snapshot.rounds)
+      setParticipantType(snapshot.participantType)
+      setCourtCount(snapshot.courtCount)
+      setDefaultWinningGames(snapshot.defaultWinningGames)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   return (
     <AppLayout
+      tournamentName={tournamentName}
       participantLabel={participantLabel}
       playerCount={players.filter((player) => !player.withdrawn).length}
       roundCount={rounds.length}
-      currentRound={getCurrentRoundNumber(rounds)}
+      currentRound={getCurrentRoundNumber(rounds, courtCount)}
     >
-      <AppRoutes
+      <AppContent
+        tournamentName={tournamentName}
         players={players}
         participantLabel={participantLabel}
         participantPlural={participantPlural}
         rounds={rounds}
         participantType={participantType}
+        courtCount={courtCount}
+        defaultWinningGames={defaultWinningGames}
         name={name}
         record={recordBeforeRound}
         sorted={sorted}
+        sort={sort}
         desc={desc}
         onAdd={() => bulkRef.current?.showModal()}
         onDeleteParticipant={(id) =>
           setPlayers((current) => current.filter((player) => player.id !== id))
         }
         onRename={rename}
-        onToggleWithdraw={(id) => toggleWithdrawal(setPlayers, id)}
+        onToggleWithdraw={(id) => setPlayers((current) => toggleParticipantWithdrawal(current, id))}
         onToggleSort={toggleSort}
         onCreateRound={makeRound}
+        onStartRound={startRound}
         onUpdateRound={updateRound}
-        onSetWinningGames={(number, value) =>
+        onSetRoundSettings={(number, winningGames, roundCourtCount) =>
           setRounds((current) =>
             current.map((round) =>
-              round.number === number ? { ...round, winningGames: value } : round,
+              round.number === number
+                ? { ...round, winningGames, courtCount: roundCourtCount }
+                : round,
             ),
           )
         }
@@ -210,23 +247,30 @@ function App() {
         onReroll={(number) => setRounds((current) => rerollRound(players, current, number))}
         onSwapPlayers={swapRoundPlayers}
         setParticipantType={setParticipantType}
-        onDeleteAll={() => confirmRef.current?.showModal()}
-      />
-      <AppDialogs
-        participantType={participantType}
+        setCourtCount={(value) => {
+          setCourtCount(value)
+          setRounds((current) => updateRoundsForCourtCount(current, value))
+        }}
+        setDefaultWinningGames={setDefaultWinningGames}
+        setTournamentName={setTournamentName}
+        onExport={exportTournament}
+        onImport={importTournament}
         bulkRef={bulkRef}
         confirmRef={confirmRef}
         draft={draft}
         setDraft={setDraft}
-        onAdd={addBulk}
-        onDeleteAll={deleteAll}
+        onAddParticipants={addBulk}
+        onDeleteAllConfirmed={deleteAll}
+        onDeleteAll={() => confirmRef.current?.showModal()}
       />
     </AppLayout>
   )
 }
 
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined
+
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
+  <BrowserRouter basename={basename}>
     <App />
   </BrowserRouter>,
 )

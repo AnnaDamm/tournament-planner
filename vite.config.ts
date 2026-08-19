@@ -6,18 +6,21 @@ import tailwindcss from '@tailwindcss/vite'
 
 function inlineAssets(): Plugin {
   let outputDir = resolve('dist')
+  let assetBase = '/assets/'
   return {
     name: 'inline-assets-in-index',
     configResolved(config) {
       outputDir = resolve(config.root, config.build.outDir)
+      assetBase = `${config.base}assets/`
     },
     closeBundle() {
       const outDir = outputDir
+      const assetsPath = resolve(outDir, 'assets')
       let source = readFileSync(resolve(outDir, 'index.html'), 'utf8')
-      for (const fileName of readdirSync(resolve(outDir, 'assets'))) {
-        const filePath = resolve(outDir, 'assets', fileName)
+      for (const fileName of readdirSync(assetsPath)) {
+        const filePath = resolve(assetsPath, fileName)
         const content = readFileSync(filePath, 'utf8')
-        const assetUrl = `/assets/${fileName}`
+        const assetUrl = `${assetBase}${fileName}`
         if (fileName.endsWith('.css'))
           source = source.replace(
             new RegExp(`<link[^>]*href="${assetUrl}"[^>]*>`),
@@ -38,8 +41,9 @@ function inlineAssets(): Plugin {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: 'src',
+  base: mode === 'production' ? '/tournament-planner/' : '/',
   plugins: [react(), tailwindcss(), inlineAssets()],
   build: {
     outDir: '../dist',
@@ -48,4 +52,4 @@ export default defineConfig({
     cssCodeSplit: false,
     rollupOptions: { output: { manualChunks: undefined } },
   },
-})
+}))

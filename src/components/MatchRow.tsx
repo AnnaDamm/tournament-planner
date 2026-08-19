@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../storage'
+import { t } from '../i18n'
 import { getMatchResult, hasEnteredScore } from '../tournament'
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   allMatches: Match[]
   onSwap?: (draggedId: string, targetId: string) => void
   winningGames: number
+  isRunning?: boolean
 }
 
 const isCompleteSet = (set: SetScore) =>
@@ -65,6 +67,7 @@ export function MatchRow({
   allMatches,
   onSwap,
   winningGames,
+  isRunning = false,
 }: Props) {
   const swapPlayers = (draggedId: string, targetId: string) => {
     if (!draggedId || draggedId === targetId) return
@@ -127,7 +130,10 @@ export function MatchRow({
     }, 200)
   }
   return (
-    <div className="match">
+    <div
+      className={`match ${isRunning ? 'running' : ''}`}
+      aria-label={isRunning ? t('running') : undefined}
+    >
       <span className="match-no">{String(matchIndex + 1).padStart(2, '0')}</span>
       <span
         className={`drag-hint ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}

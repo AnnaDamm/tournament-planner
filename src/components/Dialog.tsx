@@ -4,7 +4,13 @@ type Props = { dialogRef: RefObject<HTMLDialogElement | null>; children: ReactNo
 
 export function Dialog({ dialogRef, children }: Props) {
   return (
-    <dialog ref={dialogRef} className="dialog">
+    <dialog
+      ref={dialogRef}
+      className="dialog"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) dialogRef.current?.close()
+      }}
+    >
       {children}
     </dialog>
   )

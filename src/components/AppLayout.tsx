@@ -4,6 +4,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 
 type Props = {
+  tournamentName: string
   participantLabel: string
   playerCount: number
   roundCount: number
@@ -12,6 +13,7 @@ type Props = {
 }
 
 export function AppLayout({
+  tournamentName,
   participantLabel,
   playerCount,
   roundCount,
@@ -32,12 +34,11 @@ export function AppLayout({
           <div className="brand-mark">
             <Trophy size={20} />
           </div>
-          <div className="brand-title">Courtly</div>
+          <div className="brand-title" title={tournamentName}>
+            {tournamentName}
+          </div>
         </div>
         <div className="header-actions">
-          <span className="live">
-            <i /> {t('local')}
-          </span>
           <button
             className="icon-btn settings-trigger"
             aria-label={t('settings')}
@@ -61,24 +62,14 @@ export function AppLayout({
             >
               <Icon size={18} />
               {label}
-              {target === '/rounds' && currentRound > 0 && (
-                <span className="nav-badge">{currentRound}</span>
+              {target === '/participants' && <span className="nav-badge">{playerCount}</span>}
+              {target === '/rounds' && (
+                <span className="nav-badge">
+                  {currentRound} / {roundCount}
+                </span>
               )}
             </NavLink>
           ))}
-          <div className="side-card">
-            <div className="side-card-icon">
-              <Users size={17} />
-            </div>
-            <div>
-              <b>
-                {playerCount} {participantLabel}
-              </b>
-              <small>
-                {roundCount} {t('rounds')}
-              </small>
-            </div>
-          </div>
         </aside>
         <section className="content">{children}</section>
       </main>

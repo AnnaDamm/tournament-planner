@@ -1,6 +1,10 @@
-# Courtly — Swiss Badminton Tournament
+# Tourny — Tournament Manager
 
-A small local React/Vite application for organising badminton tournaments with Swiss-style rounds.
+A small local React/Vite application for organising sport-agnostic tournaments with Swiss-style rounds.
+
+## GitHub Pages
+
+[Open Tourny](https://annadamm.github.io/tournament-planner/)
 
 ## Requirements
 
@@ -82,7 +86,7 @@ Prettier is the project formatter for React and TypeScript files. GitHub Actions
 
 Oxlint enforces one React component per file and a maximum of 200 lines per function or component.
 
-## GitHub releases
+## GitHub Pages deployment
 
 Pushing a version tag such as `v1.0.0` triggers the GitHub Actions workflow:
 
@@ -91,7 +95,9 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow installs dependencies, runs the production build, creates a GitHub Release, and attaches the generated `dist/index.html` as `index.html`.
+The workflow installs dependencies, runs the production build, creates a `404.html` fallback for client-side routes, uploads `dist/` as a GitHub Pages artifact, and deploys it with the official Pages deployment action. In the repository settings, configure GitHub Pages to use **GitHub Actions** as its source.
+
+To create a release automatically, open **Actions → Create release tag → Run workflow** and choose `patch`, `minor`, or `major`. The workflow uses `pnpm version`, commits the version bump, creates a `v...` tag, and pushes it. That tag then starts the Pages deployment.
 
 ## Features
 

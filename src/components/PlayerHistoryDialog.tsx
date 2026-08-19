@@ -65,7 +65,15 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
     : []
 
   return (
-    <dialog ref={dialogRef} className="dialog history-dialog" onCancel={onClose} onClose={onClose}>
+    <dialog
+      ref={dialogRef}
+      className="dialog history-dialog"
+      onCancel={onClose}
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
       <div className="dialog-head">
         <div>
           <h2>{player?.name}</h2>
@@ -100,11 +108,6 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
             </tbody>
           </table>
         )}
-      </div>
-      <div className="dialog-actions">
-        <button className="button ghost" onClick={onClose}>
-          {t('close')}
-        </button>
       </div>
     </dialog>
   )
