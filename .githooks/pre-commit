@@ -1,18 +1,31 @@
 #!/bin/sh
 set -e
 
+if command -v pnpm >/dev/null 2>&1; then
+  run_pnpm() {
+    pnpm "$@"
+  }
+elif command -v docker >/dev/null 2>&1; then
+  run_pnpm() {
+    docker compose run --rm app pnpm "$@"
+  }
+else
+  echo "Skipping pre-commit checks: neither pnpm nor Docker is available."
+  exit 0
+fi
+
 changed_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(css|html|js|jsx|json|md|ts|tsx|yml|yaml)$' || true)
 
 if [ -n "$changed_files" ]; then
   echo "Checking Prettier formatting on staged files..."
-  docker compose run --rm app pnpm exec prettier --check $changed_files
+  run_pnpm exec prettier --check $changed_files
 
   echo "Running Oxlint on staged files..."
   lint_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$' || true)
   if [ -n "$lint_files" ]; then
-    docker compose run --rm app pnpm exec oxlint $lint_files
+    run_pnpm exec oxlint $lint_files
   fi
 fi
 
 echo "Running TypeScript check..."
-docker compose run --rm app pnpm typecheck
+run_pnpm typecheck
