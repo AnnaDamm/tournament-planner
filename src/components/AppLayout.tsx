@@ -31,26 +31,6 @@ type Props = {
   children: ReactNode
 }
 
-type WindowWithFind = typeof window & {
-  find: (
-    text: string,
-    caseSensitive?: boolean,
-    backwards?: boolean,
-    wrapAround?: boolean,
-    wholeWord?: boolean,
-    searchInFrames?: boolean,
-    showDialog?: boolean,
-  ) => boolean
-}
-
-const findPlayer = (term: string, backwards = false) => {
-  if (!term.trim()) return
-  window.setTimeout(
-    () => (window as WindowWithFind).find(term.trim(), false, backwards, true, false, false, false),
-    0,
-  )
-}
-
 const scrollToTarget = (elementId: string, attemptsLeft = 10) => {
   window.setTimeout(() => {
     const targetElement = document.getElementById(elementId)
@@ -87,11 +67,9 @@ export function AppLayout({
   const mobileNavRef = useRef<HTMLElement>(null)
   const mobileNavTriggerRef = useRef<HTMLButtonElement>(null)
   const mobileNavCloseRef = useRef<HTMLButtonElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
   const findingCursorRef = useRef({ key: '', index: -1 })
   const matchCursorRef = useRef({ key: '', index: -1 })
   const [searchOpen, setSearchOpen] = useState(false)
-  const [pageFindingCount, setPageFindingCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
   )
@@ -114,12 +92,9 @@ export function AppLayout({
         ),
       ]
     : []
-  const findingCount = isTablePage ? matchingParticipants.length : pageFindingCount
+  const findingCount = matchingParticipants.length
   const navigateFinding = (direction: 1 | -1) => {
-    if (!isTablePage) {
-      findPlayer(searchTerm, direction < 0)
-      return
-    }
+    if (matchingParticipants.length === 0) return
     const cursor = findingCursorRef.current
     const nextIndex =
       cursor.key === normalizedSearch
@@ -128,6 +103,7 @@ export function AppLayout({
           ? 0
           : matchingParticipants.length - 1
     findingCursorRef.current = { key: normalizedSearch, index: nextIndex }
+    if (!isTablePage) navigate(pathWithSearch('/table'))
     scrollToTarget(`player-${matchingParticipants[nextIndex].participantId}`)
   }
   const updateSearch = (value: string) => {
@@ -146,27 +122,6 @@ export function AppLayout({
     // oxlint-disable-next-line react/set-state-in-effect
     setSearchTerm(new URLSearchParams(location.hash.slice(1)).get('search') ?? '')
   }, [location.hash])
-
-  useEffect(() => {
-    if (searchTerm) findPlayer(searchTerm)
-  }, [location.pathname, searchTerm])
-
-  useEffect(() => {
-    if (!normalizedSearch || isTablePage) {
-      // oxlint-disable-next-line react/set-state-in-effect
-      setPageFindingCount(0)
-      return
-    }
-    const content = contentRef.current?.textContent?.toLocaleLowerCase() ?? ''
-    let count = 0
-    let position = 0
-    while ((position = content.indexOf(normalizedSearch, position)) >= 0) {
-      count += 1
-      position += normalizedSearch.length
-    }
-    // oxlint-disable-next-line react/set-state-in-effect
-    setPageFindingCount(count)
-  }, [children, isTablePage, location.pathname, normalizedSearch])
 
   useEffect(() => {
     if (!searchOpen) return
@@ -302,7 +257,7 @@ export function AppLayout({
                     aria-label={t('playerSearch')}
                     onChange={(event) => updateSearch(event.target.value)}
                     onKeyDown={(event) => {
-                      if (event.key === 'Enter') findPlayer(searchTerm)
+                      if (event.key === 'Enter') navigateFinding(1)
                       if (event.key === 'Escape') closeSearch()
                     }}
                   />
@@ -441,9 +396,7 @@ export function AppLayout({
         >
           {renderNavigation(true)}
         </nav>
-        <div className="content" ref={contentRef}>
-          {children}
-        </div>
+        <div className="content">{children}</div>
       </main>
     </div>
   )
