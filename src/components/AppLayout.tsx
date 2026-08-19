@@ -11,7 +11,6 @@ import {
   QrCode,
   Settings2,
   Trophy,
-  Wifi,
   X,
 } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -325,14 +324,6 @@ export function AppLayout({
           </button>
           {localMaster && (
             <>
-              <button
-                className="icon-btn"
-                aria-label={t('networkDocumentation')}
-                title={t('networkDocumentation')}
-                onClick={() => navigate(pathWithSearch('/network'))}
-              >
-                <Wifi size={18} aria-hidden="true" />
-              </button>
               <button
                 className="icon-btn"
                 aria-label={t('viewerQrCode')}

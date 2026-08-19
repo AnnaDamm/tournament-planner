@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { LocalMasterConfig } from '../liveSharing'
 import type { Match, Participant, Round } from '../tournamentTypes'
-import { LocalNetworkDocumentationPage } from './LocalNetworkDocumentationPage'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { SharePage } from './SharePage'
@@ -113,10 +112,6 @@ export function AppRoutes({
             <Navigate to="/table" replace />
           )
         }
-      />
-      <Route
-        path="/network"
-        element={localMaster ? <LocalNetworkDocumentationPage /> : <Navigate to="/table" replace />}
       />
       <Route
         path="/rounds"

@@ -62,9 +62,8 @@ On Windows, double-click `scripts\\start.bat` in File Explorer. It starts the sa
 Compose setup and keeps its window open if startup fails.
 
 Open the printed `http://localhost:<port>/` address on the tournament laptop as the master and
-use the QR-code action in the upper-right corner for the viewer URL. The documentation action
-next to it contains hotspot instructions for macOS, Windows, and Linux. Allow incoming
-connections to the selected port in the laptop firewall when prompted.
+use the QR-code action in the upper-right corner for the viewer URL. Allow incoming connections
+to the selected port in the laptop firewall when prompted.
 
 If the laptop has several active network adapters (for example a VPN), override the selected
 address explicitly:

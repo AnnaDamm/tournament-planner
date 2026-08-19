@@ -91,7 +91,6 @@ export const en = {
   nextFinding: 'Next result',
   liveView: 'LIVE VIEW',
   shareTournament: 'Share tournament',
-  networkDocumentation: 'Local network guide',
   scanToView: 'Scan to follow live',
   shareHelp: 'Players can scan this code to see the standings, rounds and participants live.',
   viewerAddress: 'Viewer address',

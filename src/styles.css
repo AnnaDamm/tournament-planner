@@ -2510,8 +2510,7 @@ dialog.settings-modal:not([open]) {
 .share-copy {
   max-width: 460px;
 }
-.share-icon,
-.documentation-icon {
+.share-icon {
   display: grid;
   width: 48px;
   height: 48px;
@@ -2523,17 +2522,11 @@ dialog.settings-modal:not([open]) {
 .share-icon {
   margin-bottom: 16px;
 }
-.share-copy h2,
-.documentation-checklist h2,
-.documentation-guide h2,
-.documentation-note h2 {
+.share-copy h2 {
   margin: 0;
   font: 600 18px 'Space Grotesk';
 }
-.share-copy > p,
-.documentation-intro p,
-.documentation-guide > div:last-child > p,
-.documentation-note p {
+.share-copy > p {
   margin: 8px 0 0;
   color: #68745f;
   font-size: 14px;
@@ -2570,89 +2563,6 @@ dialog.settings-modal:not([open]) {
   max-width: 100%;
   height: auto;
 }
-.documentation-card,
-.documentation-guide,
-.documentation-note {
-  border: 1px solid #e4eae5;
-  border-radius: 12px;
-  background: #fff;
-  padding: 28px;
-}
-.documentation-card {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
-  gap: 36px;
-  margin-bottom: 20px;
-}
-.documentation-intro {
-  display: flex;
-  align-items: start;
-  gap: 14px;
-}
-.documentation-icon {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-}
-.documentation-checklist ol,
-.documentation-steps {
-  display: grid;
-  gap: 9px;
-  margin: 14px 0 0;
-  padding-left: 22px;
-  color: #526159;
-  font-size: 14px;
-  line-height: 1.45;
-}
-.documentation-guide {
-  overflow: hidden;
-  padding: 0;
-}
-.documentation-tabs {
-  display: flex;
-  border-bottom: 1px solid #e4eae5;
-  padding: 0 18px;
-}
-.documentation-tab {
-  cursor: pointer;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  padding: 15px 14px 13px;
-  color: #87918c;
-  font: 700 13px inherit;
-}
-.documentation-tab.active {
-  border-color: #93c84c;
-  color: #35412e;
-}
-.documentation-guide > div:last-child {
-  padding: 28px;
-}
-.documentation-source {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 22px;
-  color: #4f7c2c;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-}
-.documentation-source:hover {
-  text-decoration: underline;
-}
-.documentation-note {
-  margin-top: 20px;
-  border-color: #f2dfb4;
-  background: #fff8e9;
-}
-.documentation-note h2 {
-  color: #785d20;
-}
-.documentation-note p {
-  color: #856f3c;
-}
 @media (max-width: 760px) {
   .share-card {
     align-items: start;
@@ -2662,57 +2572,17 @@ dialog.settings-modal:not([open]) {
   .share-qr {
     align-self: center;
   }
-  .documentation-card {
-    grid-template-columns: 1fr;
-    gap: 26px;
-  }
-  .documentation-card,
-  .documentation-guide > div:last-child,
-  .documentation-note {
-    padding: 24px;
-  }
-  .documentation-tabs {
-    padding: 0 10px;
-  }
-  .documentation-tab {
-    flex: 1;
-    padding-right: 8px;
-    padding-left: 8px;
-  }
 }
 @media (prefers-color-scheme: dark) {
   .share-card,
-  .share-qr,
-  .documentation-card,
-  .documentation-guide {
+  .share-qr {
     border-color: #2c3931;
     background: #17201c;
   }
-  .share-copy > p,
-  .documentation-intro p,
-  .documentation-guide > div:last-child > p,
-  .documentation-note p {
+  .share-copy > p {
     color: #b4c5ab;
   }
   .share-address code {
     color: #c9ef86;
-  }
-  .documentation-checklist ol,
-  .documentation-steps {
-    color: #c7d2ca;
-  }
-  .documentation-tabs {
-    border-color: #2c3931;
-  }
-  .documentation-tab.active {
-    color: #d8f5b1;
-  }
-  .documentation-note {
-    border-color: #594b2c;
-    background: #322b1d;
-  }
-  .documentation-note h2,
-  .documentation-note p {
-    color: #f1dcaa;
   }
 }
