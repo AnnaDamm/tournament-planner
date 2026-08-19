@@ -236,6 +236,7 @@ header {
   padding: 7px;
   color: #76817c;
   cursor: pointer;
+  text-decoration: none;
 }
 .icon-btn:hover {
   background: #f1f4f1;
