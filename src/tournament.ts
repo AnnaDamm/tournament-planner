@@ -365,10 +365,9 @@ export const rerollRound = (players: Participant[], rounds: Round[], number: num
 }
 
 export const getCurrentRoundNumber = (rounds: Round[], defaultCourtCount = 1) => {
+  const runningMatchIds = getRunningMatchIdsByRound(rounds, defaultCourtCount)
   const currentRound = rounds.find(
-    (round) =>
-      (!round.startedAt && !isRoundComplete(round)) ||
-      getRunningMatchIds(round, defaultCourtCount).size > 0,
+    (round) => (!round.startedAt && !isRoundComplete(round)) || runningMatchIds.has(round.number),
   )
   return currentRound?.number ?? rounds.at(-1)?.number ?? 0
 }
@@ -390,6 +389,53 @@ export const getRunningMatchIds = (round: Round, defaultCourtCount = 1) => {
   return new Set(runningMatches.map((match) => match.id))
 }
 
+export const getRunningMatchIdsByRound = (
+  rounds: Round[],
+  defaultCourtCount = 1,
+  includeUnstarted = false,
+) => {
+  const capacity = Math.max(1, Math.floor(defaultCourtCount) || 1)
+  const runningByRound = new Map<number, Set<string>>()
+  const occupiedParticipants = new Set<string>()
+  const blockedByPreviousRounds = new Set<string>()
+  let assignedCourts = 0
+
+  rounds.forEach((round) => {
+    const winningGames = Math.max(1, round.winningGames || 1)
+    const incompleteMatches = round.matches.filter((match) => !getMatchResult(match, winningGames))
+    const runningIds = new Set<string>()
+
+    if (round.startedAt || includeUnstarted) {
+      for (const match of incompleteMatches) {
+        if (assignedCourts >= capacity || runningIds.size >= getRoundCourtCount(round, capacity)) {
+          break
+        }
+        if (isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b)) continue
+        if (
+          blockedByPreviousRounds.has(match.a) ||
+          blockedByPreviousRounds.has(match.b) ||
+          occupiedParticipants.has(match.a) ||
+          occupiedParticipants.has(match.b)
+        ) {
+          continue
+        }
+        runningIds.add(match.id)
+        occupiedParticipants.add(match.a)
+        occupiedParticipants.add(match.b)
+        assignedCourts += 1
+      }
+    }
+
+    if (runningIds.size > 0) runningByRound.set(round.number, runningIds)
+    incompleteMatches.forEach((match) => {
+      if (!isUnknownParticipantId(match.a)) blockedByPreviousRounds.add(match.a)
+      if (!isUnknownParticipantId(match.b)) blockedByPreviousRounds.add(match.b)
+    })
+  })
+
+  return runningByRound
+}
+
 export const startRoundInRounds = (
   rounds: Round[],
   number: number,
@@ -404,15 +450,10 @@ export const startReadyRounds = (
   defaultCourtCount = 1,
   startedAt = new Date().toISOString(),
 ) => {
+  const readyMatchIds = getRunningMatchIdsByRound(rounds, defaultCourtCount, true)
   let changed = false
   const next = rounds.map((round, index) => {
-    const previousRound = rounds[index - 1]
-    if (
-      !round.startedAt &&
-      previousRound &&
-      isRoundComplete(previousRound) &&
-      getRunningMatchIds(previousRound, defaultCourtCount).size === 0
-    ) {
+    if (index > 0 && !round.startedAt && readyMatchIds.has(round.number)) {
       changed = true
       return { ...round, startedAt }
     }
