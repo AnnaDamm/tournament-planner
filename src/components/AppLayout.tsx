@@ -96,10 +96,9 @@ export function AppLayout({
   const pathWithSearch = (pathname: string) => ({ pathname, hash: location.hash })
   const toggleReadOnlyTab = () => {
     if (isReadOnlyTab) return
-    const params = new URLSearchParams(location.search)
-    params.set('readonly', '1')
-    const query = params.toString()
-    window.location.assign(`${location.pathname}${query ? `?${query}` : ''}${location.hash}`)
+    const url = new URL(window.location.href)
+    url.searchParams.set('readonly', '1')
+    window.location.assign(url)
   }
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
   const isTablePage = location.pathname === '/table'
