@@ -67,4 +67,5 @@ export const en = {
   withdraw: 'Withdraw participant',
   undoWithdrawal: 'Undo withdrawal',
   withdrawn: 'withdrawn',
+  reroll: 'Reroll',
 } as const

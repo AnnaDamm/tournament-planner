@@ -1,4 +1,4 @@
-import { GripVertical, RefreshCw, Trophy, X } from 'lucide-react'
+import { Dices, GripVertical, RefreshCw, Trophy, X } from 'lucide-react'
 import { useState } from 'react'
 import { MatchRow } from './MatchRow'
 import { PageTitle } from './PageTitle'
@@ -6,7 +6,7 @@ import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { t } from '../i18n'
 import type { Match, Round } from '../storage'
 import type { Participant } from './Players'
-import { isRoundComplete, isUnknownParticipantId } from '../tournament'
+import { hasEnteredScore, isRoundComplete, isUnknownParticipantId } from '../tournament'
 
 type Props = {
   rounds: Round[]
@@ -18,6 +18,7 @@ type Props = {
   onSetWinningGames: (number: number, value: number) => void
   onDelete: (number: number) => void
   onFillUnknown: (number: number) => void
+  onReroll: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
 }
 
@@ -31,6 +32,7 @@ export function Rounds({
   onSetWinningGames,
   onDelete,
   onFillUnknown,
+  onReroll,
   onSwapPlayers,
 }: Props) {
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
@@ -52,6 +54,7 @@ export function Rounds({
         <div className="round-list">
           {rounds.map((round, roundIndex) => {
             const canReorderBye = !isRoundComplete(round)
+            const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
             return (
               <div className="round-card" key={round.number}>
                 <div className="round-head">
@@ -103,6 +106,15 @@ export function Rounds({
                       onClick={() => onFillUnknown(round.number)}
                     >
                       {t('fillMore')}
+                    </button>
+                  )}
+                  {isUnstarted && (
+                    <button
+                      className="button ghost"
+                      type="button"
+                      onClick={() => onReroll(round.number)}
+                    >
+                      <Dices size={16} /> {t('reroll')}
                     </button>
                   )}
                   <label className="round-games">

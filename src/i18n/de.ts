@@ -71,4 +71,5 @@ export const de: Translation = {
   withdraw: 'Teilnahme aufgeben',
   undoWithdrawal: 'Aufgabe rückgängig machen',
   withdrawn: 'aufgegeben',
+  reroll: 'Neu würfeln',
 }

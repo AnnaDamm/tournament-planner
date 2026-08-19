@@ -124,34 +124,35 @@ const finalizedParticipantIds = (players: Participant[], rounds: Round[]) => {
   return finalized
 }
 
-const takePair = (group: string[], rounds: Round[]) => {
-  const firstIndex = group.findIndex((firstId, index) =>
-    group.slice(index + 1).some((secondId) => !hasPlayed(firstId, secondId, rounds)),
-  )
-  const safeFirstIndex = firstIndex >= 0 ? firstIndex : 0
-  const secondIndex = group.findIndex(
-    (secondId, index) =>
-      index !== safeFirstIndex && !hasPlayed(group[safeFirstIndex], secondId, rounds),
-  )
-  const safeSecondIndex = secondIndex >= 0 ? secondIndex : safeFirstIndex === 0 ? 1 : 0
-  const first = group[safeFirstIndex]
-  const second = group[safeSecondIndex]
-  group.splice(Math.max(safeFirstIndex, safeSecondIndex), 1)
-  group.splice(Math.min(safeFirstIndex, safeSecondIndex), 1)
-  return [first, second] as [string, string]
+const shuffled = <T>(items: T[]) => {
+  const result = [...items]
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    ;[result[index], result[swapIndex]] = [result[swapIndex], result[index]]
+  }
+  return result
 }
 
-const chooseLowerPlayer = (
-  currentId: string,
-  currentWins: number,
-  groups: Map<number, string[]>,
-  rounds: Round[],
-) => {
-  const lowerPlayers = [...groups.entries()]
-    .filter(([wins, group]) => wins < currentWins && group.length > 0)
-    .flatMap(([, group]) => group)
-  const compatible = lowerPlayers.filter((playerId) => !hasPlayed(currentId, playerId, rounds))
-  return randomItem(compatible.length > 0 ? compatible : lowerPlayers)
+const pairGroup = (group: string[], rounds: Round[]): Array<[string, string]> => {
+  const findWithoutRematches = (remaining: string[]): Array<[string, string]> | null => {
+    if (remaining.length === 0) return []
+    const first = remaining[0]
+    for (const second of shuffled(remaining.slice(1))) {
+      if (hasPlayed(first, second, rounds)) continue
+      const next = remaining.filter((id) => id !== first && id !== second)
+      const result = findWithoutRematches(next)
+      if (result) return [[first, second], ...result]
+    }
+    return null
+  }
+
+  const noRematches = findWithoutRematches(shuffled(group))
+  if (noRematches) return noRematches
+  const fallback = shuffled(group)
+  return Array.from({ length: fallback.length / 2 }, (_, index) => [
+    fallback[index * 2],
+    fallback[index * 2 + 1],
+  ])
 }
 
 export const createRoundPlan = (
@@ -164,31 +165,51 @@ export const createRoundPlan = (
   const standingsById = new Map(standings.map((standing) => [standing.id, standing]))
   const finalizedIds = finalizedParticipantIds(activePlayers, previousRounds)
   const knownPlayers = activePlayers.filter((player) => finalizedIds.has(player.id))
-  const groups = new Map<number, string[]>()
+  const groups = new Map<string, { wins: number; losses: number; players: string[] }>()
 
   knownPlayers.forEach((player) => {
-    const wins = standingsById.get(player.id)?.wins ?? 0
-    groups.set(wins, [...(groups.get(wins) ?? []), player.id])
+    const standing = standingsById.get(player.id)
+    const wins = standing?.wins ?? 0
+    const losses = standing?.losses ?? 0
+    const key = `${wins}:${losses}`
+    const group = groups.get(key) ?? { wins, losses, players: [] }
+    group.players.push(player.id)
+    groups.set(key, group)
   })
 
   const pairs: Array<[string, string]> = []
   const leftovers: string[] = []
-  const sortedWins = [...groups.keys()].sort((a, b) => b - a)
+  const sortedGroups = [...groups.values()].sort(
+    (first, second) => second.wins - first.wins || second.losses - first.losses,
+  )
 
-  sortedWins.forEach((wins) => {
-    const group = groups.get(wins)!
-    while (group.length >= 2) pairs.push(takePair(group, previousRounds))
-    if (group.length === 1) {
-      const playerId = group.pop()!
-      const lowerPlayer = chooseLowerPlayer(playerId, wins, groups, previousRounds)
-      if (lowerPlayer) {
-        const lowerGroup = groups.get(standingsById.get(lowerPlayer)?.wins ?? 0)!
-        lowerGroup.splice(lowerGroup.indexOf(lowerPlayer), 1)
-        pairs.push([playerId, lowerPlayer])
-      } else {
-        leftovers.push(playerId)
+  sortedGroups.forEach((group, groupIndex) => {
+    if (group.players.length % 2 === 1) {
+      const lowerGroups = sortedGroups
+        .slice(groupIndex + 1)
+        .filter((candidate) => candidate.wins < group.wins && candidate.players.length > 0)
+      const nextWins = Math.max(...lowerGroups.map((candidate) => candidate.wins), -1)
+      const candidates = lowerGroups
+        .filter((candidate) => candidate.wins === nextWins)
+        .flatMap((candidate) => candidate.players)
+      const compatible = candidates.filter((candidateId) =>
+        group.players.every((groupId) => !hasPlayed(groupId, candidateId, previousRounds)),
+      )
+      const promotedId = randomItem(compatible.length > 0 ? compatible : candidates)
+      if (promotedId) {
+        const sourceGroup = sortedGroups.find((candidate) =>
+          candidate.players.includes(promotedId),
+        )!
+        sourceGroup.players.splice(sourceGroup.players.indexOf(promotedId), 1)
+        group.players.push(promotedId)
       }
     }
+
+    const leftover = group.players.length % 2 === 1 ? group.players.at(-1) : undefined
+    const pairablePlayers = leftover ? group.players.slice(0, -1) : group.players
+    pairs.push(...pairGroup(pairablePlayers, previousRounds))
+    if (leftover) leftovers.push(leftover)
+    group.players = []
   })
 
   const unknownIds = Array.from(
@@ -201,7 +222,7 @@ export const createRoundPlan = (
     const byeIndex = unpaired.findIndex((id) => !isUnknownParticipantId(id))
     bye = unpaired.splice(byeIndex >= 0 ? byeIndex : 0, 1)[0]
   }
-  while (unpaired.length >= 2) pairs.push([unpaired.shift()!, unpaired.shift()!])
+  if (unpaired.length >= 2) pairs.push(...pairGroup(unpaired, previousRounds))
 
   return {
     standings,
@@ -222,16 +243,30 @@ const chooseCandidate = (
   standingsById: Map<string, Participant>,
   previousRounds: Round[],
 ) => {
-  const opponentWins = opponentId ? standingsById.get(opponentId)?.wins : undefined
-  const sameWins =
-    opponentWins === undefined
+  const opponentStanding = opponentId ? standingsById.get(opponentId) : undefined
+  const sameRecord =
+    opponentStanding === undefined
       ? []
-      : available.filter((player) => (standingsById.get(player.id)?.wins ?? 0) === opponentWins)
+      : available.filter((player) => {
+          const standing = standingsById.get(player.id)
+          return (
+            standing?.wins === opponentStanding.wins && standing.losses === opponentStanding.losses
+          )
+        })
   const lowerWins =
-    opponentWins === undefined
+    opponentStanding === undefined
       ? []
-      : available.filter((player) => (standingsById.get(player.id)?.wins ?? 0) < opponentWins)
-  const possible = sameWins.length > 0 ? sameWins : lowerWins.length > 0 ? lowerWins : available
+      : available.filter(
+          (player) => (standingsById.get(player.id)?.wins ?? 0) < opponentStanding.wins,
+        )
+  const nextLowerWins = Math.max(
+    ...lowerWins.map((player) => standingsById.get(player.id)?.wins ?? 0),
+    -1,
+  )
+  const nextLower = lowerWins.filter(
+    (player) => (standingsById.get(player.id)?.wins ?? 0) === nextLowerWins,
+  )
+  const possible = sameRecord.length > 0 ? sameRecord : nextLower.length > 0 ? nextLower : available
   const withoutRematch = opponentId
     ? possible.filter((player) => !hasPlayed(opponentId, player.id, previousRounds))
     : possible
@@ -282,6 +317,19 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
 
 export const hasEnteredScore = (match: Match) =>
   getMatchSets(match).some((set) => set.a.trim() !== '' || set.b.trim() !== '')
+
+export const rerollRound = (players: Participant[], rounds: Round[], number: number) => {
+  const index = rounds.findIndex((round) => round.number === number)
+  if (index < 0) return rounds
+  const round = rounds[index]
+  if (round.matches.some(hasEnteredScore)) return rounds
+  const plan = createRoundPlan(players, rounds.slice(0, index), number)
+  return rounds.map((item, roundIndex) =>
+    roundIndex === index
+      ? { ...item, bye: plan.bye, matches: plan.matches, standings: plan.standings }
+      : item,
+  )
+}
 
 export const getCurrentRoundNumber = (rounds: Round[]) => {
   const currentRound = rounds.find((round) => !isRoundComplete(round))

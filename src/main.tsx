@@ -17,6 +17,7 @@ import {
   hasEnteredScore,
   isRoundComplete,
   isUnknownParticipantId,
+  rerollRound,
 } from './tournament'
 
 const uid = () => Math.random().toString(36).slice(2, 9)
@@ -206,6 +207,7 @@ function App() {
             return current.map((round, roundIndex) => (roundIndex === index ? filled : round))
           })
         }
+        onReroll={(number) => setRounds((current) => rerollRound(players, current, number))}
         onSwapPlayers={swapRoundPlayers}
         setParticipantType={setParticipantType}
         onDeleteAll={() => confirmRef.current?.showModal()}

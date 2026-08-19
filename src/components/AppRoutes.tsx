@@ -25,6 +25,7 @@ type Props = {
   onSetWinningGames: (number: number, value: number) => void
   onDeleteRound: (number: number) => void
   onFillUnknown: (number: number) => void
+  onReroll: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   setParticipantType: (value: 'players' | 'teams') => void
   onDeleteAll: () => void
@@ -50,6 +51,7 @@ export function AppRoutes({
   onSetWinningGames,
   onDeleteRound,
   onFillUnknown,
+  onReroll,
   onSwapPlayers,
   setParticipantType,
   onDeleteAll,
@@ -90,6 +92,7 @@ export function AppRoutes({
             onSetWinningGames={onSetWinningGames}
             onDelete={onDeleteRound}
             onFillUnknown={onFillUnknown}
+            onReroll={onReroll}
             onSwapPlayers={onSwapPlayers}
           />
         }
