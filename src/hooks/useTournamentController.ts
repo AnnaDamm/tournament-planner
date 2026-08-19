@@ -78,6 +78,7 @@ export function useTournamentController(): TournamentContextValue {
   const [desc, setDesc] = useState(true)
   const [draft, setDraft] = useState('')
   const bulkRef = useRef<HTMLDialogElement>(null)
+  const bulkInputRef = useRef<HTMLTextAreaElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -192,7 +193,11 @@ export function useTournamentController(): TournamentContextValue {
     sorted,
     sort,
     desc,
-    onAdd: () => bulkRef.current?.showModal(),
+    onAdd: () => {
+      const dialog = bulkRef.current
+      dialog?.showModal()
+      bulkInputRef.current?.focus()
+    },
     onDeleteParticipant: (id) =>
       setPlayers((current) => current.filter((player) => player.id !== id)),
     onRename: rename,
@@ -245,6 +250,7 @@ export function useTournamentController(): TournamentContextValue {
     routes,
     dialogs: {
       bulkRef,
+      bulkInputRef,
       confirmRef,
       draft,
       setDraft,

@@ -41,16 +41,22 @@ export function RoundSettingsDialog({
   }
 
   return (
-    <dialog ref={dialogRef} className="dialog" onCancel={close}>
+    <dialog
+      ref={dialogRef}
+      className="dialog"
+      aria-labelledby="round-settings-title"
+      aria-describedby="round-settings-description"
+      onCancel={close}
+    >
       <div className="dialog-head">
         <div>
-          <h2>{t('roundSettings')}</h2>
-          <p>
+          <h2 id="round-settings-title">{t('roundSettings')}</h2>
+          <p id="round-settings-description">
             {t('round')} {String(round.number).padStart(2, '0')}
           </p>
         </div>
         <button className="icon-btn" type="button" onClick={close} aria-label={t('close')}>
-          <X size={18} />
+          <X size={18} aria-hidden="true" />
         </button>
       </div>
       <div className="round-settings-fields">

@@ -82,14 +82,17 @@ export function AppLayout({
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
   const searchPopoverRef = useRef<HTMLDivElement>(null)
+  const searchTriggerRef = useRef<HTMLButtonElement>(null)
+  const mobileNavRef = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const findingCursorRef = useRef({ key: '', index: -1 })
   const matchCursorRef = useRef({ key: '', index: -1 })
   const [searchOpen, setSearchOpen] = useState(false)
   const [pageFindingCount, setPageFindingCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState(
-    () => new URLSearchParams(window.location.hash.slice(1)).get('search') ?? '',
+    () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
   )
-  const pathWithSearch = (pathname: string) => ({ pathname, hash: window.location.hash })
+  const pathWithSearch = (pathname: string) => ({ pathname, hash: location.hash })
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
   const isTablePage = location.pathname === '/table'
   const matchingParticipants = normalizedSearch
@@ -126,26 +129,20 @@ export function AppLayout({
   }
   const updateSearch = (value: string) => {
     setSearchTerm(value)
-    const hashParams = new URLSearchParams(window.location.hash.slice(1))
+    const hashParams = new URLSearchParams(location.hash.slice(1))
     if (value.trim()) hashParams.set('search', value)
     else hashParams.delete('search')
     const hash = hashParams.toString()
-    window.history.replaceState(
-      null,
-      '',
-      `${location.pathname}${location.search}${hash ? `#${hash}` : ''}`,
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: hash ? `#${hash}` : '' },
+      { replace: true },
     )
-    if (!value.trim()) window.getSelection()?.removeAllRanges()
   }
 
   useEffect(() => {
-    const readHash = () => {
-      const term = new URLSearchParams(window.location.hash.slice(1)).get('search') ?? ''
-      setSearchTerm(term)
-    }
-    window.addEventListener('hashchange', readHash)
-    return () => window.removeEventListener('hashchange', readHash)
-  }, [])
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSearchTerm(new URLSearchParams(location.hash.slice(1)).get('search') ?? '')
+  }, [location.hash])
 
   useEffect(() => {
     if (searchTerm) findPlayer(searchTerm)
@@ -157,7 +154,7 @@ export function AppLayout({
       setPageFindingCount(0)
       return
     }
-    const content = document.querySelector('.content')?.textContent?.toLocaleLowerCase() ?? ''
+    const content = contentRef.current?.textContent?.toLocaleLowerCase() ?? ''
     let count = 0
     let position = 0
     while ((position = content.indexOf(normalizedSearch, position)) >= 0) {
@@ -176,18 +173,24 @@ export function AppLayout({
     document.addEventListener('mousedown', closeOnOutsideClick)
     return () => document.removeEventListener('mousedown', closeOnOutsideClick)
   }, [searchOpen])
+  const closeSearch = () => {
+    setSearchOpen(false)
+    searchTriggerRef.current?.focus()
+  }
   const navigation = [
     { label: t('table'), target: '/table', icon: BarChart3 },
     { label: t('rounds'), target: '/rounds', icon: Trophy },
   ]
 
-  const closeMobileNav = () => document.getElementById('mobile-nav-close')?.click()
+  const closeMobileNav = () => mobileNavRef.current?.hidePopover()
 
   const renderNavigation = (mobile = false) => (
     <>
       {mobile && (
         <div className="mobile-nav-head">
-          <div className="side-label">{t('tournament')}</div>
+          <div className="side-label" aria-hidden="true">
+            {t('tournament')}
+          </div>
           <button
             className="icon-btn mobile-nav-close"
             id="mobile-nav-close"
@@ -196,11 +199,15 @@ export function AppLayout({
             popoverTarget="mobile-nav"
             popoverTargetAction="hide"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
       )}
-      {!mobile && <div className="side-label">{t('tournament')}</div>}
+      {!mobile && (
+        <div className="side-label" aria-hidden="true">
+          {t('tournament')}
+        </div>
+      )}
       {navigation.map(({ label, target, icon: Icon }) => (
         <NavLink
           key={target}
@@ -208,7 +215,7 @@ export function AppLayout({
           onClick={mobile ? closeMobileNav : undefined}
           className={`nav-item ${location.pathname === target ? 'active' : ''}`}
         >
-          <Icon size={18} />
+          <Icon size={18} aria-hidden="true" />
           {label}
           {target === '/rounds' && (
             <span className="nav-badge">
@@ -222,6 +229,9 @@ export function AppLayout({
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        {t('skipToContent')}
+      </a>
       <header>
         <button
           className="icon-btn mobile-nav-trigger"
@@ -231,33 +241,38 @@ export function AppLayout({
           popoverTarget="mobile-nav"
           popoverTargetAction="toggle"
         >
-          <Menu size={21} />
+          <Menu size={21} aria-hidden="true" />
         </button>
         <div className="brand">
           <div className="brand-mark">
-            <Trophy size={20} />
+            <Trophy size={20} aria-hidden="true" />
           </div>
-          <h1 className="brand-title" title={tournamentName}>
+          <div className="brand-title" title={tournamentName}>
             <Link to={pathWithSearch('/table')}>{tournamentName}</Link>
-          </h1>
+          </div>
         </div>
         <div className="header-actions">
           <div className="search-control" ref={searchPopoverRef}>
             <button
               className={`icon-btn search-trigger ${searchTerm ? 'active' : ''}`}
+              ref={searchTriggerRef}
               type="button"
               aria-label={t('playerSearch')}
               aria-expanded={searchOpen}
+              aria-controls="player-search-popover"
               onClick={() => setSearchOpen((open) => !open)}
             >
-              <Search size={18} />
+              <Search size={18} aria-hidden="true" />
             </button>
             {searchOpen && (
-              <div className="search-popover">
+              <section
+                className="search-popover"
+                id="player-search-popover"
+                aria-label={t('playerSearch')}
+              >
                 <div className="search-input-wrap">
-                  <Search size={16} />
+                  <Search size={16} aria-hidden="true" />
                   <input
-                    autoFocus
                     type="search"
                     list="participant-search-options"
                     value={searchTerm}
@@ -266,7 +281,7 @@ export function AppLayout({
                     onChange={(event) => updateSearch(event.target.value)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') findPlayer(searchTerm)
-                      if (event.key === 'Escape') setSearchOpen(false)
+                      if (event.key === 'Escape') closeSearch()
                     }}
                   />
                   {searchTerm && (
@@ -275,13 +290,15 @@ export function AppLayout({
                       aria-label={t('clearSearch')}
                       onClick={() => updateSearch('')}
                     >
-                      <X size={15} />
+                      <X size={15} aria-hidden="true" />
                     </button>
                   )}
                 </div>
                 <datalist id="participant-search-options">
                   {participantNames.map((name, index) => (
-                    <option value={name} key={`${name}-${index}`} />
+                    <option value={name} key={`${name}-${index}`}>
+                      {name}
+                    </option>
                   ))}
                 </datalist>
                 {findingCount > 1 && (
@@ -292,16 +309,18 @@ export function AppLayout({
                       title={t('previousFinding')}
                       onClick={() => navigateFinding(-1)}
                     >
-                      <ChevronLeft size={16} />
+                      <ChevronLeft size={16} aria-hidden="true" />
                     </button>
-                    <span>{findingCount}</span>
+                    <span aria-live="polite">
+                      {findingCount} {t('searchResults')}
+                    </span>
                     <button
                       type="button"
                       aria-label={t('nextFinding')}
                       title={t('nextFinding')}
                       onClick={() => navigateFinding(1)}
                     >
-                      <ChevronRight size={16} />
+                      <ChevronRight size={16} aria-hidden="true" />
                     </button>
                   </div>
                 )}
@@ -324,9 +343,9 @@ export function AppLayout({
                   }}
                 >
                   {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
-                  <ChevronDown size={15} />
+                  <ChevronDown size={15} aria-hidden="true" />
                 </button>
-              </div>
+              </section>
             )}
           </div>
           <button
@@ -335,7 +354,7 @@ export function AppLayout({
             title={t('documentation')}
             onClick={() => navigate(pathWithSearch('/docs'))}
           >
-            <BookOpen size={18} />
+            <BookOpen size={18} aria-hidden="true" />
           </button>
           {localMaster && (
             <>
@@ -345,7 +364,7 @@ export function AppLayout({
                 title={t('networkDocumentation')}
                 onClick={() => navigate(pathWithSearch('/network'))}
               >
-                <Wifi size={18} />
+                <Wifi size={18} aria-hidden="true" />
               </button>
               <button
                 className="icon-btn"
@@ -353,16 +372,15 @@ export function AppLayout({
                 title={t('viewerQrCode')}
                 onClick={() => navigate(pathWithSearch('/share'))}
               >
-                <QrCode size={18} />
+                <QrCode size={18} aria-hidden="true" />
               </button>
-              <span
+              <output
                 className={`live-indicator ${isLive ? 'is-live' : 'is-offline'}`}
-                role="status"
                 aria-label={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
                 title={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
               >
                 <span aria-hidden="true" />
-              </span>
+              </output>
             </>
           )}
           {!readOnly && (
@@ -374,21 +392,35 @@ export function AppLayout({
                   isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings'))
                 }
               >
-                {isSettingsPage ? <ArrowLeft size={18} /> : <Settings2 size={18} />}
+                {isSettingsPage ? (
+                  <ArrowLeft size={18} aria-hidden="true" />
+                ) : (
+                  <Settings2 size={18} aria-hidden="true" />
+                )}
               </button>
-              <div className="tooltip-popover" role="tooltip">
+              <div className="tooltip-popover" aria-hidden="true">
                 {isSettingsPage ? t('back') : t('settings')}
               </div>
             </>
           )}
         </div>
       </header>
-      <main>
-        <aside className="desktop-side-nav">{renderNavigation()}</aside>
-        <aside id="mobile-nav" className="mobile-side-nav" popover="auto">
+      <main id="main-content" tabIndex={-1}>
+        <nav className="desktop-side-nav" aria-label={t('tournamentNavigation')}>
+          {renderNavigation()}
+        </nav>
+        <nav
+          id="mobile-nav"
+          ref={mobileNavRef}
+          className="mobile-side-nav"
+          aria-label={t('tournamentNavigation')}
+          popover="auto"
+        >
           {renderNavigation(true)}
-        </aside>
-        <section className="content">{children}</section>
+        </nav>
+        <div className="content" ref={contentRef}>
+          {children}
+        </div>
       </main>
     </div>
   )

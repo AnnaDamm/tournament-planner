@@ -58,17 +58,14 @@ export function SettingsPage({
     <dialog
       ref={dialogRef}
       className="settings-modal"
-      aria-label={t('settings')}
+      aria-labelledby="settings-title"
       onCancel={handleCancel}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) navigate(-1)
-      }}
     >
-      <aside className="settings-drawer">
+      <section className="settings-drawer">
         <div className="settings-drawer-head">
           <div>
             <div className="eyebrow">{t('tournament')}</div>
-            <h1>{t('settings')}</h1>
+            <h1 id="settings-title">{t('settings')}</h1>
           </div>
           <button
             className="icon-btn settings-drawer-close"
@@ -76,7 +73,7 @@ export function SettingsPage({
             aria-label={t('back')}
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} aria-hidden="true" />
           </button>
         </div>
         <div className="round-card settings-card">
@@ -142,17 +139,18 @@ export function SettingsPage({
           </div>
           <div className="settings-actions">
             <button className="button ghost" type="button" onClick={onExport}>
-              <Download size={16} /> {t('exportData')}
+              <Download size={16} aria-hidden="true" /> {t('exportData')}
             </button>
             <button
               className="button ghost"
               type="button"
               onClick={() => importInputRef.current?.click()}
             >
-              <Upload size={16} /> {t('importData')}
+              <Upload size={16} aria-hidden="true" /> {t('importData')}
             </button>
             <input
               ref={importInputRef}
+              aria-label={t('importData')}
               type="file"
               accept="application/json,.json"
               hidden
@@ -171,7 +169,7 @@ export function SettingsPage({
         <button className="button danger delete-all-button" onClick={onDeleteAll}>
           {t('deleteAll')}
         </button>
-      </aside>
+      </section>
     </dialog>
   )
 }
