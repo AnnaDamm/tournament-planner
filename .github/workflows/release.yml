@@ -3,6 +3,8 @@ name: Deploy static content to Pages
 on:
   push:
     tags: ['v*.*.*']
+  pull_request_target:
+    types: [closed]
   workflow_dispatch:
     inputs:
       preview_pr:
@@ -27,7 +29,7 @@ concurrency:
 
 jobs:
   build:
-    if: inputs.preview_action != 'remove'
+    if: github.event_name != 'pull_request_target' && inputs.preview_action != 'remove'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -106,14 +108,14 @@ jobs:
           ref: main
 
       - name: Download build artifact
-        if: inputs.preview_action != 'remove'
+        if: github.event_name != 'pull_request_target' && inputs.preview_action != 'remove'
         uses: actions/download-artifact@v5
         with:
           name: pages-build
           path: site-input
 
       - name: Validate build artifact
-        if: inputs.preview_action != 'remove'
+        if: github.event_name != 'pull_request_target' && inputs.preview_action != 'remove'
         run: |
           test -f site-input/index.html
           test -f site-input/404.html
@@ -125,8 +127,8 @@ jobs:
       - name: Prepare Pages state
         env:
           GH_TOKEN: ${{ github.token }}
-          PREVIEW_ACTION: ${{ inputs.preview_action }}
-          PREVIEW_PATH: ${{ inputs.preview_pr && format('previews/pr-{0}', inputs.preview_pr) || '' }}
+          PREVIEW_ACTION: ${{ github.event_name == 'pull_request_target' && 'remove' || inputs.preview_action }}
+          PREVIEW_PATH: ${{ (inputs.preview_pr || github.event.pull_request.number) && format('previews/pr-{0}', inputs.preview_pr || github.event.pull_request.number) || '' }}
         run: |
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           if git fetch origin gh-pages; then
@@ -143,11 +145,11 @@ jobs:
               mkdir -p "pages/$PREVIEW_PATH"
               cp -a site-input/. "pages/$PREVIEW_PATH/"
             fi
-            cp src/public/404.html pages/404.html
           else
             find pages -mindepth 1 -maxdepth 1 ! -name .git ! -name previews -exec rm -rf {} +
             cp -a site-input/. pages/
           fi
+          cp src/public/404.html pages/404.html
 
           touch pages/.nojekyll
           git -C pages config user.name github-actions[bot]
