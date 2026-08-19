@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+set -eu
+
+if command -v pnpm >/dev/null 2>&1; then
+  run_pnpm() {
+    pnpm "$@"
+  }
+  read_version() {
+    node -p "require('./package.json').version"
+  }
+elif command -v docker >/dev/null 2>&1; then
+  run_pnpm() {
+    docker compose run --rm --no-deps app pnpm "$@"
+  }
+  read_version() {
+    docker compose run --rm --no-deps app node -p "require('./package.json').version"
+  }
+else
+  echo "Release failed: neither pnpm nor Docker is available." >&2
+  exit 1
+fi
+
+release_type="${1:-}"
+
+case "$release_type" in
+  patch|minor|major) ;;
+  *)
+    echo "Usage: $0 {patch|minor|major}" >&2
+    exit 1
+    ;;
+esac
+
+run_pnpm version "$release_type" --no-git-tag-version
+
+version="$(read_version)"
+
+git add package.json
+git commit --no-verify -m "v$version"
+git tag "v$version"
+git push origin HEAD:main --follow-tags

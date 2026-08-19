@@ -16,9 +16,6 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "release:patch": "pnpm version patch --no-commit-hooks && git push origin HEAD:main --follow-tags",
-    "release:minor": "pnpm version minor --no-commit-hooks && git push origin HEAD:main --follow-tags",
-    "release:major": "pnpm version major --no-commit-hooks && git push origin HEAD:main --follow-tags",
     "postinstall": "if command -v git >/dev/null 2>&1; then git config core.hooksPath .githooks; fi"
   },
   "dependencies": {
