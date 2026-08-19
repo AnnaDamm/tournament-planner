@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type SyntheticEvent } from 'react'
 import {
   ArrowLeft,
   BarChart3,
@@ -61,7 +61,6 @@ export function AppLayout({
   const navigate = useNavigate()
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
-  const searchPopoverRef = useRef<HTMLDivElement>(null)
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
@@ -123,22 +122,13 @@ export function AppLayout({
     setSearchTerm(new URLSearchParams(location.hash.slice(1)).get('search') ?? '')
   }, [location.hash])
 
-  useEffect(() => {
-    if (!searchOpen) return
-    const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!searchPopoverRef.current?.contains(event.target as Node)) setSearchOpen(false)
-    }
-    document.addEventListener('mousedown', closeOnOutsideClick)
-    return () => document.removeEventListener('mousedown', closeOnOutsideClick)
-  }, [searchOpen])
-  useEffect(() => {
-    if (!searchOpen) return
-    const frame = requestAnimationFrame(() => searchInputRef.current?.focus())
-    return () => cancelAnimationFrame(frame)
-  }, [searchOpen])
-  const closeSearch = () => {
-    setSearchOpen(false)
-    searchTriggerRef.current?.focus()
+  const handleSearchToggle = (event: SyntheticEvent<HTMLElement>) => {
+    const isOpen = (event.nativeEvent as ToggleEvent).newState === 'open'
+    setSearchOpen(isOpen)
+    requestAnimationFrame(() => {
+      if (isOpen) searchInputRef.current?.focus()
+      else searchTriggerRef.current?.focus()
+    })
   }
   const navigation = [
     { label: t('table'), target: '/table', icon: BarChart3 },
@@ -228,7 +218,7 @@ export function AppLayout({
           </div>
         </div>
         <div className="header-actions">
-          <div className="search-control" ref={searchPopoverRef}>
+          <div className="search-control">
             <button
               className={`icon-btn search-trigger ${searchTerm ? 'active' : ''}`}
               ref={searchTriggerRef}
@@ -236,94 +226,94 @@ export function AppLayout({
               aria-label={t('playerSearch')}
               aria-expanded={searchOpen}
               aria-controls="player-search-popover"
-              onClick={() => setSearchOpen((open) => !open)}
+              popoverTarget="player-search-popover"
+              popoverTargetAction="toggle"
             >
               <Search size={18} aria-hidden="true" />
             </button>
-            {searchOpen && (
-              <section
-                className="search-popover"
-                id="player-search-popover"
-                aria-label={t('playerSearch')}
-              >
-                <div className="search-input-wrap">
-                  <Search size={16} aria-hidden="true" />
-                  <input
-                    ref={searchInputRef}
-                    type="search"
-                    list="participant-search-options"
-                    value={searchTerm}
-                    placeholder={t('playerSearch')}
-                    aria-label={t('playerSearch')}
-                    onChange={(event) => updateSearch(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') navigateFinding(1)
-                      if (event.key === 'Escape') closeSearch()
-                    }}
-                  />
-                  {searchTerm && (
-                    <button
-                      type="button"
-                      aria-label={t('clearSearch')}
-                      onClick={() => updateSearch('')}
-                    >
-                      <X size={15} aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-                <datalist id="participant-search-options">
-                  {participantNames.map((name, index) => (
-                    <option value={name} key={`${name}-${index}`}>
-                      {name}
-                    </option>
-                  ))}
-                </datalist>
-                {findingCount > 1 && (
-                  <div className="finding-navigation">
-                    <button
-                      type="button"
-                      aria-label={t('previousFinding')}
-                      title={t('previousFinding')}
-                      onClick={() => navigateFinding(-1)}
-                    >
-                      <ChevronLeft size={16} aria-hidden="true" />
-                    </button>
-                    <span aria-live="polite">
-                      {findingCount} {t('searchResults')}
-                    </span>
-                    <button
-                      type="button"
-                      aria-label={t('nextFinding')}
-                      title={t('nextFinding')}
-                      onClick={() => navigateFinding(1)}
-                    >
-                      <ChevronRight size={16} aria-hidden="true" />
-                    </button>
-                  </div>
-                )}
-                <button
-                  className="next-match-button"
-                  type="button"
-                  disabled={matchingMatchIds.length === 0}
-                  onClick={() => {
-                    if (matchingMatchIds.length === 0) return
-                    const cursor = matchCursorRef.current
-                    const nextIndex =
-                      cursor.key === normalizedSearch
-                        ? (cursor.index + 1) % matchingMatchIds.length
-                        : 0
-                    matchCursorRef.current = { key: normalizedSearch, index: nextIndex }
-                    if (location.pathname !== '/rounds') {
-                      navigate(pathWithSearch('/rounds'))
-                    }
-                    scrollToTarget(`match-${matchingMatchIds[nextIndex]}`)
+            <section
+              className="search-popover"
+              id="player-search-popover"
+              aria-label={t('playerSearch')}
+              onToggle={handleSearchToggle}
+              popover="auto"
+            >
+              <div className="search-input-wrap">
+                <Search size={16} aria-hidden="true" />
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  list="participant-search-options"
+                  value={searchTerm}
+                  placeholder={t('playerSearch')}
+                  aria-label={t('playerSearch')}
+                  onChange={(event) => updateSearch(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') navigateFinding(1)
                   }}
-                >
-                  {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
-                  <ChevronDown size={15} aria-hidden="true" />
-                </button>
-              </section>
-            )}
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    aria-label={t('clearSearch')}
+                    onClick={() => updateSearch('')}
+                  >
+                    <X size={15} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+              <datalist id="participant-search-options">
+                {participantNames.map((name, index) => (
+                  <option value={name} key={`${name}-${index}`}>
+                    {name}
+                  </option>
+                ))}
+              </datalist>
+              {findingCount > 1 && (
+                <div className="finding-navigation">
+                  <button
+                    type="button"
+                    aria-label={t('previousFinding')}
+                    title={t('previousFinding')}
+                    onClick={() => navigateFinding(-1)}
+                  >
+                    <ChevronLeft size={16} aria-hidden="true" />
+                  </button>
+                  <span aria-live="polite">
+                    {findingCount} {t('searchResults')}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t('nextFinding')}
+                    title={t('nextFinding')}
+                    onClick={() => navigateFinding(1)}
+                  >
+                    <ChevronRight size={16} aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+              <button
+                className="next-match-button"
+                type="button"
+                disabled={matchingMatchIds.length === 0}
+                onClick={() => {
+                  if (matchingMatchIds.length === 0) return
+                  const cursor = matchCursorRef.current
+                  const nextIndex =
+                    cursor.key === normalizedSearch
+                      ? (cursor.index + 1) % matchingMatchIds.length
+                      : 0
+                  matchCursorRef.current = { key: normalizedSearch, index: nextIndex }
+                  if (location.pathname !== '/rounds') {
+                    navigate(pathWithSearch('/rounds'))
+                  }
+                  scrollToTarget(`match-${matchingMatchIds[nextIndex]}`)
+                }}
+              >
+                {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
+                <ChevronDown size={15} aria-hidden="true" />
+              </button>
+            </section>
           </div>
           <button
             className="icon-btn"
