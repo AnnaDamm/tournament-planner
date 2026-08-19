@@ -82,6 +82,7 @@ export function AppRoutes({
         element={
           <Rounds
             rounds={rounds}
+            players={players}
             name={name}
             record={record}
             onCreate={onCreateRound}

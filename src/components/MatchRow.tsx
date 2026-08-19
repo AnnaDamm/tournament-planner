@@ -9,6 +9,7 @@ type Props = {
   roundIndex: number
   name: (id: string) => string
   record: (id: string) => string
+  onPlayerClick: (id: string) => void
   onUpdate: (matches: Match[]) => void
   allMatches: Match[]
   onSwap?: (draggedId: string, targetId: string) => void
@@ -59,6 +60,7 @@ export function MatchRow({
   roundIndex,
   name,
   record,
+  onPlayerClick,
   onUpdate,
   allMatches,
   onSwap,
@@ -147,7 +149,9 @@ export function MatchRow({
         }}
       >
         {canReorder && <GripVertical size={16} />}
-        {name(match.a)}
+        <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.a)}>
+          {name(match.a)}
+        </button>
         <small className="player-record">{record(match.a)}</small>
       </span>
       <span className="versus">VS</span>
@@ -171,7 +175,9 @@ export function MatchRow({
         }}
       >
         {canReorder && <GripVertical size={16} />}
-        {name(match.b)}
+        <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.b)}>
+          {name(match.b)}
+        </button>
         <small className="player-record">{record(match.b)}</small>
       </span>
       <div className="set-scores">

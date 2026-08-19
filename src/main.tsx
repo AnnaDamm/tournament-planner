@@ -7,15 +7,8 @@ import { AppDialogs } from './components/AppDialogs'
 import { AppLayout } from './components/AppLayout'
 import { AppRoutes } from './components/AppRoutes'
 import type { Participant } from './components/Players'
-import {
-  loadParticipantType,
-  loadParticipants,
-  loadRounds,
-  saveParticipantType,
-  saveParticipants,
-  saveRounds,
-  type Round,
-} from './storage'
+import { loadParticipantType, loadParticipants, loadRounds, type Round } from './storage'
+import { useTournamentStorage } from './useTournamentStorage'
 import {
   calculateStandings,
   createRoundPlan,
@@ -45,9 +38,7 @@ function App() {
   const bulkRef = useRef<HTMLDialogElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
 
-  useEffect(() => saveParticipants(players), [players])
-  useEffect(() => saveRounds(rounds), [rounds])
-  useEffect(() => saveParticipantType(participantType), [participantType])
+  useTournamentStorage(players, setPlayers, rounds, setRounds, participantType, setParticipantType)
 
   const standings = useMemo(() => calculateStandings(players, rounds), [players, rounds])
   const standingsBeforeRounds = useMemo(
@@ -125,12 +116,13 @@ function App() {
       : setRounds((current) => {
           const number = current.length + 1
           const plan = createRoundPlan(players, current, number)
+          const winningGames = current.at(-1)?.winningGames ?? 1
           return [
             ...current,
             {
               number,
               bye: plan.bye,
-              winningGames: 1,
+              winningGames,
               matches: plan.matches,
               standings: plan.standings,
             },

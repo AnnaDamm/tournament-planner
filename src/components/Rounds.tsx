@@ -1,12 +1,16 @@
 import { GripVertical, RefreshCw, Trophy, X } from 'lucide-react'
+import { useState } from 'react'
 import { MatchRow } from './MatchRow'
 import { PageTitle } from './PageTitle'
+import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { t } from '../i18n'
 import type { Match, Round } from '../storage'
+import type { Participant } from './Players'
 import { isRoundComplete, isUnknownParticipantId } from '../tournament'
 
 type Props = {
   rounds: Round[]
+  players: Participant[]
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   onCreate: () => void
@@ -19,6 +23,7 @@ type Props = {
 
 export function Rounds({
   rounds,
+  players,
   name,
   record,
   onCreate,
@@ -28,6 +33,8 @@ export function Rounds({
   onFillUnknown,
   onSwapPlayers,
 }: Props) {
+  const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
+  const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   return (
     <>
       <PageTitle eyebrow={t('schedule')} title={t('rounds')}>
@@ -133,6 +140,9 @@ export function Rounds({
                       roundIndex={roundIndex}
                       name={name}
                       record={(id) => record(roundIndex, id)}
+                      onPlayerClick={(id) => {
+                        if (!isUnknownParticipantId(id)) setHistoryPlayerId(id)
+                      }}
                       onUpdate={(matches) => onUpdate(roundIndex, matches)}
                       allMatches={round.matches}
                       winningGames={round.winningGames ?? 1}
@@ -147,6 +157,12 @@ export function Rounds({
           })}
         </div>
       )}
+      <PlayerHistoryDialog
+        player={historyPlayer}
+        rounds={rounds}
+        name={name}
+        onClose={() => setHistoryPlayerId(null)}
+      />
     </>
   )
 }
