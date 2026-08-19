@@ -4,8 +4,9 @@ export {}
 
 declare const self: ServiceWorkerGlobalScope
 
-const cacheName = 'tourny-__APP_VERSION__'
 const baseUrl = new URL('__BASE_URL__', self.location.origin)
+const cachePrefix = `tourny-${encodeURIComponent(baseUrl.pathname)}-`
+const cacheName = `${cachePrefix}__APP_VERSION__`
 const offlineUrls = [
   baseUrl.pathname,
   `${baseUrl.pathname}index.html`,
@@ -29,7 +30,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith('tourny-') && key !== cacheName)
+            .filter((key) => key.startsWith(cachePrefix) && key !== cacheName)
             .map((key) => caches.delete(key)),
         ),
       )
