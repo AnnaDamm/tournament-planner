@@ -1,4 +1,5 @@
 import { defineConfig, transformWithOxc, type Plugin } from 'vite'
+import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
@@ -17,10 +18,12 @@ function serviceWorker(): Plugin {
       const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
         version: string
       }
+      const indexContent = readFileSync(resolve(outputDir, 'index.html'))
+      const buildId = createHash('sha256').update(indexContent).digest('hex').slice(0, 16)
       const source = readFileSync(resolve('src/service-worker.ts'), 'utf8')
         .replace(/^.*<reference lib="webworker".*$/m, '')
         .replace(/^export {}\n/m, '')
-        .replaceAll('__APP_VERSION__', packageJson.version)
+        .replaceAll('__APP_VERSION__', `${packageJson.version}-${buildId}`)
         .replaceAll('__BASE_URL__', base)
       const result = await transformWithOxc(source, 'service-worker.ts', {})
       writeFileSync(resolve(outputDir, 'sw.js'), result.code)

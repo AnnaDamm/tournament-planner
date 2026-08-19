@@ -236,6 +236,7 @@ header {
   padding: 7px;
   color: #76817c;
   cursor: pointer;
+  text-decoration: none;
 }
 .icon-btn:hover {
   background: #f1f4f1;
@@ -871,6 +872,12 @@ select {
   color: #a1aaa5;
   font-weight: 700;
 }
+.match-score {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
 .score {
   margin-left: auto;
   display: flex;
@@ -884,6 +891,10 @@ select {
   border: 1px solid #dfe7e0;
   border-radius: 5px;
   font: 600 13px inherit;
+}
+.score-readonly .score-value {
+  font-size: 18px;
+  font-weight: 800;
 }
 .score b {
   color: #a0aaa5;
@@ -1607,6 +1618,11 @@ aside {
   }
 
   .versus {
+    grid-area: versus;
+    text-align: center;
+  }
+
+  .match-score {
     grid-area: versus;
     text-align: center;
   }

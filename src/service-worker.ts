@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 async function networkFirst(request: Request) {
   const cache = await caches.open(cacheName)
   try {
-    const response = await fetch(request)
+    const response = await fetch(new Request(request, { cache: 'no-store' }))
     if (response.ok) await cache.put(`${baseUrl.pathname}index.html`, response.clone())
     return response
   } catch {

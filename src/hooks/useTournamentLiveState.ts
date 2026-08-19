@@ -48,6 +48,7 @@ export function useTournamentLiveState() {
     setDefaultWinningGames,
     tournamentName,
     setTournamentName,
+    true,
     !readOnly,
   )
 

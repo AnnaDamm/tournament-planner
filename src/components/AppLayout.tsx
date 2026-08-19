@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Lock,
   LockOpen,
   Menu,
   Search,
@@ -93,13 +92,13 @@ export function AppLayout({
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
   )
-  const pathWithSearch = (pathname: string) => ({ pathname, hash: location.hash })
-  const toggleReadOnlyTab = () => {
-    if (isReadOnlyTab) return
-    const url = new URL(window.location.href)
-    url.searchParams.set('readonly', '1')
-    window.location.assign(url)
-  }
+  const pathWithSearch = (pathname: string) => ({
+    pathname,
+    search: location.search,
+    hash: location.hash,
+  })
+  const readOnlyUrl = new URL(window.location.href)
+  readOnlyUrl.searchParams.set('readonly', '1')
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
   const isTablePage = location.pathname === '/table'
   const matchingParticipants = normalizedSearch
@@ -374,20 +373,14 @@ export function AppLayout({
             </>
           )}
           {!readOnly && (
-            <button
+            <a
               className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
-              type="button"
+              href={readOnlyUrl.toString()}
               aria-label={t('enableReadOnly')}
               title={t('enableReadOnly')}
-              disabled={isReadOnlyTab}
-              onClick={toggleReadOnlyTab}
             >
-              {isReadOnlyTab ? (
-                <Lock size={18} aria-hidden="true" />
-              ) : (
-                <LockOpen size={18} aria-hidden="true" />
-              )}
-            </button>
+              <LockOpen size={18} aria-hidden="true" />
+            </a>
           )}
           {!readOnly && (
             <>
