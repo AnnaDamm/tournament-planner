@@ -18,8 +18,7 @@ import { t } from '../i18n'
 import type { Match, Round } from '../storage'
 import type { Participant } from './Players'
 import {
-  getCurrentRoundNumber,
-  getRunningMatchIds,
+  getRunningMatchIdsByRound,
   hasEnteredScore,
   isRoundComplete,
   isUnknownParticipantId,
@@ -62,7 +61,7 @@ export function Rounds({
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
-  const currentRoundNumber = getCurrentRoundNumber(rounds, defaultCourtCount)
+  const runningMatchIdsByRound = getRunningMatchIdsByRound(rounds, defaultCourtCount)
   const formatStartTime = (startedAt: string) => {
     const date = new Date(startedAt)
     return Number.isNaN(date.getTime())
@@ -85,10 +84,7 @@ export function Rounds({
           {rounds.map((round, roundIndex) => {
             const canReorderBye = !isRoundComplete(round)
             const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
-            const runningMatchIds =
-              round.number === currentRoundNumber
-                ? getRunningMatchIds(round, defaultCourtCount)
-                : new Set<string>()
+            const runningMatchIds = runningMatchIdsByRound.get(round.number) ?? new Set<string>()
             return (
               <div className="round-card" key={round.number}>
                 <div className="round-head">
