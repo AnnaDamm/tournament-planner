@@ -15,8 +15,7 @@ import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { t } from '../i18n'
-import type { Match, Round } from '../storage'
-import type { Participant } from './Participant'
+import type { Match, Participant, Round } from '../tournamentTypes'
 import {
   getRunningMatchIdsByRound,
   hasEnteredScore,

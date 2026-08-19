@@ -1,9 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import type { Participant } from './Participant'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { Table, type Stat } from './Table'
-import type { Match, Round } from '../storage'
+import type { Match, Participant, Round } from '../tournamentTypes'
 
 export type AppRoutesProps = {
   tournamentName: string

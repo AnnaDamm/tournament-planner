@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
-import type { Participant } from '../components/Participant'
+import type { Participant, Round } from '../tournamentTypes'
 import {
   loadCourtCount,
   loadDefaultWinningGames,
@@ -8,9 +8,8 @@ import {
   loadParticipants,
   loadRounds,
   loadTournamentName,
-  parseTournamentSnapshot,
-  type Round,
 } from '../storage'
+import { parseTournamentSnapshot } from '../tournamentSnapshot'
 import { useTournamentStorage } from './useTournamentStorage'
 import {
   createParticipant,
