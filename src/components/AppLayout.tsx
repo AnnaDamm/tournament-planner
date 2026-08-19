@@ -83,7 +83,10 @@ export function AppLayout({
   const isSettingsPage = location.pathname === '/settings'
   const searchPopoverRef = useRef<HTMLDivElement>(null)
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
+  const mobileNavTriggerRef = useRef<HTMLButtonElement>(null)
+  const mobileNavCloseRef = useRef<HTMLButtonElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const findingCursorRef = useRef({ key: '', index: -1 })
   const matchCursorRef = useRef({ key: '', index: -1 })
@@ -173,6 +176,11 @@ export function AppLayout({
     document.addEventListener('mousedown', closeOnOutsideClick)
     return () => document.removeEventListener('mousedown', closeOnOutsideClick)
   }, [searchOpen])
+  useEffect(() => {
+    if (!searchOpen) return
+    const frame = requestAnimationFrame(() => searchInputRef.current?.focus())
+    return () => cancelAnimationFrame(frame)
+  }, [searchOpen])
   const closeSearch = () => {
     setSearchOpen(false)
     searchTriggerRef.current?.focus()
@@ -182,7 +190,17 @@ export function AppLayout({
     { label: t('rounds'), target: '/rounds', icon: Trophy },
   ]
 
-  const closeMobileNav = () => mobileNavRef.current?.hidePopover()
+  const closeMobileNav = () => {
+    mobileNavRef.current?.hidePopover()
+    requestAnimationFrame(() => mobileNavTriggerRef.current?.focus())
+  }
+  const handleMobileNavToggle = () => {
+    if (mobileNavRef.current?.matches(':popover-open')) {
+      requestAnimationFrame(() => mobileNavCloseRef.current?.focus())
+    } else {
+      requestAnimationFrame(() => mobileNavTriggerRef.current?.focus())
+    }
+  }
 
   const renderNavigation = (mobile = false) => (
     <>
@@ -194,10 +212,12 @@ export function AppLayout({
           <button
             className="icon-btn mobile-nav-close"
             id="mobile-nav-close"
+            ref={mobileNavCloseRef}
             type="button"
             aria-label={t('close')}
             popoverTarget="mobile-nav"
             popoverTargetAction="hide"
+            onClick={closeMobileNav}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -235,6 +255,7 @@ export function AppLayout({
       <header>
         <button
           className="icon-btn mobile-nav-trigger"
+          ref={mobileNavTriggerRef}
           type="button"
           aria-label={t('menu')}
           aria-controls="mobile-nav"
@@ -273,6 +294,7 @@ export function AppLayout({
                 <div className="search-input-wrap">
                   <Search size={16} aria-hidden="true" />
                   <input
+                    ref={searchInputRef}
                     type="search"
                     list="participant-search-options"
                     value={searchTerm}
@@ -412,6 +434,7 @@ export function AppLayout({
         <nav
           id="mobile-nav"
           ref={mobileNavRef}
+          onToggle={handleMobileNavToggle}
           className="mobile-side-nav"
           aria-label={t('tournamentNavigation')}
           popover="auto"
