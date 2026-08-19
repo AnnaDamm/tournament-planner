@@ -44,6 +44,15 @@ export function DocumentationPage() {
               </ul>
             )}
             {section.note && <div className="docs-note">{section.note}</div>}
+            {section.links && (
+              <p className="docs-links">
+                {section.links.map((link) => (
+                  <NavLink key={link.to} to={link.to}>
+                    {link.label}
+                  </NavLink>
+                ))}
+              </p>
+            )}
           </section>
         ))}
       </article>

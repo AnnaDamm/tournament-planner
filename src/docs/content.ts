@@ -4,7 +4,13 @@ export type DocPage = {
   slug: string
   title: string
   summary: string
-  sections: Array<{ title: string; text?: string[]; items?: string[]; note?: string }>
+  sections: Array<{
+    title: string
+    text?: string[]
+    items?: string[]
+    note?: string
+    links?: Array<{ label: string; to: string }>
+  }>
 }
 
 const en: DocPage[] = [
@@ -18,14 +24,16 @@ const en: DocPage[] = [
         text: [
           'Open Tournament settings using the cog. Set the tournament name, participant type, court count, and default games required to win.',
         ],
+        links: [{ label: 'Open Settings', to: '/settings' }],
       },
       {
         title: 'Add participants',
         items: [
-          'Open Players or Teams and select Edit.',
+          'Open the table and select Edit.',
           'Select Add, enter one name per line, and confirm.',
           'At least two active participants are required. Duplicate names are allowed but produce a warning.',
         ],
+        links: [{ label: 'Open Table', to: '/table' }],
       },
       {
         title: 'Create and start a round',
@@ -33,6 +41,7 @@ const en: DocPage[] = [
           'Open Rounds and select Create round. The first round is randomized; with an odd participant count, one participant receives a bye.',
           'Before entering scores, you may reroll, swap participants or the bye using drag and drop, and override round settings. Start the first round with the play button.',
         ],
+        links: [{ label: 'Open Rounds', to: '/rounds' }],
       },
       {
         title: 'Results and later rounds',
@@ -53,6 +62,7 @@ const en: DocPage[] = [
         text: [
           'The default is Tourny and the maximum is 80 characters. The name appears in the header, browser title, and export and determines the export filename. An empty name becomes Tourny.',
         ],
+        links: [{ label: 'Open Settings', to: '/settings' }],
       },
       {
         title: 'Participant type',
@@ -90,32 +100,6 @@ const en: DocPage[] = [
     ],
   },
   {
-    slug: 'participants',
-    title: 'Players and teams',
-    summary: 'Add, edit, withdraw, restore, and inspect participants.',
-    sections: [
-      {
-        title: 'Adding and editing',
-        text: [
-          'Every non-empty line creates one participant and surrounding whitespace is removed. Duplicate names are allowed with a warning.',
-          'Renaming updates existing pairings through stable IDs. Deleting leaves old matches behind; the participant may appear as unknown and those matches no longer count.',
-        ],
-      },
-      {
-        title: 'Withdrawals',
-        text: [
-          'Withdrawn participants remain visible and retain results but are excluded from new pairings and byes. Restoring affects only subsequently created or rerolled rounds.',
-        ],
-      },
-      {
-        title: 'Match history',
-        text: [
-          'Select a name outside editing mode or inside a round to see opponents, scores, and Won, Lost, or Pending status.',
-        ],
-      },
-    ],
-  },
-  {
     slug: 'rounds-and-pairings',
     title: 'Rounds and pairings',
     summary: 'Swiss pairing, byes, unknown positions, and concurrent courts.',
@@ -126,6 +110,7 @@ const en: DocPage[] = [
           'Active participants are grouped by win-loss record and randomized within those groups. Rematches are avoided whenever a complete rematch-free solution exists.',
           'Odd groups receive a compatible participant from the next-lower win group where possible. A random fallback can contain a rematch.',
         ],
+        links: [{ label: 'Open Rounds', to: '/rounds' }],
       },
       {
         title: 'Byes',
@@ -193,6 +178,7 @@ const en: DocPage[] = [
         text: [
           'Every heading is sortable, but the position number always follows the official criteria. (-n) means n fewer counted results than the maximum. Withdrawn participants remain visible.',
         ],
+        links: [{ label: 'Open Table', to: '/table' }],
       },
     ],
   },
@@ -284,14 +270,16 @@ const de: DocPage[] = [
         text: [
           'Öffne über das Zahnrad die Turniereinstellungen und lege Name, Teilnehmendentyp, Spielfelder und Gewinnsätze fest.',
         ],
+        links: [{ label: 'Einstellungen öffnen', to: '/settings' }],
       },
       {
         title: 'Teilnehmende hinzufügen',
         items: [
-          'Öffne Spieler oder Teams und wähle Bearbeiten.',
+          'Öffne die Tabelle und wähle Bearbeiten.',
           'Wähle Hinzufügen, trage pro Zeile einen Namen ein und bestätige.',
           'Mindestens zwei aktive Teilnehmende sind nötig. Doppelte Namen erzeugen eine Warnung.',
         ],
+        links: [{ label: 'Tabelle öffnen', to: '/table' }],
       },
       {
         title: 'Runde erstellen und starten',
@@ -299,6 +287,7 @@ const de: DocPage[] = [
           'Unter Runden wird die erste Runde zufällig gepaart; bei ungerader Anzahl erhält eine Person ein Bye.',
           'Vor Ergebnissen kannst du neu auslosen, Namen oder Bye ziehen und Rundeneinstellungen ändern. Starte über das Play-Symbol.',
         ],
+        links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
       {
         title: 'Ergebnisse und Folgerunden',
@@ -319,6 +308,7 @@ const de: DocPage[] = [
         text: [
           'Standard ist Tourny, maximal 80 Zeichen. Der Name erscheint in Kopfbereich, Browsertitel und Export. Leer wird zu Tourny.',
         ],
+        links: [{ label: 'Einstellungen öffnen', to: '/settings' }],
       },
       {
         title: 'Teilnehmendentyp',
@@ -356,32 +346,6 @@ const de: DocPage[] = [
     ],
   },
   {
-    slug: 'participants',
-    title: 'Spieler und Teams',
-    summary: 'Hinzufügen, bearbeiten, zurückziehen, reaktivieren und Historie ansehen.',
-    sections: [
-      {
-        title: 'Hinzufügen und bearbeiten',
-        text: [
-          'Jede nichtleere Zeile erzeugt einen Eintrag. Doppelte Namen sind mit Warnung erlaubt.',
-          'Umbenennen aktualisiert Paarungen. Löschen lässt alte Begegnungen zurück; die Person kann unbekannt erscheinen und wird nicht mehr gewertet.',
-        ],
-      },
-      {
-        title: 'Teilnahme aufgeben',
-        text: [
-          'Zurückgezogene Personen bleiben sichtbar und behalten Ergebnisse, werden aber von neuen Paarungen und Byes ausgeschlossen. Reaktivieren wirkt erst auf neue oder neu ausgeloste Runden.',
-        ],
-      },
-      {
-        title: 'Spielhistorie',
-        text: [
-          'Ein Klick auf einen Namen zeigt Gegner, Ergebnisse und den Status Gewonnen, Verloren oder Offen.',
-        ],
-      },
-    ],
-  },
-  {
     slug: 'rounds-and-pairings',
     title: 'Runden und Paarungen',
     summary: 'Schweizer System, Byes, unbekannte Plätze und parallele Spielfelder.',
@@ -392,6 +356,7 @@ const de: DocPage[] = [
           'Aktive Teilnehmende werden nach Siegen und Niederlagen gruppiert und zufällig gepaart. Rematches werden vermieden, wenn eine vollständige Lösung existiert.',
           'Ungerade Gruppen erhalten möglichst jemanden aus der nächstniedrigeren Sieggruppe; die Zufallsreserve kann einen Rematch enthalten.',
         ],
+        links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
       {
         title: 'Byes',
@@ -459,6 +424,7 @@ const de: DocPage[] = [
         text: [
           'Spalten sind sortierbar, die Positionsnummer bleibt offiziell. (-n) zeigt weniger gewertete Ergebnisse. Zurückgezogene bleiben sichtbar.',
         ],
+        links: [{ label: 'Tabelle öffnen', to: '/table' }],
       },
     ],
   },
