@@ -31,6 +31,7 @@ export function useTournamentStorage(
   tournamentName: string,
   setTournamentName: (value: string) => void,
   enabled = true,
+  writable = enabled,
 ) {
   const skipRemoteSave = useRef<Set<StorageKey>>(new Set())
 
@@ -55,33 +56,33 @@ export function useTournamentStorage(
     enabled,
   ])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('players')) return
     saveParticipants(players)
-  }, [enabled, players])
+  }, [enabled, players, writable])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('rounds')) return
     saveRounds(rounds)
-  }, [enabled, rounds])
+  }, [enabled, rounds, writable])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('participantType')) return
     saveParticipantType(participantType)
-  }, [enabled, participantType])
+  }, [enabled, participantType, writable])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('courtCount')) return
     saveCourtCount(courtCount)
-  }, [courtCount, enabled])
+  }, [courtCount, enabled, writable])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('defaultWinningGames')) return
     saveDefaultWinningGames(defaultWinningGames)
-  }, [defaultWinningGames, enabled])
+  }, [defaultWinningGames, enabled, writable])
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('tournamentName')) return
     saveTournamentName(tournamentName)
-  }, [enabled, tournamentName])
+  }, [enabled, tournamentName, writable])
 }
