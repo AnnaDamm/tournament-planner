@@ -21,13 +21,13 @@ function inlineAssets(): Plugin {
         if (fileName.endsWith('.css'))
           source = source.replace(
             new RegExp(`<link[^>]*href="${assetUrl}"[^>]*>`),
-            `<style>${content}</style>`,
+            () => `<style>${content}</style>`,
           )
         if (fileName.endsWith('.js')) {
           const safeContent = content.replace(/<\/script/gi, '<\\/script')
           source = source.replace(
             new RegExp(`<script[^>]*src="${assetUrl}"[^>]*><\\/script>`),
-            `<script>${safeContent}</script>`,
+            () => `<script>${safeContent}</script>`,
           )
         }
         unlinkSync(filePath)
