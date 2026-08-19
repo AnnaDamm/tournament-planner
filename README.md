@@ -12,7 +12,7 @@ A small local React/Vite application for organising badminton tournaments with S
 Start the Vite development server:
 
 ```bash
-docker compose up
+docker compose up --build
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
@@ -23,13 +23,28 @@ Stop the server with `Ctrl+C`, or run:
 docker compose down
 ```
 
-The Compose setup uses the current `node:lts-alpine` image. Dependencies are installed when the container starts, and the project directory is mounted for live reload.
+The Compose setup builds the local `Dockerfile` from the current `node:lts-alpine` image, enables pnpm through Corepack, and mounts the project directory for live reload.
+
+Run quality checks inside Docker:
+
+```bash
+docker compose run --rm app pnpm lint
+docker compose run --rm app pnpm lint:fix
+docker compose run --rm app pnpm typecheck
+```
+
+The pre-commit hook is configured automatically by `pnpm install` and runs Prettier, Oxlint and TypeScript checks before every commit. To enable it manually in an existing checkout:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 ## Development without Docker
 
 ```bash
-npm install
-npm run dev
+corepack enable
+pnpm install
+pnpm dev
 ```
 
 Then open [http://localhost:5173](http://localhost:5173).
@@ -39,17 +54,33 @@ Then open [http://localhost:5173](http://localhost:5173).
 Create a production build locally:
 
 ```bash
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 The generated files are written to `dist/`. Preview the production build with:
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 The preview server is available at [http://localhost:4173](http://localhost:4173).
+
+## Code quality
+
+Run the checks locally without Docker:
+
+```bash
+pnpm lint
+pnpm lint:fix
+pnpm typecheck
+pnpm format
+pnpm format:check
+```
+
+Prettier is the project formatter for React and TypeScript files. GitHub Actions runs Oxlint, Prettier and the TypeScript check on every push and pull request. The pre-commit hook checks all three before allowing a commit.
+
+Oxlint enforces one React component per file and a maximum of 200 lines per function or component.
 
 ## GitHub releases
 

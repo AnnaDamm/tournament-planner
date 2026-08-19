@@ -1,0 +1,8 @@
+{
+  "$schema": "https://oxc.rs/schema/oxlint.json",
+  "plugins": ["eslint", "react"],
+  "rules": {
+    "react/no-multi-comp": "error",
+    "eslint/max-lines-per-function": ["error", 200]
+  }
+}

@@ -1,25 +1,238 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Plus, Trash2, Users, Trophy, Swords, Settings, GripVertical, X } from 'lucide-react';
-import './style.css';
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import './styles.css'
+import { locale, t } from './i18n'
+import { AppDialogs } from './components/AppDialogs'
+import { AppLayout } from './components/AppLayout'
+import { AppRoutes } from './components/AppRoutes'
+import type { Participant } from './components/Players'
+import {
+  loadParticipantType,
+  loadParticipants,
+  loadRounds,
+  saveParticipantType,
+  saveParticipants,
+  saveRounds,
+  type Round,
+} from './storage'
+import {
+  calculateStandings,
+  createRoundPlan,
+  fillUnknownRound,
+  getCurrentRoundNumber,
+  hasEnteredScore,
+  isRoundComplete,
+  isUnknownParticipantId,
+} from './tournament'
 
-type Player = { id:string; name:string };
-type Match = { id:string; a:string; b:string|null; aSets:number|null; bSets:number|null; aPoints:number[]; bPoints:number[]; bye?:boolean };
-type Round = { id:string; number:number; matches:Match[] };
-type Data = { players:Player[]; rounds:Round[]; setsToWin:number; byeMode:'ask'|'auto' };
-const blank:Data={players:[],rounds:[],setsToWin:2,byeMode:'auto'};
-const load=():Data=>{try{return {...blank,...JSON.parse(localStorage.getItem('badminton-data')||'{}')}}catch{return blank}};
-const uid=()=>Math.random().toString(36).slice(2,10);
+const uid = () => Math.random().toString(36).slice(2, 9)
 
-function App(){
- const [data,setData]=useState<Data>(load),[page,setPage]=useState('Spieler'),[showAdd,setShowAdd]=useState(false),[names,setNames]=useState(''),[sort,setSort]=useState('points'),[drag,setDrag]=useState<string|null>(null);
- useEffect(()=>localStorage.setItem('badminton-data',JSON.stringify(data)),[data]);
- const scores=useMemo(()=>{const s:Record<string,{w:number;l:number;p:number;o:number}>={};data.players.forEach(p=>s[p.id]={w:0,l:0,p:0,o:0}); data.rounds.forEach(r=>r.matches.forEach(m=>{if(!m.b||m.aSets===null||m.bSets===null)return; const a=s[m.a],b=s[m.b]; a.p+=(m.aPoints.reduce((x,y)=>x+y,0));b.p+=(m.bPoints.reduce((x,y)=>x+y,0)); a.o+=m.bPoints.reduce((x,y)=>x+y,0);b.o+=m.aPoints.reduce((x,y)=>x+y,0); if(m.aSets>m.bSets){a.w++;b.l++}else{b.w++;a.l++}}));return s},[data]);
- const update=(fn:(d:Data)=>void)=>setData(d=>{const n=structuredClone(d);fn(n);return n});
- const add=()=>{const ns=names.split('\n').map(x=>x.trim()).filter(Boolean).map(name=>({id:uid(),name}));update(d=>d.players.push(...ns));setNames('');setShowAdd(false)};
- const makeRound=()=>{if(data.players.length<2)return; const groups:Record<number,Player[]>={}; data.players.forEach(p=>{const w=scores[p.id]?.w||0;(groups[w]??=[]).push(p)}); const matches:Match[]=[];Object.values(groups).forEach(g=>{g.sort(()=>Math.random()-.5);while(g.length>1){const a=g.pop()!,b=g.pop()!;matches.push({id:uid(),a:a.id,b:b.id,aSets:null,bSets:null,aPoints:Array(data.setsToWin*2-1).fill(0),bPoints:Array(data.setsToWin*2-1).fill(0)})}if(g.length){let winner=g[0];if(data.byeMode==='ask'){const answer=window.prompt(`Ungerade Gruppe: Wer erhält das Freilos?\n${g[0].name}`);if(answer?.trim())winner=g.find(p=>p.name.toLowerCase()===answer.trim().toLowerCase())||winner}matches.push({id:uid(),a:winner.id,b:null,aSets:data.setsToWin,bSets:0,aPoints:[],bPoints:[],bye:true})}});update(d=>d.rounds.push({id:uid(),number:d.rounds.length+1,matches}))};
- const swap=(mid:string,target:string)=>{if(!drag||drag===target)return;update(d=>{const r=d.rounds.find(x=>x.id===drag.split(':')[0]);if(!r)return;const m=r.matches.find(x=>x.id===drag.split(':')[1]);const t=r.matches.flatMap(x=>[x.a,x.b]).findIndex(x=>x===target);const tm=r.matches.flatMap(x=>x);if(m&&t>=0){const old=m.a;m.a=target;const other=tm[t] as string;if(r.matches.flatMap(x=>[x.a,x.b]).includes(old)){for(const z of r.matches){if(z.a===target&&z.id!==m.id)z.a=old;else if(z.b===target&&z.id!==m.id)z.b=old}}}});setDrag(null)};
- const pname=(id:string|null)=>id?data.players.find(p=>p.id===id)?.name||'Unbekannt':'Freilos';
- return <div className="min-h-screen bg-slate-950 text-slate-100"><header className="border-b border-slate-800 bg-slate-900/90"><div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"><div><p className="text-xs font-bold uppercase tracking-[.25em] text-cyan-400">Badminton</p><h1 className="text-2xl font-bold">Turnierverwaltung</h1></div><nav className="flex gap-1">{[['Spieler',Users],['Tabelle',Trophy],['Runden',Swords],['Einstellungen',Settings]].map(([n,I]:any)=><button onClick={()=>setPage(n)} className={`nav ${page===n?'active':''}`}><I size={16}/>{n}</button>)}</nav></div></header><main className="mx-auto max-w-6xl px-5 py-8">{page==='Spieler'&&<section><div className="mb-6 flex items-center justify-between"><div><h2>Spieler</h2><p className="muted">{data.players.length} Teilnehmer registriert</p></div><button className="btn" onClick={()=>setShowAdd(true)}><Plus size={17}/> Spieler hinzufügen</button></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{data.players.map((p,i)=><div className="card flex items-center justify-between"><span><span className="mr-3 text-slate-500">{String(i+1).padStart(2,'0')}</span>{p.name}</span><button className="icon danger" onClick={()=>update(d=>d.players=d.players.filter(x=>x.id!==p.id))}><Trash2 size={16}/></button></div>)}</div>{!data.players.length&&<div className="empty">Noch keine Spieler. Füge Namen einzeln oder per Zeilenliste hinzu.</div>}</section>}{page==='Tabelle'&&<section><h2>Tabelle</h2><p className="muted mb-6">Aktueller Stand nach allen abgeschlossenen Spielen</p><div className="table-wrap"><table><thead><tr>{[['name','Name'],['w','Siege'],['l','Niederlagen'],['p','Punkte'],['diff','Punktedifferenz']].map(([k,n])=><th onClick={()=>setSort(k)}>{n} {sort===k?'↓':''}</th>)}</tr></thead><tbody>{[...data.players].sort((a,b)=>{const x=scores[a.id],y=scores[b.id];return sort==='name'?a.name.localeCompare(b.name):sort==='w'?y.w-x.w:sort==='l'?x.l-y.l:sort==='diff'?(y.p-y.o)-(x.p-x.o):y.p-x.p}).map(p=><tr><td>{p.name}</td><td>{scores[p.id].w}</td><td>{scores[p.id].l}</td><td>{scores[p.id].p}:{scores[p.id].o}</td><td className={scores[p.id].p-scores[p.id].o>=0?'pos':'neg'}>{scores[p.id].p-scores[p.id].o>0?'+':''}{scores[p.id].p-scores[p.id].o}</td></tr>)}</tbody></table></div></section>}{page==='Runden'&&<section><div className="mb-6 flex items-center justify-between"><div><h2>Runden</h2><p className="muted">Paarungen und Ergebnisse</p></div><button className="btn" onClick={makeRound}><Plus size={17}/> Runde automatisch erstellen</button></div>{data.rounds.map(r=><div className="round"><h3>Runde {r.number}</h3>{r.matches.map(m=><div className="match"><div draggable onDragStart={()=>setDrag(`${r.id}:${m.id}`)} onDragOver={e=>e.preventDefault()} onDrop={()=>swap(m.id,m.b||'')} className="player"><GripVertical size={15}/>{pname(m.a)}</div><span className="versus">{m.bye?'FREILOS':'vs.'}</span><div draggable onDragOver={e=>e.preventDefault()} onDrop={()=>swap(m.id,m.a)} className="player">{pname(m.b)}<GripVertical size={15}/></div>{!m.bye&&<div className="scores">{Array.from({length:data.setsToWin*2-1},(_,i)=><input type="number" min="0" placeholder={`S${i+1}`} value={m.aPoints[i]||''} onChange={e=>update(d=>{const mm=d.rounds.find(x=>x.id===r.id)!.matches.find(x=>x.id===m.id)!;mm.aPoints[i]=+e.target.value})} onBlur={()=>update(d=>{const mm=d.rounds.find(x=>x.id===r.id)!.matches.find(x=>x.id===m.id)!;mm.aSets=mm.aPoints.filter((v,j)=>v>(mm.bPoints[j]||0)).length;mm.bSets=mm.bPoints.filter((v,j)=>v>(mm.aPoints[j]||0)).length})}/>)}</div>}</div>)}</div>)}</section>}{page==='Einstellungen'&&<section className="max-w-xl"><h2>Einstellungen</h2><label>Gewinnsätze pro Spiel<input type="number" min="1" value={data.setsToWin} onChange={e=>setData({...data,setsToWin:Math.max(1,+e.target.value)})}/></label><p className="muted mt-3">Pro Satz gewinnt automatisch der Spieler mit den meisten Punkten. Ergebnisse werden beim Verlassen des Feldes ausgewertet.</p></section>}</main>{showAdd&&<dialog open className="modal"><button className="close" onClick={()=>setShowAdd(false)}><X/></button><h2>Spieler hinzufügen</h2><p className="muted">Ein Name pro Zeile – auch viele auf einmal.</p><textarea autoFocus value={names} onChange={e=>setNames(e.target.value)} placeholder="Anna Müller\nMax Mustermann"/><button className="btn mt-4" onClick={add}><Plus size={17}/> Hinzufügen</button></dialog>}</div>
+const toggleWithdrawal = (setPlayers: Dispatch<SetStateAction<Participant[]>>, id: string) =>
+  setPlayers((current) =>
+    current.map((player) =>
+      player.id === id ? { ...player, withdrawn: !player.withdrawn } : player,
+    ),
+  )
+
+function App() {
+  const [players, setPlayers] = useState<Participant[]>(loadParticipants)
+  const [rounds, setRounds] = useState<Round[]>(loadRounds)
+  const [participantType, setParticipantType] = useState<'players' | 'teams'>(loadParticipantType)
+  const [sort, setSort] = useState('wins')
+  const [desc, setDesc] = useState(true)
+  const [draft, setDraft] = useState('')
+  const bulkRef = useRef<HTMLDialogElement>(null)
+  const confirmRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => saveParticipants(players), [players])
+  useEffect(() => saveRounds(rounds), [rounds])
+  useEffect(() => saveParticipantType(participantType), [participantType])
+
+  const standings = useMemo(() => calculateStandings(players, rounds), [players, rounds])
+  const standingsBeforeRounds = useMemo(
+    () => rounds.map((_, index) => calculateStandings(players, rounds.slice(0, index))),
+    [players, rounds],
+  )
+  const stats = useMemo(
+    () =>
+      standings.map((player) => ({
+        ...player,
+        played: player.wins + player.losses,
+        diff: player.scored - player.conceded,
+        points: player.scored,
+      })),
+    [standings],
+  )
+  const sorted = useMemo(
+    () =>
+      [...stats].sort((a, b) => {
+        const value =
+          sort === 'name'
+            ? a.name.localeCompare(b.name)
+            : Number(a[sort as keyof typeof a]) - Number(b[sort as keyof typeof b])
+        return (desc ? -1 : 1) * (value || a.name.localeCompare(b.name))
+      }),
+    [stats, sort, desc],
+  )
+
+  const participantLabel = participantType === 'teams' ? t('teams') : t('players')
+  const participantPlural = participantType === 'teams' ? t('allTeams') : t('all')
+  const name = (id: string) =>
+    isUnknownParticipantId(id)
+      ? t('notYetKnown')
+      : players.find((player) => player.id === id)?.name || t('unknown')
+  const recordBeforeRound = (roundIndex: number, id: string) => {
+    const player = standingsBeforeRounds[roundIndex]?.find((item) => item.id === id)
+    return player ? `${player.wins}:${player.losses}` : '—'
+  }
+  const toggleSort = (key: string) =>
+    sort === key ? setDesc((value) => !value) : (setSort(key), setDesc(key !== 'name'))
+  const updateRound = (index: number, matches: Round['matches']) =>
+    setRounds((current) =>
+      current.map((round, roundIndex) => (roundIndex === index ? { ...round, matches } : round)),
+    )
+  const swapRoundPlayers = (roundIndex: number, draggedId: string, targetId: string) => {
+    if (!draggedId || draggedId === targetId) return
+    setRounds((current) =>
+      current.map((round, index) => {
+        if (index !== roundIndex) return round
+        if (isRoundComplete(round)) return round
+        const draggedMatch = round.matches.find(
+          (match) => match.a === draggedId || match.b === draggedId,
+        )
+        const targetMatch = round.matches.find(
+          (match) => match.a === targetId || match.b === targetId,
+        )
+        if (draggedMatch && hasEnteredScore(draggedMatch)) return round
+        if (targetMatch && hasEnteredScore(targetMatch)) return round
+        return {
+          ...round,
+          bye: round.bye === draggedId ? targetId : round.bye === targetId ? draggedId : round.bye,
+          matches: round.matches.map((match) => ({
+            ...match,
+            a: match.a === draggedId ? targetId : match.a === targetId ? draggedId : match.a,
+            b: match.b === draggedId ? targetId : match.b === targetId ? draggedId : match.b,
+          })),
+        }
+      }),
+    )
+  }
+
+  const makeRound = () =>
+    players.filter((player) => !player.withdrawn).length < 2
+      ? undefined
+      : setRounds((current) => {
+          const number = current.length + 1
+          const plan = createRoundPlan(players, current, number)
+          return [
+            ...current,
+            {
+              number,
+              bye: plan.bye,
+              winningGames: 1,
+              matches: plan.matches,
+              standings: plan.standings,
+            },
+          ]
+        })
+  const addBulk = () => {
+    const names = draft
+      .split('\n')
+      .map((nameValue) => nameValue.trim())
+      .filter(Boolean)
+    setPlayers((current) => [
+      ...current,
+      ...names.map((nameValue) => ({
+        id: uid(),
+        name: nameValue,
+        wins: 0,
+        losses: 0,
+        scored: 0,
+        conceded: 0,
+      })),
+    ])
+    setDraft('')
+    bulkRef.current?.close()
+  }
+  const rename = (player: Participant, value: string) =>
+    setPlayers((current) =>
+      current.map((item) => (item.id === player.id ? { ...item, name: value } : item)),
+    )
+  const deleteAll = () => {
+    setPlayers([])
+    setRounds([])
+    confirmRef.current?.close()
+  }
+
+  useEffect(() => {
+    document.documentElement.lang = locale
+  }, [])
+
+  return (
+    <AppLayout
+      participantLabel={participantLabel}
+      playerCount={players.filter((player) => !player.withdrawn).length}
+      roundCount={rounds.length}
+      currentRound={getCurrentRoundNumber(rounds)}
+    >
+      <AppRoutes
+        players={players}
+        participantLabel={participantLabel}
+        participantPlural={participantPlural}
+        rounds={rounds}
+        participantType={participantType}
+        name={name}
+        record={recordBeforeRound}
+        sorted={sorted}
+        desc={desc}
+        onAdd={() => bulkRef.current?.showModal()}
+        onDeleteParticipant={(id) =>
+          setPlayers((current) => current.filter((player) => player.id !== id))
+        }
+        onRename={rename}
+        onToggleWithdraw={(id) => toggleWithdrawal(setPlayers, id)}
+        onToggleSort={toggleSort}
+        onCreateRound={makeRound}
+        onUpdateRound={updateRound}
+        onSetWinningGames={(number, value) =>
+          setRounds((current) =>
+            current.map((round) =>
+              round.number === number ? { ...round, winningGames: value } : round,
+            ),
+          )
+        }
+        onDeleteRound={(number) =>
+          setRounds((current) => current.filter((round) => round.number !== number))
+        }
+        onFillUnknown={(number) =>
+          setRounds((current) => {
+            const index = current.findIndex((round) => round.number === number)
+            if (index < 0) return current
+            const previousRounds = current.slice(0, index)
+            const filled = fillUnknownRound(current[index], players, previousRounds)
+            return current.map((round, roundIndex) => (roundIndex === index ? filled : round))
+          })
+        }
+        onSwapPlayers={swapRoundPlayers}
+        setParticipantType={setParticipantType}
+        onDeleteAll={() => confirmRef.current?.showModal()}
+      />
+      <AppDialogs
+        participantType={participantType}
+        bulkRef={bulkRef}
+        confirmRef={confirmRef}
+        draft={draft}
+        setDraft={setDraft}
+        onAdd={addBulk}
+        onDeleteAll={deleteAll}
+      />
+    </AppLayout>
+  )
 }
-createRoot(document.getElementById('root')!).render(<App/>);
+
+createRoot(document.getElementById('root')!).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
+)

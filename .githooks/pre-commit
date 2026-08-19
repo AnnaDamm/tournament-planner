@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+changed_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(css|html|js|jsx|json|md|ts|tsx|yml|yaml)$' || true)
+
+if [ -n "$changed_files" ]; then
+  echo "Checking Prettier formatting on staged files..."
+  docker compose run --rm app pnpm exec prettier --check $changed_files
+
+  echo "Running Oxlint on staged files..."
+  lint_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$' || true)
+  if [ -n "$lint_files" ]; then
+    docker compose run --rm app pnpm exec oxlint $lint_files
+  fi
+fi
+
+echo "Running TypeScript check..."
+docker compose run --rm app pnpm typecheck
