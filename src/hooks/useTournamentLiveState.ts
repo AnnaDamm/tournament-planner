@@ -7,7 +7,7 @@ import {
   loadRounds,
   loadTournamentName,
 } from '../storage'
-import { getLocalSession } from '../liveSharing'
+import { getLocalSession, isReadOnlyTab } from '../liveSharing'
 import { startReadyRounds } from '../tournament'
 import type { Participant, Round, TournamentSnapshot } from '../tournamentTypes'
 import { useLiveTournamentSync } from './useLiveTournamentSync'
@@ -15,21 +15,24 @@ import { useTournamentStorage } from './useTournamentStorage'
 
 export function useTournamentLiveState() {
   const localSession = useMemo(() => getLocalSession(), [])
+  const readOnlyTab = isReadOnlyTab()
   const localMaster = localSession?.role === 'master' ? localSession : null
-  const readOnly = localSession?.role === 'viewer'
-  const [players, setPlayers] = useState<Participant[]>(() => (readOnly ? [] : loadParticipants()))
+  const isViewer = localSession?.role === 'viewer'
+  const readOnly = isViewer || readOnlyTab
+  const syncSession = readOnlyTab ? null : localSession
+  const [players, setPlayers] = useState<Participant[]>(() => (isViewer ? [] : loadParticipants()))
   const [tournamentName, setTournamentName] = useState(() =>
-    readOnly ? 'Tourny' : loadTournamentName(),
+    isViewer ? 'Tourny' : loadTournamentName(),
   )
-  const [courtCount, setCourtCount] = useState(() => (readOnly ? 1 : loadCourtCount()))
+  const [courtCount, setCourtCount] = useState(() => (isViewer ? 1 : loadCourtCount()))
   const [defaultWinningGames, setDefaultWinningGames] = useState(() =>
-    readOnly ? 1 : loadDefaultWinningGames(),
+    isViewer ? 1 : loadDefaultWinningGames(),
   )
   const [rounds, setRounds] = useState<Round[]>(() =>
-    readOnly ? [] : startReadyRounds(loadRounds(), loadCourtCount()),
+    isViewer ? [] : startReadyRounds(loadRounds(), loadCourtCount()),
   )
   const [participantType, setParticipantType] = useState<'players' | 'teams'>(() =>
-    readOnly ? 'players' : loadParticipantType(),
+    isViewer ? 'players' : loadParticipantType(),
   )
 
   useTournamentStorage(
@@ -62,7 +65,7 @@ export function useTournamentLiveState() {
   )
 
   const isLive = useLiveTournamentSync({
-    session: localSession,
+    session: syncSession,
     snapshot,
     onSnapshot: (incoming) => {
       setTournamentName(incoming.tournamentName)

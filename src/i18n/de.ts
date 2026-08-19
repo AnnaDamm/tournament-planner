@@ -102,6 +102,7 @@ export const de: Translation = {
   qrError: 'Der QR-Code konnte nicht erzeugt werden.',
   liveConnectionOnline: 'Live-Verbindung aktiv',
   liveConnectionOffline: 'Nicht live — erneuter Verbindungsversuch',
+  enableReadOnly: 'Read-only-Ansicht aktivieren',
   skipToContent: 'Zum Hauptinhalt springen',
   tournamentNavigation: 'Turniernavigation',
   searchResults: 'Treffer',

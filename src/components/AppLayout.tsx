@@ -6,9 +6,10 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Lock,
+  LockOpen,
   Menu,
   Search,
-  QrCode,
   Settings2,
   Trophy,
   X,
@@ -79,6 +80,7 @@ export function AppLayout({
   const navigate = useNavigate()
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
+  const isReadOnlyTab = new URLSearchParams(location.search).get('readonly') === '1'
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
   const searchPopoverRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -92,6 +94,13 @@ export function AppLayout({
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
   )
   const pathWithSearch = (pathname: string) => ({ pathname, hash: location.hash })
+  const toggleReadOnlyTab = () => {
+    if (isReadOnlyTab) return
+    const params = new URLSearchParams(location.search)
+    params.set('readonly', '1')
+    const query = params.toString()
+    window.location.assign(`${location.pathname}${query ? `?${query}` : ''}${location.hash}`)
+  }
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
   const isTablePage = location.pathname === '/table'
   const matchingParticipants = normalizedSearch
@@ -354,14 +363,6 @@ export function AppLayout({
           </button>
           {localMaster && (
             <>
-              <button
-                className="icon-btn"
-                aria-label={t('viewerQrCode')}
-                title={t('viewerQrCode')}
-                onClick={() => navigate(pathWithSearch('/share'))}
-              >
-                <QrCode size={18} aria-hidden="true" />
-              </button>
               <output
                 className={`live-indicator ${isLive ? 'is-live' : 'is-offline'}`}
                 aria-label={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
@@ -371,6 +372,20 @@ export function AppLayout({
               </output>
             </>
           )}
+          <button
+            className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
+            type="button"
+            aria-label={t('enableReadOnly')}
+            title={t('enableReadOnly')}
+            disabled={isReadOnlyTab}
+            onClick={toggleReadOnlyTab}
+          >
+            {isReadOnlyTab ? (
+              <Lock size={18} aria-hidden="true" />
+            ) : (
+              <LockOpen size={18} aria-hidden="true" />
+            )}
+          </button>
           {!readOnly && (
             <>
               <button

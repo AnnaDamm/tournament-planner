@@ -19,6 +19,9 @@ export type LocalViewerConfig = { role: 'viewer' }
 
 export type LocalSession = LocalMasterConfig | LocalViewerConfig
 
+export const isReadOnlyTab = () =>
+  new URLSearchParams(window.location.search).get('readonly') === '1'
+
 const isViewerUrl = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
 

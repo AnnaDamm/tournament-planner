@@ -3,7 +3,6 @@ import { createReadStream } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { extname, join, normalize, resolve } from 'node:path'
-import { getLanAddress } from './localNetwork.js'
 
 type Snapshot = Record<string, unknown>
 
@@ -26,8 +25,8 @@ const mimeTypes: Record<string, string> = {
   '.webmanifest': 'application/manifest+json',
 }
 
-const getViewerUrl = () =>
-  process.env.TOURNY_VIEWER_URL || `http://${getLanAddress() ?? '127.0.0.1'}:${port}/`
+const getViewerUrl = (request: IncomingMessage) =>
+  process.env.TOURNY_VIEWER_URL || `http://${request.headers.host ?? `127.0.0.1:${port}`}/`
 
 const getHostname = (request: IncomingMessage) => {
   const host = request.headers.host ?? ''
@@ -72,7 +71,7 @@ const isSnapshot = (value: unknown): value is Snapshot =>
 
 const renderIndex = (request: IncomingMessage) => {
   const config = isMasterRequest(request)
-    ? { mode: 'local', role: 'master', viewerUrl: getViewerUrl(), relayToken: masterToken }
+    ? { mode: 'local', role: 'master', viewerUrl: getViewerUrl(request), relayToken: masterToken }
     : { mode: 'local', role: 'viewer' }
   const script = `<script>window.__TOURNY_LIVE_CONFIG__=${JSON.stringify(config)}</script>`
   return indexTemplate.replace(/<script id="tourny-runtime-config">[\s\S]*?<\/script>/, script)
@@ -159,5 +158,4 @@ const server = createServer(async (request, response) => {
 
 server.listen(port, '0.0.0.0', () => {
   console.log(`Tourny master: http://localhost:${port}/`)
-  console.log(`Viewer URL: ${getViewerUrl()}`)
 })
