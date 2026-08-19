@@ -1,8 +1,32 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, transformWithOxc, type Plugin } from 'vite'
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+
+function serviceWorker(): Plugin {
+  let outputDir = resolve('dist')
+  let base = '/'
+  return {
+    name: 'service-worker',
+    configResolved(config) {
+      outputDir = resolve(config.root, config.build.outDir)
+      base = config.base
+    },
+    async closeBundle() {
+      const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
+        version: string
+      }
+      const source = readFileSync(resolve('src/service-worker.ts'), 'utf8')
+        .replace(/^.*<reference lib="webworker".*$/m, '')
+        .replace(/^export {}\n/m, '')
+        .replaceAll('__APP_VERSION__', packageJson.version)
+        .replaceAll('__BASE_URL__', base)
+      const result = await transformWithOxc(source, 'service-worker.ts', {})
+      writeFileSync(resolve(outputDir, 'sw.js'), result.code)
+    },
+  }
+}
 
 function inlineAssets(): Plugin {
   let outputDir = resolve('dist')
@@ -44,7 +68,7 @@ function inlineAssets(): Plugin {
 export default defineConfig(({ mode }) => ({
   root: 'src',
   base: mode === 'production' ? '/tournament-planner/' : '/',
-  plugins: [react(), tailwindcss(), inlineAssets()],
+  plugins: [react(), tailwindcss(), serviceWorker(), inlineAssets()],
   build: {
     outDir: '../dist',
     emptyOutDir: true,
