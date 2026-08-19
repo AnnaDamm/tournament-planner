@@ -83,4 +83,7 @@ export const en = {
   undoWithdrawal: 'Undo withdrawal',
   withdrawn: 'withdrawn',
   reroll: 'Reroll',
+  playerSearch: 'Search players',
+  clearSearch: 'Clear search',
+  nextMatch: 'Next match',
 } as const
