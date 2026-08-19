@@ -3,6 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      const url = new URL(window.location.href)
+      const route = url.searchParams.get('route')
+
+      if (route !== null) {
+        url.searchParams.delete('route')
+        const base = url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`
+        const restoredUrl = new URL(route, `${url.origin}${base}`)
+
+        for (const [key, value] of url.searchParams) restoredUrl.searchParams.append(key, value)
+        window.history.replaceState(null, '', restoredUrl)
+      }
+    </script>
     <title>Tourny — Tournament Manager</title>
     <meta name="theme-color" content="#2563eb" />
     <link rel="manifest" href="/manifest.webmanifest" />
