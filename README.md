@@ -2,6 +2,10 @@
 
 A small local React/Vite application for organising sport-agnostic tournaments with Swiss-style rounds.
 
+## GitHub Pages
+
+[Open Tourny on GitHub Pages](https://annadamm.github.io/tournament-planner/)
+
 ## Features
 
 - **Currently only the Swiss system is supported**
@@ -88,10 +92,6 @@ latest snapshot in memory and forgets it when it stops. The master republishes i
 every five seconds, so the relay automatically recovers after a restart without persisting
 tournament data on the server. `localhost:8080` is a different browser origin from GitHub Pages,
 so import an exported tournament JSON there the first time you use local master mode.
-
-## GitHub Pages
-
-[Open Tourny](https://annadamm.github.io/tournament-planner/)
 
 ## Documentation
 
