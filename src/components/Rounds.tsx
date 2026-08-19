@@ -38,6 +38,14 @@ type Props = {
   onFillUnknown: (number: number) => void
   onReroll: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
+  readOnly?: boolean
+}
+
+const formatStartTime = (startedAt: string) => {
+  const date = new Date(startedAt)
+  return Number.isNaN(date.getTime())
+    ? startedAt
+    : new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(date)
 }
 
 export function Rounds({
@@ -55,20 +63,13 @@ export function Rounds({
   onFillUnknown,
   onReroll,
   onSwapPlayers,
+  readOnly = false,
 }: Props) {
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
   const runningMatchIdsByRound = getRunningMatchIdsByRound(rounds, defaultCourtCount)
-  const formatStartTime = (startedAt: string) => {
-    const date = new Date(startedAt)
-    return Number.isNaN(date.getTime())
-      ? startedAt
-      : new Intl.DateTimeFormat(undefined, {
-          timeStyle: 'short',
-        }).format(date)
-  }
   return (
     <>
       <PageTitle eyebrow={t('schedule')} title={t('rounds')} />
@@ -81,7 +82,7 @@ export function Rounds({
       ) : (
         <div className="round-list">
           {rounds.map((round, roundIndex) => {
-            const canReorderBye = !isRoundComplete(round)
+            const canReorderBye = !readOnly && !isRoundComplete(round)
             const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
             const runningMatchIds = runningMatchIdsByRound.get(round.number) ?? new Set<string>()
             return (
@@ -133,63 +134,66 @@ export function Rounds({
                       )}
                     </div>
                   </div>
-                  <div className="round-actions">
-                    <button
-                      className="button ghost"
-                      type="button"
-                      aria-label={t('roundSettings')}
-                      title={t('roundSettings')}
-                      onClick={() => setSettingsRoundNumber(round.number)}
-                    >
-                      <Settings2 size={16} />
-                    </button>
-                    {!round.startedAt && (
+                  {!readOnly && (
+                    <div className="round-actions">
                       <button
                         className="button ghost"
                         type="button"
-                        aria-label={t('startRound')}
-                        title={t('startRound')}
-                        onClick={() => onStart(round.number)}
+                        aria-label={t('roundSettings')}
+                        title={t('roundSettings')}
+                        onClick={() => setSettingsRoundNumber(round.number)}
                       >
-                        <Play size={14} />
+                        <Settings2 size={16} />
                       </button>
-                    )}
-                    {round.matches.some(
-                      (match) => isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
-                    ) && (
-                      <button
-                        className="button ghost"
-                        type="button"
-                        aria-label={t('fillMore')}
-                        title={t('fillMore')}
-                        onClick={() => onFillUnknown(round.number)}
-                      >
-                        <ListPlus size={16} />
-                      </button>
-                    )}
-                    {isUnstarted && (
-                      <button
-                        className="button ghost"
-                        type="button"
-                        aria-label={t('reroll')}
-                        title={t('reroll')}
-                        onClick={() => onReroll(round.number)}
-                      >
-                        <Dices size={16} />
-                      </button>
-                    )}
-                    {!round.matches.some((match) => match.scoreA || match.scoreB) && (
-                      <button
-                        className="button danger"
-                        type="button"
-                        aria-label={t('deleteRound')}
-                        onClick={() => onDelete(round.number)}
-                        title={t('deleteRound')}
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
+                      {!round.startedAt && (
+                        <button
+                          className="button ghost"
+                          type="button"
+                          aria-label={t('startRound')}
+                          title={t('startRound')}
+                          onClick={() => onStart(round.number)}
+                        >
+                          <Play size={14} />
+                        </button>
+                      )}
+                      {round.matches.some(
+                        (match) =>
+                          isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
+                      ) && (
+                        <button
+                          className="button ghost"
+                          type="button"
+                          aria-label={t('fillMore')}
+                          title={t('fillMore')}
+                          onClick={() => onFillUnknown(round.number)}
+                        >
+                          <ListPlus size={16} />
+                        </button>
+                      )}
+                      {isUnstarted && (
+                        <button
+                          className="button ghost"
+                          type="button"
+                          aria-label={t('reroll')}
+                          title={t('reroll')}
+                          onClick={() => onReroll(round.number)}
+                        >
+                          <Dices size={16} />
+                        </button>
+                      )}
+                      {!round.matches.some((match) => match.scoreA || match.scoreB) && (
+                        <button
+                          className="button danger"
+                          type="button"
+                          aria-label={t('deleteRound')}
+                          onClick={() => onDelete(round.number)}
+                          title={t('deleteRound')}
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="matches">
                   {round.matches.map((match, matchIndex) => (
@@ -210,6 +214,7 @@ export function Rounds({
                       onSwap={(draggedId, targetId) =>
                         onSwapPlayers(roundIndex, draggedId, targetId)
                       }
+                      readOnly={readOnly}
                     />
                   ))}
                 </div>
@@ -218,22 +223,26 @@ export function Rounds({
           })}
         </div>
       )}
-      <button className="button primary" onClick={onCreate}>
-        <Plus size={16} /> {t('create')}
-      </button>
+      {!readOnly && (
+        <button className="button primary" onClick={onCreate}>
+          <Plus size={16} /> {t('create')}
+        </button>
+      )}
       <PlayerHistoryDialog
         player={historyPlayer}
         rounds={rounds}
         name={name}
         onClose={() => setHistoryPlayerId(null)}
       />
-      <RoundSettingsDialog
-        round={settingsRound}
-        defaultCourtCount={defaultCourtCount}
-        defaultWinningGames={defaultWinningGames}
-        onSave={onSetRoundSettings}
-        onClose={() => setSettingsRoundNumber(null)}
-      />
+      {!readOnly && (
+        <RoundSettingsDialog
+          round={settingsRound}
+          defaultCourtCount={defaultCourtCount}
+          defaultWinningGames={defaultWinningGames}
+          onSave={onSetRoundSettings}
+          onClose={() => setSettingsRoundNumber(null)}
+        />
+      )}
     </>
   )
 }

@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
 import type { Participant, Round } from '../tournamentTypes'
-import {
-  loadCourtCount,
-  loadDefaultWinningGames,
-  loadParticipantType,
-  loadParticipants,
-  loadRounds,
-  loadTournamentName,
-} from '../storage'
 import { parseTournamentSnapshot } from '../tournamentSnapshot'
-import { useTournamentStorage } from './useTournamentStorage'
 import {
   createParticipant,
   swapRoundPlayers as swapRoundPlayersInRounds,
@@ -32,6 +23,7 @@ import {
 import { t } from '../i18n'
 import type { TournamentContextValue } from '../context/TournamentContext'
 import { useTournamentDerivedState } from './useTournamentDerivedState'
+import { useTournamentLiveState } from './useTournamentLiveState'
 
 const buildRoundWithResult = (
   rounds: Round[],
@@ -64,34 +56,28 @@ const getNextMatchTargets = (players: Participant[], rounds: Round[], courtCount
 }
 
 export function useTournamentController(): TournamentContextValue {
-  const [players, setPlayers] = useState<Participant[]>(loadParticipants)
-  const [tournamentName, setTournamentName] = useState(loadTournamentName)
-  const [courtCount, setCourtCount] = useState(loadCourtCount)
-  const [defaultWinningGames, setDefaultWinningGames] = useState(loadDefaultWinningGames)
-  const [rounds, setRounds] = useState<Round[]>(() =>
-    startReadyRounds(loadRounds(), loadCourtCount()),
-  )
-  const [participantType, setParticipantType] = useState<'players' | 'teams'>(loadParticipantType)
+  const {
+    localMaster,
+    readOnly,
+    isLive,
+    players,
+    setPlayers,
+    tournamentName,
+    setTournamentName,
+    courtCount,
+    setCourtCount,
+    defaultWinningGames,
+    setDefaultWinningGames,
+    rounds,
+    setRounds,
+    participantType,
+    setParticipantType,
+  } = useTournamentLiveState()
   const [sort, setSort] = useState('position')
   const [desc, setDesc] = useState(true)
   const [draft, setDraft] = useState('')
   const bulkRef = useRef<HTMLDialogElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
-
-  useTournamentStorage(
-    players,
-    setPlayers,
-    rounds,
-    setRounds,
-    participantType,
-    setParticipantType,
-    courtCount,
-    setCourtCount,
-    defaultWinningGames,
-    setDefaultWinningGames,
-    tournamentName,
-    setTournamentName,
-  )
 
   useEffect(() => {
     document.title = `${tournamentName} — Tournament Manager`
@@ -188,6 +174,8 @@ export function useTournamentController(): TournamentContextValue {
 
   const routes: AppRoutesProps = {
     tournamentName,
+    localMaster,
+    readOnly,
     players,
     participantLabel,
     rounds,
@@ -237,6 +225,9 @@ export function useTournamentController(): TournamentContextValue {
   return {
     layout: {
       tournamentName,
+      localMaster,
+      readOnly,
+      isLive,
       participantNames: players.map((player) => player.name),
       participantTargets: players.map((player) => ({
         participantName: player.name,

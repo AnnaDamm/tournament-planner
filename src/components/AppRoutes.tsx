@@ -1,12 +1,17 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import type { LocalMasterConfig } from '../liveSharing'
+import type { Match, Participant, Round } from '../tournamentTypes'
+import { LocalNetworkDocumentationPage } from './LocalNetworkDocumentationPage'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
+import { SharePage } from './SharePage'
 import { Table, type Stat } from './Table'
 import { DocumentationPage } from './DocumentationPage'
-import type { Match, Participant, Round } from '../tournamentTypes'
 
 export type AppRoutesProps = {
   tournamentName: string
+  localMaster: LocalMasterConfig | null
+  readOnly: boolean
   players: Participant[]
   participantLabel: string
   rounds: Round[]
@@ -42,6 +47,8 @@ export type AppRoutesProps = {
 
 export function AppRoutes({
   tournamentName,
+  localMaster,
+  readOnly,
   players,
   participantLabel,
   rounds,
@@ -93,8 +100,23 @@ export function AppRoutes({
             onDelete={onDeleteParticipant}
             onRename={onRename}
             onToggleWithdraw={onToggleWithdraw}
+            readOnly={readOnly}
           />
         }
+      />
+      <Route
+        path="/share"
+        element={
+          localMaster ? (
+            <SharePage viewerUrl={localMaster.viewerUrl} />
+          ) : (
+            <Navigate to="/table" replace />
+          )
+        }
+      />
+      <Route
+        path="/network"
+        element={localMaster ? <LocalNetworkDocumentationPage /> : <Navigate to="/table" replace />}
       />
       <Route
         path="/rounds"
@@ -114,25 +136,30 @@ export function AppRoutes({
             onFillUnknown={onFillUnknown}
             onReroll={onReroll}
             onSwapPlayers={onSwapPlayers}
+            readOnly={readOnly}
           />
         }
       />
       <Route
         path="/settings"
         element={
-          <SettingsPage
-            tournamentName={tournamentName}
-            setTournamentName={setTournamentName}
-            participantType={participantType}
-            setParticipantType={setParticipantType}
-            courtCount={courtCount}
-            setCourtCount={setCourtCount}
-            defaultWinningGames={defaultWinningGames}
-            setDefaultWinningGames={setDefaultWinningGames}
-            onExport={onExport}
-            onImport={onImport}
-            onDeleteAll={onDeleteAll}
-          />
+          readOnly ? (
+            <Navigate to="/table" replace />
+          ) : (
+            <SettingsPage
+              tournamentName={tournamentName}
+              setTournamentName={setTournamentName}
+              participantType={participantType}
+              setParticipantType={setParticipantType}
+              courtCount={courtCount}
+              setCourtCount={setCourtCount}
+              defaultWinningGames={defaultWinningGames}
+              setDefaultWinningGames={setDefaultWinningGames}
+              onExport={onExport}
+              onImport={onImport}
+              onDeleteAll={onDeleteAll}
+            />
+          )
         }
       />
       <Route path="/docs" element={<DocumentationPage />} />

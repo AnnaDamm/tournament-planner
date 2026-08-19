@@ -2,9 +2,13 @@ import { createContext, useContext, type ReactNode } from 'react'
 import type { RefObject } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
 import { useTournamentController } from '../hooks/useTournamentController'
+import type { LocalMasterConfig } from '../liveSharing'
 
 type LayoutState = {
   tournamentName: string
+  localMaster: LocalMasterConfig | null
+  readOnly: boolean
+  isLive: boolean
   participantNames: string[]
   participantTargets: { participantName: string; participantId: string }[]
   nextMatchTargets: { participantName: string; matchId: string }[]

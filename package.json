@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:server": "tsc --project tsconfig.server.json",
+    "build:host": "pnpm build:server && vite build --base /",
+    "host": "pnpm build:host && node dist-server/server.js",
     "preview": "vite preview",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
@@ -26,7 +29,8 @@
     "react-router-dom": "latest",
     "tailwindcss": "latest",
     "@tailwindcss/vite": "latest",
-    "lucide-react": "latest"
+    "lucide-react": "latest",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "oxlint": "latest",
@@ -34,6 +38,7 @@
     "prettier": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/node": "latest"
+    "@types/node": "latest",
+    "@types/qrcode": "^1.5.6"
   }
 }
