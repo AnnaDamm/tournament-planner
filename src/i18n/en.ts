@@ -98,6 +98,7 @@ export const en = {
   qrError: 'The QR code could not be generated.',
   liveConnectionOnline: 'Live connection active',
   liveConnectionOffline: 'Not live — reconnecting',
+  enableReadOnly: 'Enable read-only view',
   skipToContent: 'Skip to main content',
   tournamentNavigation: 'Tournament navigation',
   searchResults: 'results',
