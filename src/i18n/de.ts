@@ -95,7 +95,6 @@ export const de: Translation = {
   nextFinding: 'Nächster Treffer',
   liveView: 'LIVE-ANSICHT',
   shareTournament: 'Turnier teilen',
-  networkDocumentation: 'Anleitung zum lokalen Netzwerk',
   scanToView: 'Scannen, um live zuzuschauen',
   shareHelp: 'Spieler sehen nach dem Scan Tabelle, Runden und Teilnehmende live.',
   viewerAddress: 'Zuschaueradresse',
