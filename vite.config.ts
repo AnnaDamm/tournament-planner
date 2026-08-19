@@ -30,7 +30,7 @@ function inlineAssets(): Plugin {
           const safeContent = content.replace(/<\/script/gi, '<\\/script')
           source = source.replace(
             new RegExp(`<script[^>]*src="${assetUrl}"[^>]*><\\/script>`),
-            () => `<script>${safeContent}</script>`,
+            () => `<script type="module">${safeContent}</script>`,
           )
         }
         unlinkSync(filePath)
