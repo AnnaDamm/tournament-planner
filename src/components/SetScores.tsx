@@ -1,0 +1,64 @@
+import type { SetScore } from '../tournamentTypes'
+import { t } from '../i18n'
+
+type Props = {
+  draftSets: SetScore[]
+  visibleSetCount: number
+  readOnly: boolean
+  playerA: string
+  playerB: string
+  updateSet: (setIndex: number, side: 'a' | 'b', value: string) => void
+  scheduleCommit: () => void
+}
+
+export function SetScores({
+  draftSets,
+  visibleSetCount,
+  readOnly,
+  playerA,
+  playerB,
+  updateSet,
+  scheduleCommit,
+}: Props) {
+  return (
+    <div className="set-scores">
+      {Array.from(
+        { length: visibleSetCount },
+        (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },
+      ).map((set, setIndex) => (
+        <div className={`score${readOnly ? ' score-readonly' : ''}`} key={setIndex}>
+          <span className="set-label" aria-hidden="true">
+            {setIndex + 1}
+          </span>
+          {readOnly ? (
+            <span className="score-value">{set.a || '–'}</span>
+          ) : (
+            <input
+              type="number"
+              min="0"
+              aria-label={`${t('setScore')} ${setIndex + 1}: ${playerA}`}
+              value={set.a}
+              onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
+              onKeyUp={scheduleCommit}
+              onBlur={scheduleCommit}
+            />
+          )}
+          <b aria-hidden="true">:</b>
+          {readOnly ? (
+            <span className="score-value">{set.b || '–'}</span>
+          ) : (
+            <input
+              type="number"
+              min="0"
+              aria-label={`${t('setScore')} ${setIndex + 1}: ${playerB}`}
+              value={set.b}
+              onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
+              onKeyUp={scheduleCommit}
+              onBlur={scheduleCommit}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}

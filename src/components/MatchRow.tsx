@@ -3,6 +3,7 @@ import { GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
 import { getMatchResult, hasEnteredScore } from '../tournament'
+import { SetScores } from './SetScores'
 
 type Props = {
   match: Match
@@ -104,6 +105,17 @@ export function MatchRow({
     () => getSetStats(draftSets, targetWins),
     [draftSets, targetWins],
   )
+  const finalScore = useMemo(() => {
+    if (winnerAt < 0) return null
+    return draftSets.slice(0, winnerAt + 1).reduce(
+      (score, set) => {
+        if (Number(set.a) > Number(set.b)) score.a += 1
+        if (Number(set.b) > Number(set.a)) score.b += 1
+        return score
+      },
+      { a: 0, b: 0 },
+    )
+  }, [draftSets, winnerAt])
   const visibleSetCount = Math.max(
     targetWins,
     Math.min(
@@ -179,9 +191,15 @@ export function MatchRow({
         </button>
         <small className="player-record">{record(match.a)}</small>
       </span>
-      <span className="versus" aria-hidden="true">
-        VS
-      </span>
+      {finalScore ? (
+        <span className="match-score" aria-label={`${finalScore.a}:${finalScore.b}`}>
+          {finalScore.a} : {finalScore.b}
+        </span>
+      ) : (
+        <span className="versus" aria-hidden="true">
+          VS
+        </span>
+      )}
       <span
         className={`drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
@@ -217,45 +235,15 @@ export function MatchRow({
         </button>
         <small className="player-record">{record(match.b)}</small>
       </span>
-      <div className="set-scores">
-        {Array.from(
-          { length: visibleSetCount },
-          (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },
-        ).map((set, setIndex) => (
-          <div className="score" key={setIndex}>
-            <span className="set-label" aria-hidden="true">
-              {setIndex + 1}
-            </span>
-            {readOnly ? (
-              <span className="score-value">{set.a || '–'}</span>
-            ) : (
-              <input
-                type="number"
-                min="0"
-                aria-label={`${t('setScore')} ${setIndex + 1}: ${name(match.a)}`}
-                value={set.a}
-                onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
-                onKeyUp={scheduleCommit}
-                onBlur={scheduleCommit}
-              />
-            )}
-            <b aria-hidden="true">:</b>
-            {readOnly ? (
-              <span className="score-value">{set.b || '–'}</span>
-            ) : (
-              <input
-                type="number"
-                min="0"
-                aria-label={`${t('setScore')} ${setIndex + 1}: ${name(match.b)}`}
-                value={set.b}
-                onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
-                onKeyUp={scheduleCommit}
-                onBlur={scheduleCommit}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      <SetScores
+        draftSets={draftSets}
+        visibleSetCount={visibleSetCount}
+        readOnly={readOnly}
+        playerA={name(match.a)}
+        playerB={name(match.b)}
+        updateSet={updateSet}
+        scheduleCommit={scheduleCommit}
+      />
     </fieldset>
   )
 }

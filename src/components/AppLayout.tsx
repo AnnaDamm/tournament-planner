@@ -92,7 +92,11 @@ export function AppLayout({
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
   )
-  const pathWithSearch = (pathname: string) => ({ pathname, hash: location.hash })
+  const pathWithSearch = (pathname: string) => ({
+    pathname,
+    search: location.search,
+    hash: location.hash,
+  })
   const readOnlyUrl = new URL(window.location.href)
   readOnlyUrl.searchParams.set('readonly', '1')
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
