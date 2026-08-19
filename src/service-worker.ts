@@ -5,6 +5,8 @@ export {}
 declare const self: ServiceWorkerGlobalScope
 
 const baseUrl = new URL('__BASE_URL__', self.location.origin)
+const previewRoot = `${baseUrl.pathname}previews/`
+const isPreviewWorker = /\/previews\/pr-\d+\/$/.test(baseUrl.pathname)
 const cachePrefix = `tourny-${encodeURIComponent(baseUrl.pathname)}-`
 const cacheName = `${cachePrefix}__APP_VERSION__`
 const offlineUrls = [
@@ -47,6 +49,13 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   if (request.method !== 'GET') return
 
   const requestUrl = new URL(request.url)
+  if (
+    !isPreviewWorker &&
+    requestUrl.origin === self.location.origin &&
+    requestUrl.pathname.startsWith(previewRoot)
+  )
+    return
+
   if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request))
     return
