@@ -118,4 +118,3 @@ pnpm release:major
 ```
 
 The command uses `pnpm version`, commits the version bump, creates and pushes a `v...` tag, and that tag automatically starts the Pages build and deployment. The same versioning workflow can also be started manually under **Actions → Create release tag → Run workflow**.
-
