@@ -8,15 +8,21 @@ import {
   ChevronRight,
   Menu,
   Search,
+  QrCode,
   Settings2,
   Trophy,
+  Wifi,
   X,
 } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
+import type { LocalMasterConfig } from '../liveSharing'
 
 type Props = {
   tournamentName: string
+  localMaster: LocalMasterConfig | null
+  readOnly: boolean
+  isLive: boolean
   participantNames: string[]
   participantTargets: { participantName: string; participantId: string }[]
   nextMatchTargets: { participantName: string; matchId: string }[]
@@ -62,6 +68,9 @@ const scrollToTarget = (elementId: string, attemptsLeft = 10) => {
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function AppLayout({
   tournamentName,
+  localMaster,
+  readOnly,
+  isLive,
   participantNames,
   participantTargets,
   nextMatchTargets,
@@ -328,16 +337,50 @@ export function AppLayout({
           >
             <BookOpen size={18} />
           </button>
-          <button
-            className="icon-btn settings-trigger"
-            aria-label={isSettingsPage ? t('back') : t('settings')}
-            onClick={() => (isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings')))}
-          >
-            {isSettingsPage ? <ArrowLeft size={18} /> : <Settings2 size={18} />}
-          </button>
-          <div className="tooltip-popover" role="tooltip">
-            {isSettingsPage ? t('back') : t('settings')}
-          </div>
+          {localMaster && (
+            <>
+              <button
+                className="icon-btn"
+                aria-label={t('networkDocumentation')}
+                title={t('networkDocumentation')}
+                onClick={() => navigate(pathWithSearch('/network'))}
+              >
+                <Wifi size={18} />
+              </button>
+              <button
+                className="icon-btn"
+                aria-label={t('viewerQrCode')}
+                title={t('viewerQrCode')}
+                onClick={() => navigate(pathWithSearch('/share'))}
+              >
+                <QrCode size={18} />
+              </button>
+              <span
+                className={`live-indicator ${isLive ? 'is-live' : 'is-offline'}`}
+                role="status"
+                aria-label={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
+                title={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
+              >
+                <span aria-hidden="true" />
+              </span>
+            </>
+          )}
+          {!readOnly && (
+            <>
+              <button
+                className="icon-btn settings-trigger"
+                aria-label={isSettingsPage ? t('back') : t('settings')}
+                onClick={() =>
+                  isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings'))
+                }
+              >
+                {isSettingsPage ? <ArrowLeft size={18} /> : <Settings2 size={18} />}
+              </button>
+              <div className="tooltip-popover" role="tooltip">
+                {isSettingsPage ? t('back') : t('settings')}
+              </div>
+            </>
+          )}
         </div>
       </header>
       <main>

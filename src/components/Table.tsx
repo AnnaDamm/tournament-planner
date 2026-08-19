@@ -26,6 +26,7 @@ type Props = {
   onDelete: (id: string) => void
   onRename: (player: Participant, name: string) => void
   onToggleWithdraw: (id: string) => void
+  readOnly?: boolean
 }
 
 const formatDifference = (value: number) => (value > 0 ? `+${value}` : String(value))
@@ -42,6 +43,7 @@ export function Table({
   onDelete,
   onRename,
   onToggleWithdraw,
+  readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false)
   const [historyPlayer, setHistoryPlayer] = useState<Participant | null>(null)
@@ -61,20 +63,22 @@ export function Table({
   return (
     <>
       <PageTitle eyebrow={t('ranking')} title={t('table')}>
-        <div className="page-actions">
-          <button className="button primary" onClick={onAdd}>
-            <Plus size={17} /> {addLabel}
-          </button>
-          {!editing ? (
-            <button className="button ghost" onClick={() => setEditing(true)}>
-              <Pencil size={16} /> {t('edit')}
+        {!readOnly && (
+          <div className="page-actions">
+            <button className="button primary" onClick={onAdd}>
+              <Plus size={17} /> {addLabel}
             </button>
-          ) : (
-            <button className="button ghost" onClick={() => setEditing(false)}>
-              <Check size={16} /> {t('done')}
-            </button>
-          )}
-        </div>
+            {!editing ? (
+              <button className="button ghost" onClick={() => setEditing(true)}>
+                <Pencil size={16} /> {t('edit')}
+              </button>
+            ) : (
+              <button className="button ghost" onClick={() => setEditing(false)}>
+                <Check size={16} /> {t('done')}
+              </button>
+            )}
+          </div>
+        )}
       </PageTitle>
       <div className="section-head ranking-participants-head">
         <h2>{participantLabel === t('teams') ? t('allTeams') : t('all')}</h2>
@@ -114,7 +118,7 @@ export function Table({
                   </button>
                 </th>
               ))}
-              <th>{t('actions')}</th>
+              {!readOnly && <th>{t('actions')}</th>}
             </tr>
           </thead>
           <tbody>
@@ -184,24 +188,26 @@ export function Table({
                       {formatDifference(player.scored - player.conceded)})
                     </strong>
                   </td>
-                  <td className="player-actions" data-label={t('actions')}>
-                    <button
-                      className="status-btn"
-                      onClick={() => onToggleWithdraw(player.id)}
-                      title={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
-                      aria-label={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
-                    >
-                      {player.withdrawn ? <Undo2 size={16} /> : <Flag size={16} />}
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => onDelete(player.id)}
-                      title={t('delete')}
-                      aria-label={`${t('delete')}: ${player.name}`}
-                    >
-                      <X size={16} />
-                    </button>
-                  </td>
+                  {!readOnly && (
+                    <td className="player-actions" data-label={t('actions')}>
+                      <button
+                        className="status-btn"
+                        onClick={() => onToggleWithdraw(player.id)}
+                        title={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
+                        aria-label={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
+                      >
+                        {player.withdrawn ? <Undo2 size={16} /> : <Flag size={16} />}
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => onDelete(player.id)}
+                        title={t('delete')}
+                        aria-label={`${t('delete')}: ${player.name}`}
+                      >
+                        <X size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               )
             })}

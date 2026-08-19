@@ -30,51 +30,58 @@ export function useTournamentStorage(
   setDefaultWinningGames: (value: number) => void,
   tournamentName: string,
   setTournamentName: (value: string) => void,
+  enabled = true,
 ) {
   const skipRemoteSave = useRef<Set<StorageKey>>(new Set())
 
-  useEffect(
-    () =>
-      subscribeToStorage((key) => {
-        skipRemoteSave.current.add(key)
-        if (key === 'players') setPlayers(loadParticipants())
-        if (key === 'rounds') setRounds(loadRounds())
-        if (key === 'participantType') setParticipantType(loadParticipantType())
-        if (key === 'courtCount') setCourtCount(loadCourtCount())
-        if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())
-        if (key === 'tournamentName') setTournamentName(loadTournamentName())
-      }),
-    [
-      setCourtCount,
-      setDefaultWinningGames,
-      setParticipantType,
-      setPlayers,
-      setRounds,
-      setTournamentName,
-    ],
-  )
   useEffect(() => {
+    if (!enabled) return
+    return subscribeToStorage((key) => {
+      skipRemoteSave.current.add(key)
+      if (key === 'players') setPlayers(loadParticipants())
+      if (key === 'rounds') setRounds(loadRounds())
+      if (key === 'participantType') setParticipantType(loadParticipantType())
+      if (key === 'courtCount') setCourtCount(loadCourtCount())
+      if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())
+      if (key === 'tournamentName') setTournamentName(loadTournamentName())
+    })
+  }, [
+    setCourtCount,
+    setDefaultWinningGames,
+    setParticipantType,
+    setPlayers,
+    setRounds,
+    setTournamentName,
+    enabled,
+  ])
+  useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('players')) return
     saveParticipants(players)
-  }, [players])
+  }, [enabled, players])
   useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('rounds')) return
     saveRounds(rounds)
-  }, [rounds])
+  }, [enabled, rounds])
   useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('participantType')) return
     saveParticipantType(participantType)
-  }, [participantType])
+  }, [enabled, participantType])
   useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('courtCount')) return
     saveCourtCount(courtCount)
-  }, [courtCount])
+  }, [courtCount, enabled])
   useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('defaultWinningGames')) return
     saveDefaultWinningGames(defaultWinningGames)
-  }, [defaultWinningGames])
+  }, [defaultWinningGames, enabled])
   useEffect(() => {
+    if (!enabled) return
     if (skipRemoteSave.current.delete('tournamentName')) return
     saveTournamentName(tournamentName)
-  }, [tournamentName])
+  }, [enabled, tournamentName])
 }

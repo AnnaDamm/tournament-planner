@@ -1,5 +1,6 @@
 /.pnpm-store/
 /dist/
+/dist-server/
 /node_modules/
 .DS_Store
 .idea/

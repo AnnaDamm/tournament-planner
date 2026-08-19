@@ -16,6 +16,7 @@ type Props = {
   onSwap?: (draggedId: string, targetId: string) => void
   winningGames: number
   isRunning?: boolean
+  readOnly?: boolean
 }
 
 const isCompleteSet = (set: SetScore) =>
@@ -68,6 +69,7 @@ export function MatchRow({
   onSwap,
   winningGames,
   isRunning = false,
+  readOnly = false,
 }: Props) {
   const swapPlayers = (draggedId: string, targetId: string) => {
     if (!draggedId || draggedId === targetId) return
@@ -93,7 +95,7 @@ export function MatchRow({
   }, [initialSets])
   const targetWins = Math.max(1, Math.min(9, Number(winningGames) || 1))
   const matchResult = getMatchResult(match, targetWins)
-  const canReorder = !hasEnteredScore(match)
+  const canReorder = !readOnly && !hasEnteredScore(match)
   const { completedSets, winnerAt } = useMemo(
     () => getSetStats(draftSets, targetWins),
     [draftSets, targetWins],
@@ -194,23 +196,31 @@ export function MatchRow({
         ).map((set, setIndex) => (
           <div className="score" key={setIndex}>
             <span className="set-label">{setIndex + 1}</span>
-            <input
-              type="number"
-              min="0"
-              aria-label={`Set ${setIndex + 1} ${name(match.a)}`}
-              value={set.a}
-              onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
-              onKeyUp={scheduleCommit}
-            />
+            {readOnly ? (
+              <span className="score-value">{set.a || '–'}</span>
+            ) : (
+              <input
+                type="number"
+                min="0"
+                aria-label={`Set ${setIndex + 1} ${name(match.a)}`}
+                value={set.a}
+                onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
+                onKeyUp={scheduleCommit}
+              />
+            )}
             <b>:</b>
-            <input
-              type="number"
-              min="0"
-              aria-label={`Set ${setIndex + 1} ${name(match.b)}`}
-              value={set.b}
-              onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
-              onKeyUp={scheduleCommit}
-            />
+            {readOnly ? (
+              <span className="score-value">{set.b || '–'}</span>
+            ) : (
+              <input
+                type="number"
+                min="0"
+                aria-label={`Set ${setIndex + 1} ${name(match.b)}`}
+                value={set.b}
+                onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
+                onKeyUp={scheduleCommit}
+              />
+            )}
           </div>
         ))}
       </div>

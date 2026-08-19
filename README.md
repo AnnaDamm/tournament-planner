@@ -14,6 +14,82 @@ A small local React/Vite application for organising sport-agnostic tournaments w
 - Browser language detection with English fallback and German translations
 - Automatic light/dark mode based on the browser or operating system preference
 
+## GitHub Pages / PWA
+
+The [GitHub Pages version](https://annadamm.github.io/tournament-planner/) remains a
+standalone tournament manager. It works without a local host service and persists data
+only in the browser's `localStorage`. Once the PWA has been loaded while online, it can
+also be opened offline; data is not synchronised with other devices.
+
+The local-network documentation and viewer QR-code actions are intentionally hidden in
+this mode.
+
+## Local master mode
+
+Local master mode runs the production app and a small, in-memory LAN relay together.
+Open the master at `http://localhost:8080/`; it owns the tournament data and publishes a
+complete snapshot whenever it changes. Every device that opens the LAN URL receives a
+read-only live view through Server-Sent Events (SSE). There is no cloud service, database,
+or Internet requirement.
+
+The master sees a platform-aware Wi-Fi setup guide and a QR-code action. The QR code only
+contains the public viewer URL—viewers do not need a token or a special URL. A private,
+random master credential is supplied only to the master page and protects snapshot updates.
+
+### Run directly with Node.js
+
+```bash
+pnpm install
+pnpm host
+```
+
+The local host automatically selects a LAN IPv4 address for the QR code. Connect all
+devices to the same Wi-Fi or hotspot, then open the printed `Viewer URL` (or scan its QR
+code). Keep the master page open for the duration of the tournament.
+
+### Run the local host with Docker
+
+The host start script detects the laptop's primary private LAN IPv4 address and passes it to
+Docker Compose automatically. It does not require Node.js or pnpm on the host. Each worktree
+gets its own stable Compose project name and the next available port starting at `8080`, so
+multiple worktrees can run at the same time without sharing containers, networks, or URLs:
+
+```bash
+./scripts/start
+```
+
+On Windows, double-click `scripts\\start.bat` in File Explorer. It starts the same Docker
+Compose setup and keeps its window open if startup fails.
+
+Open the printed `http://localhost:<port>/` address on the tournament laptop as the master and
+use the QR-code action in the upper-right corner for the viewer URL. The documentation action
+next to it contains hotspot instructions for macOS, Windows, and Linux. Allow incoming
+connections to the selected port in the laptop firewall when prompted.
+
+If the laptop has several active network adapters (for example a VPN), override the selected
+address explicitly:
+
+```bash
+TOURNY_VIEWER_URL=http://192.168.178.42:8080/ ./scripts/start
+```
+
+To pick a specific port or Compose project name instead of the automatic values, set
+`TOURNY_PORT` or `TOURNY_COMPOSE_PROJECT` before starting the script. When
+`TOURNY_VIEWER_URL` is set, its port is automatically used as the host port. This is useful for
+a repeatable local URL in development.
+
+OrbStack also supplies automatic host-only service domains in the form
+`host.<compose-project>.orb.local`; the generated Compose project name makes these distinct per
+worktree as well. The QR code deliberately continues to use the laptop's LAN IP and selected
+port, because that is the portable address for phones and other devices on the tournament Wi-Fi.
+See the [OrbStack domain documentation](https://docs.orbstack.dev/docker/domains) for details.
+
+Tournament data remains in the master's browser `localStorage`; the relay only retains the
+latest snapshot in memory and forgets it when it stops. The master republishes its current state
+every five seconds, so the relay automatically recovers after a restart without persisting
+tournament data on the server. `localhost:8080` is a different browser origin from GitHub Pages,
+so import an exported tournament JSON there the first time you use local master mode.
+
 ## GitHub Pages
 
 [Open Tourny](https://annadamm.github.io/tournament-planner/)
@@ -32,42 +108,12 @@ The repository Wiki serves as a small landing page that links to this canonical 
 
 ## Requirements
 
-- Docker and Docker Compose
-- Node.js LTS (only required when running Vite outside Docker)
+- Docker and Docker Compose for local master mode
+- Node.js LTS for direct local hosting or development
 
-## Development with Docker
+## Development
 
 Start the Vite development server:
-
-```bash
-docker compose up --build
-```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-Stop the server with `Ctrl+C`, or run:
-
-```bash
-docker compose down
-```
-
-The Compose setup builds the local `Dockerfile` from the current `node:lts-alpine` image, enables pnpm through Corepack, and mounts the project directory for live reload.
-
-Run quality checks inside Docker:
-
-```bash
-docker compose run --rm app pnpm lint
-docker compose run --rm app pnpm lint:fix
-docker compose run --rm app pnpm typecheck
-```
-
-The pre-commit hook is configured automatically by `pnpm install` and runs Prettier, Oxlint and TypeScript checks before every commit. To enable it manually in an existing checkout:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-## Development without Docker
 
 ```bash
 corepack enable
@@ -75,7 +121,16 @@ pnpm install
 pnpm dev
 ```
 
-Then open [http://localhost:5173](http://localhost:5173).
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+Docker Compose is reserved for local master mode. The development server uses Vite directly,
+which keeps its live-reload workflow separate from the production-like LAN host.
+
+The pre-commit hook is configured automatically by `pnpm install` and runs Prettier, Oxlint and TypeScript checks before every commit. To enable it manually in an existing checkout:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 ## Production build
 
