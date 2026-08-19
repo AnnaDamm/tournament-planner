@@ -196,7 +196,7 @@ export function useTournamentController(): TournamentContextValue {
     onAdd: () => {
       const dialog = bulkRef.current
       dialog?.showModal()
-      bulkInputRef.current?.focus()
+      requestAnimationFrame(() => bulkInputRef.current?.focus())
     },
     onDeleteParticipant: (id) =>
       setPlayers((current) => current.filter((player) => player.id !== id)),
