@@ -2,7 +2,7 @@ const baseUrl = new URL("/tournament-planner/", self.location.origin);
 const previewRoot = `${baseUrl.pathname}previews/`;
 const isPreviewWorker = /\/previews\/pr-\d+\/$/.test(baseUrl.pathname);
 const cachePrefix = `tourny-${encodeURIComponent(baseUrl.pathname)}-`;
-const cacheName = `${cachePrefix}1.1.1`;
+const cacheName = `${cachePrefix}2.0.1`;
 const offlineUrls = [
 	baseUrl.pathname,
 	`${baseUrl.pathname}index.html`,
