@@ -5,9 +5,31 @@ export type StorageKey =
 
 type StorageMessage = { key: StorageKey; source: string }
 
+const storageKeys: StorageKey[] = [
+  'players',
+  'rounds',
+  'participantType',
+  'courtCount',
+  'defaultWinningGames',
+  'tournamentName',
+]
 const tabId = Math.random().toString(36).slice(2)
+const storagePrefix = `${import.meta.env.BASE_URL}:`
+const storageKey = (key: StorageKey) => `${storagePrefix}${key}`
 const channel =
-  typeof BroadcastChannel === 'function' ? new BroadcastChannel('tourny-storage') : null
+  typeof BroadcastChannel === 'function'
+    ? new BroadcastChannel(`tourny-storage:${import.meta.env.BASE_URL}`)
+    : null
+
+if (!import.meta.env.BASE_URL.includes('/previews/')) {
+  for (const key of storageKeys) {
+    const legacyValue = localStorage.getItem(key)
+    if (legacyValue === null) continue
+    if (localStorage.getItem(storageKey(key)) === null)
+      localStorage.setItem(storageKey(key), legacyValue)
+    localStorage.removeItem(key)
+  }
+}
 
 export type SetScore = { a: string; b: string }
 export type Match = {
@@ -47,9 +69,9 @@ export type TournamentSnapshot = {
   defaultWinningGames: number
 }
 
-const read = <T>(key: string, fallback: T): T => {
+const read = <T>(key: StorageKey, fallback: T): T => {
   try {
-    return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback
+    return JSON.parse(localStorage.getItem(storageKey(key)) || 'null') ?? fallback
   } catch {
     return fallback
   }
@@ -57,7 +79,7 @@ const read = <T>(key: string, fallback: T): T => {
 
 export const loadParticipants = () => read<Participant[]>('players', [])
 const write = (key: StorageKey, value: unknown) => {
-  localStorage.setItem(key, JSON.stringify(value))
+  localStorage.setItem(storageKey(key), JSON.stringify(value))
   channel?.postMessage({ key, source: tabId } satisfies StorageMessage)
 }
 
@@ -81,7 +103,7 @@ export const loadTournamentName = () => {
 export const saveTournamentName = (value: string) =>
   write('tournamentName', value.trim() || 'Tourny')
 export const loadParticipantType = (): 'players' | 'teams' =>
-  localStorage.getItem('participantType') === 'teams' ? 'teams' : 'players'
+  localStorage.getItem(storageKey('participantType')) === 'teams' ? 'teams' : 'players'
 export const saveParticipantType = (value: 'players' | 'teams') => write('participantType', value)
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -147,16 +169,9 @@ export const subscribeToStorage = (listener: (key: StorageKey) => void) => {
     if (event.data?.source !== tabId) listener(event.data.key)
   }
   const handleStorage = (event: StorageEvent) => {
-    if (
-      event.key === 'players' ||
-      event.key === 'rounds' ||
-      event.key === 'participantType' ||
-      event.key === 'courtCount' ||
-      event.key === 'defaultWinningGames' ||
-      event.key === 'tournamentName'
-    ) {
-      listener(event.key)
-    }
+    if (!event.key?.startsWith(storagePrefix)) return
+    const key = event.key.slice(storagePrefix.length)
+    if (storageKeys.includes(key as StorageKey)) listener(key as StorageKey)
   }
 
   if (channel) channel.addEventListener('message', handleMessage)

@@ -19,20 +19,69 @@ on:
           - remove
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  build:
+    if: inputs.preview_action != 'remove'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.preview_pr && format('refs/pull/{0}/head', inputs.preview_pr) || github.ref }}
+
+      - name: Verify production tag
+        if: github.event_name == 'push'
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        env:
+          VITE_BASE_URL: ${{ inputs.preview_pr && format('/tournament-planner/previews/pr-{0}/', inputs.preview_pr) || '/tournament-planner/' }}
+        run: pnpm build
+
+      - name: Add GitHub Pages fallback
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-build
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+
   deploy:
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
       - name: Validate request
         if: github.event_name == 'workflow_dispatch'
@@ -49,50 +98,35 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout
+      - name: Checkout trusted deployment files
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           persist-credentials: false
-          ref: ${{ inputs.preview_pr && format('refs/pull/{0}/head', inputs.preview_pr) || github.ref }}
+          ref: main
 
-      - name: Verify production tag
-        if: github.event_name == 'push'
-        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
-
-      - name: Set preview path
-        if: inputs.preview_pr
-        run: echo "PREVIEW_PATH=previews/pr-${{ inputs.preview_pr }}" >> "$GITHUB_ENV"
-
-      - name: Set up pnpm
+      - name: Download build artifact
         if: inputs.preview_action != 'remove'
-        uses: pnpm/action-setup@v5
-
-      - name: Set up Node.js
-        if: inputs.preview_action != 'remove'
-        uses: actions/setup-node@v5
+        uses: actions/download-artifact@v5
         with:
-          node-version: 24
-          cache: pnpm
+          name: pages-build
+          path: site-input
 
-      - name: Install dependencies
+      - name: Validate build artifact
         if: inputs.preview_action != 'remove'
-        run: pnpm install --frozen-lockfile
-
-      - name: Build application
-        if: inputs.preview_action != 'remove'
-        env:
-          VITE_BASE_URL: ${{ inputs.preview_pr && format('/tournament-planner/previews/pr-{0}/', inputs.preview_pr) || '/tournament-planner/' }}
-        run: pnpm build
-
-      - name: Add GitHub Pages fallback
-        if: inputs.preview_action != 'remove'
-        run: cp dist/index.html dist/404.html
+        run: |
+          test -f site-input/index.html
+          test -f site-input/404.html
+          if find site-input ! -type f ! -type d -print -quit | grep -q .; then
+            echo "The build artifact contains an unsupported file type."
+            exit 1
+          fi
 
       - name: Prepare Pages state
         env:
           GH_TOKEN: ${{ github.token }}
           PREVIEW_ACTION: ${{ inputs.preview_action }}
+          PREVIEW_PATH: ${{ inputs.preview_pr && format('previews/pr-{0}', inputs.preview_pr) || '' }}
         run: |
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           if git fetch origin gh-pages; then
@@ -103,15 +137,16 @@ jobs:
             git -C pages rm -rf .
           fi
 
-          if [[ -n "${PREVIEW_PATH:-}" ]]; then
+          if [[ -n "$PREVIEW_PATH" ]]; then
             rm -rf "pages/$PREVIEW_PATH"
             if [[ "$PREVIEW_ACTION" != "remove" ]]; then
               mkdir -p "pages/$PREVIEW_PATH"
-              cp -a dist/. "pages/$PREVIEW_PATH/"
+              cp -a site-input/. "pages/$PREVIEW_PATH/"
             fi
+            cp src/public/404.html pages/404.html
           else
             find pages -mindepth 1 -maxdepth 1 ! -name .git ! -name previews -exec rm -rf {} +
-            cp -a dist/. pages/
+            cp -a site-input/. pages/
           fi
 
           touch pages/.nojekyll
@@ -130,7 +165,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: site
