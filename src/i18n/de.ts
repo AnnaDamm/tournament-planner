@@ -12,6 +12,7 @@ export const de: Translation = {
   back: 'Zurück',
   menu: 'Menü',
   actions: 'Aktionen',
+  documentation: 'Dokumentation',
   add: 'Spieler hinzufügen',
   addTeam: 'Teams hinzufügen',
   participants: 'TEILNEHMER',
