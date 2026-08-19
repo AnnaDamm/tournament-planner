@@ -136,7 +136,7 @@ export function MatchRow({
     >
       <span className="match-no">{String(matchIndex + 1).padStart(2, '0')}</span>
       <span
-        className={`drag-hint ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
+        className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
         onDragStart={(event) => {
           if (canReorder) {
@@ -162,7 +162,7 @@ export function MatchRow({
       </span>
       <span className="versus">VS</span>
       <span
-        className={`drag-hint ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
+        className={`drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
         onDragStart={(event) => {
           if (canReorder) {

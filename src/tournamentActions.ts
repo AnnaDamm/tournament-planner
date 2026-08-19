@@ -1,4 +1,4 @@
-import type { Participant } from './components/Players'
+import type { Participant } from './components/Participant'
 import { hasEnteredScore, isRoundComplete, startReadyRounds } from './tournament'
 import type { Round } from './storage'
 

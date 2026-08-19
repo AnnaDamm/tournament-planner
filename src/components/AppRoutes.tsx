@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { Players, type Participant } from './Players'
+import type { Participant } from './Participant'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { Table, type Stat } from './Table'
@@ -9,7 +9,6 @@ export type AppRoutesProps = {
   tournamentName: string
   players: Participant[]
   participantLabel: string
-  participantPlural: string
   rounds: Round[]
   participantType: 'players' | 'teams'
   courtCount: number
@@ -45,7 +44,6 @@ export function AppRoutes({
   tournamentName,
   players,
   participantLabel,
-  participantPlural,
   rounds,
   participantType,
   courtCount,
@@ -79,25 +77,24 @@ export function AppRoutes({
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/table" replace />} />
+      <Route path="/participants" element={<Navigate to="/table" replace />} />
       <Route
-        path="/participants"
+        path="/table"
         element={
-          <Players
-            players={players}
+          <Table
+            sorted={sorted}
             participantLabel={participantLabel}
-            participantPlural={participantPlural}
             rounds={rounds}
             name={name}
+            sort={sort}
+            toggleSort={onToggleSort}
+            desc={desc}
             onAdd={onAdd}
             onDelete={onDeleteParticipant}
             onRename={onRename}
             onToggleWithdraw={onToggleWithdraw}
           />
         }
-      />
-      <Route
-        path="/table"
-        element={<Table sorted={sorted} sort={sort} toggleSort={onToggleSort} desc={desc} />}
       />
       <Route
         path="/rounds"

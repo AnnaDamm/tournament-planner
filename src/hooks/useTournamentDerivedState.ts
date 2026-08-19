@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { Participant } from '../components/Players'
+import type { Participant } from '../components/Participant'
 import type { Round } from '../storage'
 import { calculateStandings } from '../tournament'
 import { sortStats } from '../tournamentStats'

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
-import type { Participant } from '../components/Players'
+import type { Participant } from '../components/Participant'
 import {
   loadCourtCount,
   loadDefaultWinningGames,
@@ -77,7 +77,6 @@ export function useTournamentController(): TournamentContextValue {
   const { standingsBeforeRounds, sorted } = useTournamentDerivedState(players, rounds, sort, desc)
 
   const participantLabel = participantType === 'teams' ? t('teams') : t('players')
-  const participantPlural = participantType === 'teams' ? t('allTeams') : t('all')
   const name = (id: string) =>
     isUnknownParticipantId(id)
       ? t('notYetKnown')
@@ -168,7 +167,6 @@ export function useTournamentController(): TournamentContextValue {
     tournamentName,
     players,
     participantLabel,
-    participantPlural,
     rounds,
     participantType,
     courtCount,
@@ -216,8 +214,6 @@ export function useTournamentController(): TournamentContextValue {
   return {
     layout: {
       tournamentName,
-      participantLabel,
-      playerCount: players.filter((player) => !player.withdrawn).length,
       roundCount: rounds.length,
       currentRound: getCurrentRoundNumber(rounds, courtCount),
     },
