@@ -61,7 +61,7 @@ export function AppDialogs({
           placeholder={'North Stars\nRiver Club\n...'}
         />
         <div className="dialog-actions">
-          <button className="button ghost" onClick={() => bulkRef.current?.close()}>
+          <button className="button ghost" type="button" onClick={() => bulkRef.current?.close()}>
             {t('cancel')}
           </button>
           <button className="button primary" onClick={onAdd}>

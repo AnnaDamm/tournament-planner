@@ -33,10 +33,7 @@ const buildRoundWithResult = (
 ) =>
   rounds.map((round) => (round.number === number ? { ...round, winningGames, courtCount } : round))
 
-const openDialogAndFocus = (
-  dialog: HTMLDialogElement | null,
-  input: HTMLTextAreaElement | null,
-) => {
+const openBulkDialog = (dialog: HTMLDialogElement | null, input: HTMLTextAreaElement | null) => {
   if (!dialog) return
   dialog.showModal()
   setTimeout(() => {
@@ -204,7 +201,7 @@ export function useTournamentController(): TournamentContextValue {
     sorted,
     sort,
     desc,
-    onAdd: () => openDialogAndFocus(bulkRef.current, bulkInputRef.current),
+    onAdd: () => openBulkDialog(bulkRef.current, bulkInputRef.current),
     onDeleteParticipant: (id) =>
       setPlayers((current) => current.filter((player) => player.id !== id)),
     onRename: rename,
