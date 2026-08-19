@@ -11,10 +11,10 @@ if command -v pnpm >/dev/null 2>&1; then
   }
 elif command -v docker >/dev/null 2>&1; then
   run_pnpm() {
-    docker compose run --rm --no-deps app pnpm "$@"
+    docker compose run --rm --no-deps dev pnpm "$@"
   }
   read_version() {
-    docker compose run --rm --no-deps app node -p "require('./package.json').version"
+    docker compose run --rm --no-deps dev node -p "require('./package.json').version"
   }
 else
   echo "Release failed: neither pnpm nor Docker is available." >&2
