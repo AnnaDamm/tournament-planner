@@ -2,8 +2,7 @@ import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
 import { getMatchResult, getMatchSets } from '../tournament'
-import type { Round } from '../storage'
-import type { Participant } from './Participant'
+import type { Participant, Round } from '../tournamentTypes'
 
 type Props = {
   player: Participant | null

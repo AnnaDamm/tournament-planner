@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { GripVertical } from 'lucide-react'
-import type { Match, SetScore } from '../storage'
+import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
 import { getMatchResult, hasEnteredScore } from '../tournament'
 

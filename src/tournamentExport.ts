@@ -1,4 +1,4 @@
-import type { TournamentSnapshot } from './storage'
+import type { TournamentSnapshot } from './tournamentTypes'
 
 const fileSlug = (value: string) =>
   value

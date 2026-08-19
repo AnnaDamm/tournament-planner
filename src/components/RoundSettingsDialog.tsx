@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
-import type { Round } from '../storage'
+import type { Round } from '../tournamentTypes'
 
 type Props = {
   round: Round | null

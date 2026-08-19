@@ -3,8 +3,7 @@ import { useState } from 'react'
 import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { t } from '../i18n'
-import type { Round } from '../storage'
-import type { Participant } from './Participant'
+import type { Participant, Round } from '../tournamentTypes'
 
 export type Stat = Participant & {
   diff: number

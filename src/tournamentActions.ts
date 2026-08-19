@@ -1,6 +1,5 @@
-import type { Participant } from './components/Participant'
+import type { Participant, Round } from './tournamentTypes'
 import { hasEnteredScore, isRoundComplete, startReadyRounds } from './tournament'
-import type { Round } from './storage'
 
 export const createParticipant = (name: string): Participant => ({
   id: Math.random().toString(36).slice(2, 9),
