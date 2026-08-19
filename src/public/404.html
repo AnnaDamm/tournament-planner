@@ -7,13 +7,19 @@
     <script>
       const repositoryBase = '/tournament-planner/'
       const relativePath = window.location.pathname.slice(repositoryBase.length)
-      const preview = relativePath.match(/^(pr-\d+)(?:\/|$)/)
-      const appBase = preview ? `${repositoryBase}${preview[1]}/` : repositoryBase
+      const preview = relativePath.match(/^previews\/(pr-\d+)(?:\/|$)/)
+      const appBase = preview ? `${repositoryBase}previews/${preview[1]}/` : repositoryBase
       const route = window.location.pathname.slice(appBase.length)
-      const target = new URL(appBase, window.location.origin)
 
-      target.searchParams.set('route', `${route}${window.location.search}${window.location.hash}`)
-      window.location.replace(target)
+      if (route) {
+        const target = new URL(appBase, window.location.origin)
+        const search = new URLSearchParams(window.location.search)
+        search.delete('route')
+        const query = search.size ? `?${search}` : ''
+
+        target.searchParams.set('route', `${route}${query}${window.location.hash}`)
+        window.location.replace(target)
+      }
     </script>
   </head>
   <body></body>
