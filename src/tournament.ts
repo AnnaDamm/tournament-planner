@@ -10,6 +10,17 @@ const unknownParticipantId = (roundNumber: number, index: number) =>
 
 const randomItem = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)]
 
+const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
+  const byeCounts = new Map(candidateIds.map((id) => [id, 0]))
+  previousRounds.forEach((round) => {
+    if (round.bye && byeCounts.has(round.bye)) {
+      byeCounts.set(round.bye, (byeCounts.get(round.bye) ?? 0) + 1)
+    }
+  })
+  const lowestByeCount = Math.min(...byeCounts.values())
+  return randomItem(candidateIds.filter((id) => byeCounts.get(id) === lowestByeCount))
+}
+
 export const getMatchSets = (match: Match): SetScore[] =>
   match.sets?.length
     ? match.sets
@@ -66,7 +77,7 @@ export const calculateStandings = (players: Participant[], rounds: Round[]) => {
   const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
 
   rounds.forEach((round) => {
-    if (round.bye && !isUnknownParticipantId(round.bye)) {
+    if (round.startedAt && round.bye && !isUnknownParticipantId(round.bye)) {
       const byeStanding = standings.get(round.bye)
       if (byeStanding) byeStanding.wins += 1
     }
@@ -164,7 +175,15 @@ export const createRoundPlan = (
   const standings = calculateStandings(activePlayers, previousRounds)
   const standingsById = new Map(standings.map((standing) => [standing.id, standing]))
   const finalizedIds = finalizedParticipantIds(activePlayers, previousRounds)
-  const knownPlayers = activePlayers.filter((player) => finalizedIds.has(player.id))
+  let knownPlayers = activePlayers.filter((player) => finalizedIds.has(player.id))
+  let bye: string | null = null
+  if (knownPlayers.length === activePlayers.length && activePlayers.length % 2 === 1) {
+    bye = selectBye(
+      knownPlayers.map((player) => player.id),
+      previousRounds,
+    )
+    knownPlayers = knownPlayers.filter((player) => player.id !== bye)
+  }
   const groups = new Map<string, { wins: number; losses: number; players: string[] }>()
 
   knownPlayers.forEach((player) => {
@@ -217,12 +236,9 @@ export const createRoundPlan = (
     (_, index) => unknownParticipantId(roundNumber, index),
   )
   const unpaired = [...leftovers, ...unknownIds]
-  let bye: string | null = null
   if (unpaired.length % 2 === 1) {
-    const byeCandidates = unpaired.filter((id) => !isUnknownParticipantId(id))
-    const selectedBye = randomItem(byeCandidates.length > 0 ? byeCandidates : unpaired)
-    const byeIndex = unpaired.indexOf(selectedBye)
-    bye = unpaired.splice(byeIndex, 1)[0]
+    const pendingByeIndex = unpaired.findIndex(isUnknownParticipantId)
+    unpaired.splice(pendingByeIndex >= 0 ? pendingByeIndex : unpaired.length - 1, 1)
   }
   if (unpaired.length >= 2) pairs.push(...pairGroup(unpaired, previousRounds))
 
@@ -292,6 +308,17 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
   const available = activePlayers.filter(
     (player) => finalizedIds.has(player.id) && !usedIds.has(player.id),
   )
+  let bye = round.bye
+  if (!bye && activePlayers.length % 2 === 1 && available.length > 0) {
+    bye = selectBye(
+      available.map((player) => player.id),
+      previousRounds,
+    )
+    available.splice(
+      available.findIndex((player) => player.id === bye),
+      1,
+    )
+  }
   const replace = (id: string, opponentId?: string) => {
     const candidate = chooseCandidate(opponentId, available, standingsById, previousRounds)
     if (!candidate) return id
@@ -300,7 +327,6 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
     return candidate.id
   }
 
-  let bye = round.bye
   if (bye && isUnknownParticipantId(bye)) bye = replace(bye)
   const matches = round.matches.map((match) => {
     let a = match.a
