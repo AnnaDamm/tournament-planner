@@ -1,54 +1,131 @@
-# Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on version tags such as v1.0.0
   push:
     tags: ['v*.*.*']
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      preview_pr:
+        description: Pull request number; leave empty for a production deployment
+        required: false
+        type: string
+      preview_action:
+        description: Preview action
+        required: true
+        default: deploy
+        type: choice
+        options:
+          - deploy
+          - remove
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Validate request
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PREVIEW_ACTION: ${{ inputs.preview_action }}
+          PR_NUMBER: ${{ inputs.preview_pr }}
+        run: |
+          if [[ -n "$PR_NUMBER" && ! "$PR_NUMBER" =~ ^[1-9][0-9]*$ ]]; then
+            echo "The pull request number must be a positive integer."
+            exit 1
+          fi
+          if [[ "$PREVIEW_ACTION" == "remove" && -z "$PR_NUMBER" ]]; then
+            echo "Removing a preview requires a pull request number."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.preview_pr && format('refs/pull/{0}/head', inputs.preview_pr) || github.ref }}
+
+      - name: Verify production tag
+        if: github.event_name == 'push'
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Set preview path
+        if: inputs.preview_pr
+        run: echo "PREVIEW_PATH=previews/pr-${{ inputs.preview_pr }}" >> "$GITHUB_ENV"
 
       - name: Set up pnpm
+        if: inputs.preview_action != 'remove'
         uses: pnpm/action-setup@v5
 
       - name: Set up Node.js
+        if: inputs.preview_action != 'remove'
         uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: pnpm
 
       - name: Install dependencies
+        if: inputs.preview_action != 'remove'
         run: pnpm install --frozen-lockfile
 
       - name: Build application
+        if: inputs.preview_action != 'remove'
+        env:
+          VITE_BASE_URL: ${{ inputs.preview_pr && format('/tournament-planner/previews/pr-{0}/', inputs.preview_pr) || '/tournament-planner/' }}
         run: pnpm build
 
       - name: Add GitHub Pages fallback
+        if: inputs.preview_action != 'remove'
         run: cp dist/index.html dist/404.html
+
+      - name: Prepare Pages state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_ACTION: ${{ inputs.preview_action }}
+        run: |
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch origin gh-pages; then
+            git worktree add --detach pages origin/gh-pages
+          else
+            git worktree add --detach pages
+            git -C pages checkout --orphan gh-pages
+            git -C pages rm -rf .
+          fi
+
+          if [[ -n "${PREVIEW_PATH:-}" ]]; then
+            rm -rf "pages/$PREVIEW_PATH"
+            if [[ "$PREVIEW_ACTION" != "remove" ]]; then
+              mkdir -p "pages/$PREVIEW_PATH"
+              cp -a dist/. "pages/$PREVIEW_PATH/"
+            fi
+          else
+            find pages -mindepth 1 -maxdepth 1 ! -name .git ! -name previews -exec rm -rf {} +
+            cp -a dist/. pages/
+          fi
+
+          touch pages/.nojekyll
+          git -C pages config user.name github-actions[bot]
+          git -C pages config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git -C pages add --all
+          if ! git -C pages diff --cached --quiet; then
+            git -C pages commit -m "Deploy GitHub Pages"
+            git -C pages push origin HEAD:gh-pages
+          fi
+
+          mkdir site
+          cp -a pages/. site/
+          rm -f site/.git
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
@@ -56,8 +133,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Upload the generated production build
-          path: dist
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment
