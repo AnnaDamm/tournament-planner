@@ -1,0 +1,19 @@
+{
+  "name": "Tourny — Tournament Manager",
+  "short_name": "Tourny",
+  "description": "Offline-capable tournament planning app.",
+  "start_url": "/tournament-planner/previews/pr-9/",
+  "scope": "/tournament-planner/previews/pr-9/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/tournament-planner/previews/pr-9/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
