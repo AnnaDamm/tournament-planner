@@ -312,7 +312,7 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
   if (
     !bye &&
     activePlayers.length % 2 === 1 &&
-    finalizedIds.size === activePlayers.length &&
+    activePlayers.every((player) => finalizedIds.has(player.id)) &&
     available.length > 0
   ) {
     bye = selectBye(
