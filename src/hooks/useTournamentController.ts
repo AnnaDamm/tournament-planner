@@ -213,6 +213,9 @@ export function useTournamentController(): TournamentContextValue {
   return {
     layout: {
       tournamentName,
+      participantLabel,
+      participantNames: players.map((player) => player.name),
+      playerCount: players.filter((player) => !player.withdrawn).length,
       roundCount: rounds.length,
       currentRound: getCurrentRoundNumber(rounds, courtCount),
     },

@@ -87,4 +87,7 @@ export const de: Translation = {
   undoWithdrawal: 'Aufgabe rückgängig machen',
   withdrawn: 'aufgegeben',
   reroll: 'Neu würfeln',
+  playerSearch: 'Spieler suchen',
+  clearSearch: 'Suche leeren',
+  nextMatch: 'Nächstes Spiel',
 }
