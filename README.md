@@ -107,7 +107,17 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow installs dependencies, runs the production build, creates a `404.html` fallback for client-side routes, uploads `dist/` as a GitHub Pages artifact, and deploys it with the official Pages deployment action. In the repository settings, configure GitHub Pages to use **GitHub Actions** as its source.
+Tags whose commits belong to `main` automatically run the production build. The workflow
+creates a `404.html` fallback for client-side routes, updates the deployment state on the
+`gh-pages` branch, and deploys the assembled site with the official Pages deployment
+action. In the repository settings, configure GitHub Pages to use **GitHub Actions** as its
+source.
+
+Maintainers can deploy a pull request preview manually under **Actions → Deploy static
+content to Pages → Run workflow** by entering its pull request number. The preview is
+available at `https://annadamm.github.io/tournament-planner/previews/pr-<number>/`.
+Running the workflow again with the `remove` action deletes that preview. GitHub restricts
+manual workflow runs to users with write access to the repository.
 
 To create a release automatically, run one of these commands:
 
