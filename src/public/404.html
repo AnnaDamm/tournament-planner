@@ -7,8 +7,8 @@
     <script>
       const repositoryBase = '/tournament-planner/'
       const relativePath = window.location.pathname.slice(repositoryBase.length)
-      const preview = relativePath.match(/^(pr-\d+)(?:\/|$)/)
-      const appBase = preview ? `${repositoryBase}${preview[1]}/` : repositoryBase
+      const preview = relativePath.match(/^previews\/(pr-\d+)(?:\/|$)/)
+      const appBase = preview ? `${repositoryBase}previews/${preview[1]}/` : repositoryBase
       const route = window.location.pathname.slice(appBase.length)
       const target = new URL(appBase, window.location.origin)
 
