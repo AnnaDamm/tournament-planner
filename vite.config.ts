@@ -28,6 +28,30 @@ function serviceWorker(): Plugin {
   }
 }
 
+function webManifest(): Plugin {
+  let outputDir = resolve('dist')
+  let base = '/'
+  return {
+    name: 'web-manifest',
+    configResolved(config) {
+      outputDir = resolve(config.root, config.build.outDir)
+      base = config.base
+    },
+    closeBundle() {
+      const manifestPath = resolve(outputDir, 'manifest.webmanifest')
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+        start_url: string
+        scope: string
+        icons: Array<{ src: string }>
+      }
+      manifest.start_url = base
+      manifest.scope = base
+      manifest.icons = manifest.icons.map((icon) => ({ ...icon, src: `${base}icon.svg` }))
+      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+    },
+  }
+}
+
 function inlineAssets(): Plugin {
   let outputDir = resolve('dist')
   let assetBase = '/assets/'
@@ -68,7 +92,7 @@ function inlineAssets(): Plugin {
 export default defineConfig(({ mode }) => ({
   root: 'src',
   base: mode === 'production' ? (process.env.VITE_BASE_URL ?? '/tournament-planner/') : '/',
-  plugins: [react(), tailwindcss(), serviceWorker(), inlineAssets()],
+  plugins: [react(), tailwindcss(), serviceWorker(), webManifest(), inlineAssets()],
   build: {
     outDir: '../dist',
     emptyOutDir: true,
