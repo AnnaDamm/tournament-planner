@@ -195,6 +195,13 @@ const en: DocPage[] = [
         note: 'Clearing site data or ending a private session can destroy the tournament. Export regularly.',
       },
       {
+        title: 'Read-only tab',
+        text: [
+          'Select the lock in the toolbar to reopen the current tab as read-only. The tab keeps its own local snapshot, cannot change or save tournament data, and the lock cannot be removed afterward. Open the GitHub Pages app in a second tab when you need a local read-only view.',
+          'Local server viewers are read-only automatically. The lock and documentation controls are hidden in every read-only or viewer tab.',
+        ],
+      },
+      {
         title: 'JSON export and import',
         text: [
           'Export downloads the complete version-1 state named after the tournament and may contain personal data.',
@@ -439,6 +446,13 @@ const de: DocPage[] = [
           'Tourny speichert alles im localStorage. Tabs derselben URL synchronisieren sich; Geräte, Browserprofile, private Fenster, Produktion, Entwicklung und Vorschauen bleiben getrennt.',
         ],
         note: 'Gelöschte Websitedaten können das Turnier zerstören. Regelmäßig exportieren.',
+      },
+      {
+        title: 'Read-only-Tab',
+        text: [
+          'Über das Schloss in der Kopfleiste lässt sich der aktuelle Tab als Read-only-Ansicht neu öffnen. Der Tab nutzt einen eigenen lokalen Stand, kann keine Turnierdaten ändern oder speichern, und der Lock kann danach nicht mehr entfernt werden. Öffne die GitHub-Pages-App dafür in einem zweiten Tab.',
+          'Viewer über den lokalen Server sind automatisch schreibgeschützt. Lock und Dokumentation sind in jedem Read-only- oder Viewer-Tab ausgeblendet.',
+        ],
       },
       {
         title: 'JSON-Export und -Import',

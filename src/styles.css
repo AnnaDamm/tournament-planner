@@ -943,6 +943,23 @@ select {
 }
 
 @media (prefers-color-scheme: dark) {
+  .match.search-target,
+  .table-wrap tr.search-target {
+    animation-name: search-target-pulse-dark;
+  }
+
+  @keyframes search-target-pulse-dark {
+    0%,
+    35% {
+      background: #314726;
+      box-shadow: 0 0 0 4px #5e8f2e66;
+    }
+    100% {
+      background: transparent;
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+
   body {
     background: #111814;
     color: #edf4ef;
