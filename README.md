@@ -2,6 +2,18 @@
 
 A small local React/Vite application for organising sport-agnostic tournaments with Swiss-style rounds.
 
+## Features
+
+- **Currently only the Swiss system is supported**
+- Player management, including bulk entry and deletion
+- Sortable standings table
+- Swiss-style round generation grouped by wins
+- Bye handling for an odd number of players
+- Drag-and-drop opponent changes
+- Local browser persistence with `localStorage`
+- Browser language detection with English fallback and German translations
+- Automatic light/dark mode based on the browser or operating system preference
+
 ## GitHub Pages
 
 [Open Tourny](https://annadamm.github.io/tournament-planner/)
@@ -106,14 +118,3 @@ pnpm release:major
 ```
 
 The command uses `pnpm version`, commits the version bump, creates and pushes a `v...` tag, and that tag automatically starts the Pages build and deployment. The same versioning workflow can also be started manually under **Actions → Create release tag → Run workflow**.
-
-## Features
-
-- Player management, including bulk entry and deletion
-- Sortable standings table
-- Swiss-style round generation grouped by wins
-- Bye handling for an odd number of players
-- Drag-and-drop opponent changes
-- Local browser persistence with `localStorage`
-- Browser language detection with English fallback and German translations
-- Automatic light/dark mode based on the browser or operating system preference
