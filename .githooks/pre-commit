@@ -1,13 +1,21 @@
 #!/bin/sh
 set -e
 
-if command -v pnpm >/dev/null 2>&1 && [ -d node_modules ]; then
+if command -v pnpm >/dev/null 2>&1 && command -v node >/dev/null 2>&1 && [ -d node_modules ]; then
   run_pnpm() {
     pnpm "$@"
   }
 elif command -v docker >/dev/null 2>&1; then
+  check_image_hash=$(printf '%s' "$(git rev-parse --show-toplevel)" | cksum | awk '{print $1}')
+  check_image="tourny-pre-commit-check-${check_image_hash}"
+  check_image_ready=false
+
   run_pnpm() {
-    docker compose run --rm app pnpm "$@"
+    if [ "$check_image_ready" = false ]; then
+      docker build --target build --tag "$check_image" .
+      check_image_ready=true
+    fi
+    docker run --rm "$check_image" pnpm "$@"
   }
 else
   echo "Skipping pre-commit checks: neither pnpm nor Docker is available."
