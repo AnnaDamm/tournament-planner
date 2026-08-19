@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { Participant, Round } from '../tournamentTypes'
-import { calculateStandings } from '../tournament'
+import { calculateStandings, calculateStandingsBeforeRounds } from '../tournament'
 import { sortStats } from '../tournamentStats'
 
 export function useTournamentDerivedState(
@@ -11,7 +11,7 @@ export function useTournamentDerivedState(
 ) {
   const standings = useMemo(() => calculateStandings(players, rounds), [players, rounds])
   const standingsBeforeRounds = useMemo(
-    () => rounds.map((_, index) => calculateStandings(players, rounds.slice(0, index))),
+    () => calculateStandingsBeforeRounds(players, rounds),
     [players, rounds],
   )
   const stats = useMemo(

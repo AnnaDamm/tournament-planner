@@ -72,52 +72,65 @@ const newStanding = (player: Participant): RoundStanding => ({
   setsLost: 0,
 })
 
-export const calculateStandings = (players: Participant[], rounds: Round[]) => {
-  const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
+const applyRoundToStandings = (standings: Map<string, RoundStanding>, round: Round) => {
+  if (round.startedAt && round.bye && !isUnknownParticipantId(round.bye)) {
+    const byeStanding = standings.get(round.bye)
+    if (byeStanding) byeStanding.wins += 1
+  }
 
-  rounds.forEach((round) => {
-    if (round.startedAt && round.bye && !isUnknownParticipantId(round.bye)) {
-      const byeStanding = standings.get(round.bye)
-      if (byeStanding) byeStanding.wins += 1
-    }
+  round.matches.forEach((match) => {
+    if (
+      isUnknownParticipantId(match.a) ||
+      isUnknownParticipantId(match.b) ||
+      !standings.has(match.a) ||
+      !standings.has(match.b)
+    )
+      return
 
-    round.matches.forEach((match) => {
-      if (
-        isUnknownParticipantId(match.a) ||
-        isUnknownParticipantId(match.b) ||
-        !standings.has(match.a) ||
-        !standings.has(match.b)
-      )
-        return
+    const result = getMatchResult(match, Math.max(1, round.winningGames || 1))
+    if (!result) return
+    const standingA = standings.get(match.a)!
+    const standingB = standings.get(match.b)!
+    standingA.wins += result.winner === match.a ? 1 : 0
+    standingA.losses += result.winner === match.a ? 0 : 1
+    standingB.wins += result.winner === match.b ? 1 : 0
+    standingB.losses += result.winner === match.b ? 0 : 1
 
-      const result = getMatchResult(match, Math.max(1, round.winningGames || 1))
-      if (!result) return
-      const standingA = standings.get(match.a)!
-      const standingB = standings.get(match.b)!
-      standingA.wins += result.winner === match.a ? 1 : 0
-      standingA.losses += result.winner === match.a ? 0 : 1
-      standingB.wins += result.winner === match.b ? 1 : 0
-      standingB.losses += result.winner === match.b ? 0 : 1
-
-      result.sets.forEach((set) => {
-        const pointsA = Number(set.a)
-        const pointsB = Number(set.b)
-        standingA.scored += pointsA
-        standingA.conceded += pointsB
-        standingB.scored += pointsB
-        standingB.conceded += pointsA
-        standingA.setsWon += pointsA > pointsB ? 1 : 0
-        standingA.setsLost += pointsA < pointsB ? 1 : 0
-        standingB.setsWon += pointsB > pointsA ? 1 : 0
-        standingB.setsLost += pointsB < pointsA ? 1 : 0
-      })
+    result.sets.forEach((set) => {
+      const pointsA = Number(set.a)
+      const pointsB = Number(set.b)
+      standingA.scored += pointsA
+      standingA.conceded += pointsB
+      standingB.scored += pointsB
+      standingB.conceded += pointsA
+      standingA.setsWon += pointsA > pointsB ? 1 : 0
+      standingA.setsLost += pointsA < pointsB ? 1 : 0
+      standingB.setsWon += pointsB > pointsA ? 1 : 0
+      standingB.setsLost += pointsB < pointsA ? 1 : 0
     })
   })
+}
 
-  return players.map((player) => ({
+const standingsSnapshot = (players: Participant[], standings: Map<string, RoundStanding>) =>
+  players.map((player) => ({
     ...player,
     ...(standings.get(player.id) ?? newStanding(player)),
   }))
+
+export const calculateStandings = (players: Participant[], rounds: Round[]) => {
+  const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
+  rounds.forEach((round) => applyRoundToStandings(standings, round))
+
+  return standingsSnapshot(players, standings)
+}
+
+export const calculateStandingsBeforeRounds = (players: Participant[], rounds: Round[]) => {
+  const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
+  return rounds.map((round) => {
+    const snapshot = standingsSnapshot(players, standings)
+    applyRoundToStandings(standings, round)
+    return snapshot
+  })
 }
 
 const finalizedParticipantIds = (players: Participant[], rounds: Round[]) => {

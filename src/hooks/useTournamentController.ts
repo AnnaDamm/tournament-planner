@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
 import type { Participant, Round } from '../tournamentTypes'
 import { parseTournamentSnapshot } from '../tournamentSnapshot'
@@ -37,22 +37,23 @@ const getNextMatchTargets = (players: Participant[], rounds: Round[], courtCount
   const runningMatchIds = new Set(
     [...getRunningMatchIdsByRound(rounds, courtCount).values()].flatMap((ids) => [...ids]),
   )
-  return players.flatMap((player) => {
-    return rounds
-      .flatMap((round) =>
-        round.matches.map((match) => ({
-          match,
-          winningGames: Math.max(1, round.winningGames || 1),
-        })),
-      )
-      .filter(
-        ({ match, winningGames }) =>
-          (match.a === player.id || match.b === player.id) &&
-          !getMatchResult(match, winningGames) &&
-          !runningMatchIds.has(match.id),
-      )
-      .map(({ match }) => ({ participantName: player.name, matchId: match.id }))
+  const targetsByParticipant = new Map(players.map((player) => [player.id, [] as string[]]))
+
+  rounds.forEach((round) => {
+    const winningGames = Math.max(1, round.winningGames || 1)
+    round.matches.forEach((match) => {
+      if (getMatchResult(match, winningGames) || runningMatchIds.has(match.id)) return
+      targetsByParticipant.get(match.a)?.push(match.id)
+      targetsByParticipant.get(match.b)?.push(match.id)
+    })
   })
+
+  return players.flatMap((player) =>
+    (targetsByParticipant.get(player.id) ?? []).map((matchId) => ({
+      participantName: player.name,
+      matchId,
+    })),
+  )
 }
 
 export function useTournamentController(): TournamentContextValue {
@@ -84,6 +85,10 @@ export function useTournamentController(): TournamentContextValue {
   }, [tournamentName])
 
   const { standingsBeforeRounds, sorted } = useTournamentDerivedState(players, rounds, sort, desc)
+  const nextMatchTargets = useMemo(
+    () => getNextMatchTargets(players, rounds, courtCount),
+    [courtCount, players, rounds],
+  )
 
   const participantLabel = participantType === 'teams' ? t('teams') : t('players')
   const name = (id: string) =>
@@ -233,7 +238,7 @@ export function useTournamentController(): TournamentContextValue {
         participantName: player.name,
         participantId: player.id,
       })),
-      nextMatchTargets: getNextMatchTargets(players, rounds, courtCount),
+      nextMatchTargets,
       roundCount: rounds.length,
       currentRound: getCurrentRoundNumber(rounds, courtCount),
     },
