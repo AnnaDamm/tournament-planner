@@ -219,8 +219,10 @@ export const createRoundPlan = (
   const unpaired = [...leftovers, ...unknownIds]
   let bye: string | null = null
   if (unpaired.length % 2 === 1) {
-    const byeIndex = unpaired.findIndex((id) => !isUnknownParticipantId(id))
-    bye = unpaired.splice(byeIndex >= 0 ? byeIndex : 0, 1)[0]
+    const byeCandidates = unpaired.filter((id) => !isUnknownParticipantId(id))
+    const selectedBye = randomItem(byeCandidates.length > 0 ? byeCandidates : unpaired)
+    const byeIndex = unpaired.indexOf(selectedBye)
+    bye = unpaired.splice(byeIndex, 1)[0]
   }
   if (unpaired.length >= 2) pairs.push(...pairGroup(unpaired, previousRounds))
 

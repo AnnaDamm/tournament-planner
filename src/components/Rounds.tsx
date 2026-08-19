@@ -1,4 +1,4 @@
-import { Dices, GripVertical, RefreshCw, Trophy, X } from 'lucide-react'
+import { Dices, GripVertical, Plus, Trophy, X } from 'lucide-react'
 import { useState } from 'react'
 import { MatchRow } from './MatchRow'
 import { PageTitle } from './PageTitle'
@@ -39,11 +39,7 @@ export function Rounds({
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   return (
     <>
-      <PageTitle eyebrow={t('schedule')} title={t('rounds')}>
-        <button className="button primary" onClick={onCreate}>
-          <RefreshCw size={16} /> {t('create')}
-        </button>
-      </PageTitle>
+      <PageTitle eyebrow={t('schedule')} title={t('rounds')} />
       {rounds.length === 0 ? (
         <div className="empty">
           <Trophy size={30} />
@@ -169,6 +165,9 @@ export function Rounds({
           })}
         </div>
       )}
+      <button className="button primary" onClick={onCreate}>
+        <Plus size={16} /> {t('create')}
+      </button>
       <PlayerHistoryDialog
         player={historyPlayer}
         rounds={rounds}
