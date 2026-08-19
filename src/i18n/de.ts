@@ -31,7 +31,6 @@ export const de: Translation = {
   points: 'PUNKTE',
   difference: 'PUNKTE-DIFFERENZ',
   position: 'POS.',
-  note: 'Punkte = eingetragene Punkte aus allen Runden · Punktedifferenz = erzielte Punkte − gegnerische Punkte',
   onePerLine: 'Ein Name pro Zeile',
   cancel: 'Abbrechen',
   save: 'Speichern',

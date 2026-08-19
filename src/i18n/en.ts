@@ -27,7 +27,6 @@ export const en = {
   points: 'POINTS',
   difference: 'POINT DIFFERENCE',
   position: 'POS.',
-  note: 'Points = total points entered in all rounds · Point difference = points scored − opponent points',
   onePerLine: 'One name per line',
   cancel: 'Cancel',
   save: 'Save',

@@ -1,36 +1,20 @@
-import type { RefObject } from 'react'
 import { AppDialogs } from './AppDialogs'
-import { AppRoutes, type AppRoutesProps } from './AppRoutes'
+import { AppRoutes } from './AppRoutes'
+import { useTournament } from '../context/TournamentContext'
 
-type Props = AppRoutesProps & {
-  bulkRef: RefObject<HTMLDialogElement | null>
-  confirmRef: RefObject<HTMLDialogElement | null>
-  draft: string
-  setDraft: (value: string) => void
-  onAddParticipants: () => void
-  onDeleteAllConfirmed: () => void
-}
-
-export function AppContent({
-  bulkRef,
-  confirmRef,
-  draft,
-  setDraft,
-  onAddParticipants,
-  onDeleteAllConfirmed,
-  ...routeProps
-}: Props) {
+export function AppContent() {
+  const { routes, dialogs } = useTournament()
   return (
     <>
-      <AppRoutes {...routeProps} />
+      <AppRoutes {...routes} />
       <AppDialogs
-        participantType={routeProps.participantType}
-        bulkRef={bulkRef}
-        confirmRef={confirmRef}
-        draft={draft}
-        setDraft={setDraft}
-        onAdd={onAddParticipants}
-        onDeleteAll={onDeleteAllConfirmed}
+        participantType={routes.participantType}
+        bulkRef={dialogs.bulkRef}
+        confirmRef={dialogs.confirmRef}
+        draft={dialogs.draft}
+        setDraft={dialogs.setDraft}
+        onAdd={dialogs.onAddParticipants}
+        onDeleteAll={dialogs.onDeleteAllConfirmed}
       />
     </>
   )

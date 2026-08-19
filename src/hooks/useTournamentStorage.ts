@@ -15,8 +15,8 @@ import {
   subscribeToStorage,
   type StorageKey,
   type Round,
-} from './storage'
-import type { Participant } from './components/Players'
+} from '../storage'
+import type { Participant } from '../components/Players'
 
 export function useTournamentStorage(
   players: Participant[],

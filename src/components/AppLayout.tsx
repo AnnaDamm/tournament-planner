@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { BarChart3, Settings2, Trophy, Users } from 'lucide-react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 
 type Props = {
@@ -23,8 +23,8 @@ export function AppLayout({
   const navigate = useNavigate()
   const location = useLocation()
   const navigation = [
-    { label: participantLabel, target: '/participants', icon: Users },
     { label: t('table'), target: '/table', icon: BarChart3 },
+    { label: participantLabel, target: '/participants', icon: Users },
     { label: t('rounds'), target: '/rounds', icon: Trophy },
   ]
   return (
@@ -34,9 +34,9 @@ export function AppLayout({
           <div className="brand-mark">
             <Trophy size={20} />
           </div>
-          <div className="brand-title" title={tournamentName}>
-            {tournamentName}
-          </div>
+          <h1 className="brand-title" title={tournamentName}>
+            <Link to="/table">{tournamentName}</Link>
+          </h1>
         </div>
         <div className="header-actions">
           <button

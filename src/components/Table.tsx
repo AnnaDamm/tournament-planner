@@ -105,7 +105,6 @@ export function Table({ sorted, sort, desc, toggleSort }: Props) {
           </tbody>
         </table>
       </div>
-      <p className="table-note">{t('note')}</p>
     </>
   )
 }

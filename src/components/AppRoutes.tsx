@@ -78,7 +78,7 @@ export function AppRoutes({
 }: AppRoutesProps) {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/participants" replace />} />
+      <Route path="/" element={<Navigate to="/table" replace />} />
       <Route
         path="/participants"
         element={
