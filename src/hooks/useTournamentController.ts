@@ -33,6 +33,17 @@ const buildRoundWithResult = (
 ) =>
   rounds.map((round) => (round.number === number ? { ...round, winningGames, courtCount } : round))
 
+const openDialogAndFocus = (
+  dialog: HTMLDialogElement | null,
+  input: HTMLTextAreaElement | null,
+) => {
+  if (!dialog) return
+  dialog.showModal()
+  setTimeout(() => {
+    if (dialog.open) input?.focus()
+  })
+}
+
 const getNextMatchTargets = (players: Participant[], rounds: Round[], courtCount: number) => {
   const runningMatchIds = new Set(
     [...getRunningMatchIdsByRound(rounds, courtCount).values()].flatMap((ids) => [...ids]),
@@ -193,11 +204,7 @@ export function useTournamentController(): TournamentContextValue {
     sorted,
     sort,
     desc,
-    onAdd: () => {
-      const dialog = bulkRef.current
-      dialog?.showModal()
-      requestAnimationFrame(() => bulkInputRef.current?.focus())
-    },
+    onAdd: () => openDialogAndFocus(bulkRef.current, bulkInputRef.current),
     onDeleteParticipant: (id) =>
       setPlayers((current) => current.filter((player) => player.id !== id)),
     onRename: rename,
