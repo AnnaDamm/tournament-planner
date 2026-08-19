@@ -30,6 +30,17 @@ type Props = {
 }
 
 const formatDifference = (value: number) => (value > 0 ? `+${value}` : String(value))
+const hasDuplicateParticipantNames = (participants: Participant[]) =>
+  new Set(participants.map((participant) => participant.name.trim().toLocaleLowerCase())).size !==
+  participants.length
+const getColumns = (participantLabel: string) => [
+  ['name', participantLabel],
+  ['wins', t('wins')],
+  ['losses', t('losses')],
+  ['played', t('games')],
+  ['setsWon', t('sets')],
+  ['points', t('points')],
+]
 
 export function Table({
   sorted,
@@ -48,17 +59,8 @@ export function Table({
   const [editing, setEditing] = useState(false)
   const [historyPlayer, setHistoryPlayer] = useState<Participant | null>(null)
   const mostPlayed = Math.max(0, ...sorted.map((player) => player.played))
-  const hasDuplicateNames =
-    new Set(sorted.map((player) => player.name.trim().toLocaleLowerCase())).size !== sorted.length
+  const hasDuplicateNames = hasDuplicateParticipantNames(sorted)
   const addLabel = participantLabel === t('teams') ? t('addTeam') : t('add')
-  const columns = [
-    ['name', participantLabel],
-    ['wins', t('wins')],
-    ['losses', t('losses')],
-    ['played', t('games')],
-    ['setsWon', t('sets')],
-    ['points', t('points')],
-  ]
 
   return (
     <>
@@ -66,15 +68,15 @@ export function Table({
         {!readOnly && (
           <div className="page-actions">
             <button className="button primary" onClick={onAdd}>
-              <Plus size={17} /> {addLabel}
+              <Plus size={17} aria-hidden="true" /> {addLabel}
             </button>
             {!editing ? (
               <button className="button ghost" onClick={() => setEditing(true)}>
-                <Pencil size={16} /> {t('edit')}
+                <Pencil size={16} aria-hidden="true" /> {t('edit')}
               </button>
             ) : (
               <button className="button ghost" onClick={() => setEditing(false)}>
-                <Check size={16} /> {t('done')}
+                <Check size={16} aria-hidden="true" /> {t('done')}
               </button>
             )}
           </div>
@@ -93,9 +95,13 @@ export function Table({
       )}
       <div className="table-wrap">
         <table className="ranking-table">
+          <caption className="sr-only">{t('rankingTable')}</caption>
           <thead>
             <tr>
-              <th>
+              <th
+                scope="col"
+                aria-sort={sort === 'position' ? (desc ? 'descending' : 'ascending') : 'none'}
+              >
                 <button
                   className={sort === 'position' ? 'sort-active' : ''}
                   onClick={() => toggleSort('position')}
@@ -103,22 +109,31 @@ export function Table({
                   {t('position')}
                   <ChevronDown
                     size={14}
+                    aria-hidden="true"
                     className={sort === 'position' && desc ? 'sort-down' : ''}
                   />
                 </button>
               </th>
-              {columns.map(([key, label]) => (
-                <th key={key}>
+              {getColumns(participantLabel).map(([key, label]) => (
+                <th
+                  key={key}
+                  scope="col"
+                  aria-sort={sort === key ? (desc ? 'descending' : 'ascending') : 'none'}
+                >
                   <button
                     className={sort === key ? 'sort-active' : ''}
                     onClick={() => toggleSort(key)}
                   >
                     {label}
-                    <ChevronDown size={14} className={sort === key && desc ? 'sort-down' : ''} />
+                    <ChevronDown
+                      size={14}
+                      aria-hidden="true"
+                      className={sort === key && desc ? 'sort-down' : ''}
+                    />
                   </button>
                 </th>
               ))}
-              {!readOnly && <th>{t('actions')}</th>}
+              {!readOnly && <th scope="col">{t('actions')}</th>}
             </tr>
           </thead>
           <tbody>
@@ -196,7 +211,11 @@ export function Table({
                         title={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
                         aria-label={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
                       >
-                        {player.withdrawn ? <Undo2 size={16} /> : <Flag size={16} />}
+                        {player.withdrawn ? (
+                          <Undo2 size={16} aria-hidden="true" />
+                        ) : (
+                          <Flag size={16} aria-hidden="true" />
+                        )}
                       </button>
                       <button
                         className="delete-btn"
@@ -204,7 +223,7 @@ export function Table({
                         title={t('delete')}
                         aria-label={`${t('delete')}: ${player.name}`}
                       >
-                        <X size={16} />
+                        <X size={16} aria-hidden="true" />
                       </button>
                     </td>
                   )}

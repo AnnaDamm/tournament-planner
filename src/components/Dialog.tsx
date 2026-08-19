@@ -1,15 +1,19 @@
 import type { ReactNode, RefObject } from 'react'
 
-type Props = { dialogRef: RefObject<HTMLDialogElement | null>; children: ReactNode }
+type Props = {
+  dialogRef: RefObject<HTMLDialogElement | null>
+  children: ReactNode
+  labelledBy: string
+  describedBy?: string
+}
 
-export function Dialog({ dialogRef, children }: Props) {
+export function Dialog({ dialogRef, children, labelledBy, describedBy }: Props) {
   return (
     <dialog
       ref={dialogRef}
       className="dialog"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) dialogRef.current?.close()
-      }}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
     >
       {children}
     </dialog>

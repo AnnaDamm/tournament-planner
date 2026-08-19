@@ -1,27 +1,13 @@
-import {
-  Clock,
-  Dices,
-  GripVertical,
-  ListPlus,
-  Play,
-  Plus,
-  Settings2,
-  Trophy,
-  X,
-} from 'lucide-react'
+import { Clock, GripVertical, Plus, Trophy } from 'lucide-react'
 import { useState } from 'react'
 import { MatchRow } from './MatchRow'
 import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
+import { RoundActions } from './RoundActions'
 import { t } from '../i18n'
 import type { Match, Participant, Round } from '../tournamentTypes'
-import {
-  getRunningMatchIdsByRound,
-  hasEnteredScore,
-  isRoundComplete,
-  isUnknownParticipantId,
-} from '../tournament'
+import { getRunningMatchIdsByRound, isRoundComplete, isUnknownParticipantId } from '../tournament'
 
 type Props = {
   rounds: Round[]
@@ -67,15 +53,29 @@ export function Rounds({
 }: Props) {
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
+  const [keyboardMove, setKeyboardMove] = useState<{
+    roundIndex: number
+    participantId: string
+  } | null>(null)
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
   const runningMatchIdsByRound = getRunningMatchIdsByRound(rounds, defaultCourtCount)
+  const handleKeyboardSwap = (roundIndex: number, participantId: string) => {
+    if (!keyboardMove || keyboardMove.roundIndex !== roundIndex) {
+      setKeyboardMove({ roundIndex, participantId })
+      return
+    }
+    if (keyboardMove.participantId !== participantId) {
+      onSwapPlayers(roundIndex, keyboardMove.participantId, participantId)
+    }
+    setKeyboardMove(null)
+  }
   return (
     <>
       <PageTitle eyebrow={t('schedule')} title={t('rounds')} />
       {rounds.length === 0 ? (
         <div className="empty">
-          <Trophy size={30} />
+          <Trophy size={30} aria-hidden="true" />
           <h2>{t('noRounds')}</h2>
           <p>{t('firstRound')}</p>
         </div>
@@ -83,22 +83,30 @@ export function Rounds({
         <div className="round-list">
           {rounds.map((round, roundIndex) => {
             const canReorderBye = !readOnly && !isRoundComplete(round)
-            const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
             const runningMatchIds = runningMatchIdsByRound.get(round.number) ?? new Set<string>()
             return (
-              <div className="round-card" key={round.number}>
+              <section
+                className="round-card"
+                key={round.number}
+                aria-labelledby={`round-${round.number}-title`}
+              >
                 <div className="round-head">
                   <div>
                     <span className="round-kicker">
-                      {t('round')} {String(round.number).padStart(2, '0')}
+                      <span aria-hidden="true">
+                        {t('round')} {String(round.number).padStart(2, '0')}
+                      </span>
                       {round.startedAt && (
                         <time className="round-started" dateTime={round.startedAt}>
-                          <Clock size={12} /> {formatStartTime(round.startedAt)}
+                          <Clock size={12} aria-hidden="true" /> {formatStartTime(round.startedAt)}
                         </time>
                       )}
                     </span>
                     <div className="round-title-line">
-                      <h2>
+                      <h2 id={`round-${round.number}-title`}>
+                        <span className="sr-only">
+                          {t('round')} {round.number} –
+                        </span>
                         {round.matches.length} {t('match')}
                       </h2>
                       {round.bye && (
@@ -128,71 +136,34 @@ export function Rounds({
                             }
                           }}
                         >
-                          {canReorderBye && <GripVertical size={14} />}
+                          {canReorderBye && (
+                            <button
+                              className="drag-handle-button"
+                              type="button"
+                              aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
+                              aria-pressed={
+                                keyboardMove?.roundIndex === roundIndex &&
+                                keyboardMove.participantId === round.bye
+                              }
+                              onClick={() => handleKeyboardSwap(roundIndex, round.bye ?? '')}
+                            >
+                              <GripVertical size={14} aria-hidden="true" />
+                            </button>
+                          )}
                           {t('bye')}: {name(round.bye)}
                         </span>
                       )}
                     </div>
                   </div>
                   {!readOnly && (
-                    <div className="round-actions">
-                      <button
-                        className="button ghost"
-                        type="button"
-                        aria-label={t('roundSettings')}
-                        title={t('roundSettings')}
-                        onClick={() => setSettingsRoundNumber(round.number)}
-                      >
-                        <Settings2 size={16} />
-                      </button>
-                      {!round.startedAt && (
-                        <button
-                          className="button ghost"
-                          type="button"
-                          aria-label={t('startRound')}
-                          title={t('startRound')}
-                          onClick={() => onStart(round.number)}
-                        >
-                          <Play size={14} />
-                        </button>
-                      )}
-                      {round.matches.some(
-                        (match) =>
-                          isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
-                      ) && (
-                        <button
-                          className="button ghost"
-                          type="button"
-                          aria-label={t('fillMore')}
-                          title={t('fillMore')}
-                          onClick={() => onFillUnknown(round.number)}
-                        >
-                          <ListPlus size={16} />
-                        </button>
-                      )}
-                      {isUnstarted && (
-                        <button
-                          className="button ghost"
-                          type="button"
-                          aria-label={t('reroll')}
-                          title={t('reroll')}
-                          onClick={() => onReroll(round.number)}
-                        >
-                          <Dices size={16} />
-                        </button>
-                      )}
-                      {!round.matches.some((match) => match.scoreA || match.scoreB) && (
-                        <button
-                          className="button danger"
-                          type="button"
-                          aria-label={t('deleteRound')}
-                          onClick={() => onDelete(round.number)}
-                          title={t('deleteRound')}
-                        >
-                          <X size={16} />
-                        </button>
-                      )}
-                    </div>
+                    <RoundActions
+                      round={round}
+                      onSettings={() => setSettingsRoundNumber(round.number)}
+                      onStart={() => onStart(round.number)}
+                      onFillUnknown={() => onFillUnknown(round.number)}
+                      onReroll={() => onReroll(round.number)}
+                      onDelete={() => onDelete(round.number)}
+                    />
                   )}
                 </div>
                 <div className="matches">
@@ -214,20 +185,29 @@ export function Rounds({
                       onSwap={(draggedId, targetId) =>
                         onSwapPlayers(roundIndex, draggedId, targetId)
                       }
+                      selectedParticipantId={
+                        keyboardMove?.roundIndex === roundIndex ? keyboardMove.participantId : null
+                      }
+                      onKeyboardSwap={(participantId) =>
+                        handleKeyboardSwap(roundIndex, participantId)
+                      }
                       readOnly={readOnly}
                     />
                   ))}
                 </div>
-              </div>
+              </section>
             )
           })}
         </div>
       )}
       {!readOnly && (
         <button className="button primary" onClick={onCreate}>
-          <Plus size={16} /> {t('create')}
+          <Plus size={16} aria-hidden="true" /> {t('create')}
         </button>
       )}
+      <p className="sr-only" aria-live="polite">
+        {keyboardMove ? t('moveInstructions') : ''}
+      </p>
       <PlayerHistoryDialog
         player={historyPlayer}
         rounds={rounds}

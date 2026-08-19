@@ -67,19 +67,18 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
     <dialog
       ref={dialogRef}
       className="dialog history-dialog"
+      aria-labelledby="player-history-title"
+      aria-describedby="player-history-description"
       onCancel={onClose}
       onClose={onClose}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose()
-      }}
     >
       <div className="dialog-head">
         <div>
-          <h2>{player?.name}</h2>
-          <p>{t('history')}</p>
+          <h2 id="player-history-title">{player?.name}</h2>
+          <p id="player-history-description">{t('history')}</p>
         </div>
         <button className="icon-btn" onClick={onClose} aria-label={t('close')}>
-          <X size={18} />
+          <X size={18} aria-hidden="true" />
         </button>
       </div>
       <div className="history-table-wrap">
@@ -87,12 +86,15 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
           <p className="history-empty">{t('historyEmpty')}</p>
         ) : (
           <table>
+            <caption className="sr-only">
+              {t('history')}: {player?.name}
+            </caption>
             <thead>
               <tr>
-                <th>{t('round')}</th>
-                <th>{t('opponent')}</th>
-                <th>{t('score')}</th>
-                <th>{t('result')}</th>
+                <th scope="col">{t('round')}</th>
+                <th scope="col">{t('opponent')}</th>
+                <th scope="col">{t('score')}</th>
+                <th scope="col">{t('result')}</th>
               </tr>
             </thead>
             <tbody>

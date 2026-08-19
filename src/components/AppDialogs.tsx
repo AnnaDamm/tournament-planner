@@ -6,6 +6,7 @@ import { t } from '../i18n'
 type Props = {
   participantType: 'players' | 'teams'
   bulkRef: RefObject<HTMLDialogElement | null>
+  bulkInputRef: RefObject<HTMLTextAreaElement | null>
   confirmRef: RefObject<HTMLDialogElement | null>
   draft: string
   setDraft: (value: string) => void
@@ -16,6 +17,7 @@ type Props = {
 export function AppDialogs({
   participantType,
   bulkRef,
+  bulkInputRef,
   confirmRef,
   draft,
   setDraft,
@@ -24,20 +26,38 @@ export function AppDialogs({
 }: Props) {
   return (
     <>
-      <Dialog dialogRef={bulkRef}>
+      <Dialog
+        dialogRef={bulkRef}
+        labelledBy="add-participants-title"
+        describedBy="add-participants-help"
+      >
         <div className="dialog-head">
           <div>
-            <h2>{participantType === 'teams' ? t('addTeam') : t('add')}</h2>
-            <p>{t('onePerLine')}</p>
+            <h2 id="add-participants-title">
+              {participantType === 'teams' ? t('addTeam') : t('add')}
+            </h2>
+            <p id="add-participants-help">{t('onePerLine')}</p>
           </div>
-          <button className="icon-btn" onClick={() => bulkRef.current?.close()}>
-            <X size={18} />
+          <button
+            className="icon-btn"
+            type="button"
+            aria-label={t('close')}
+            onClick={() => bulkRef.current?.close()}
+          >
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
         <textarea
-          autoFocus
+          ref={bulkInputRef}
+          aria-label={participantType === 'teams' ? t('teamNames') : t('playerNames')}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+              event.preventDefault()
+              onAdd()
+            }
+          }}
           placeholder={'North Stars\nRiver Club\n...'}
         />
         <div className="dialog-actions">
@@ -45,18 +65,27 @@ export function AppDialogs({
             {t('cancel')}
           </button>
           <button className="button primary" onClick={onAdd}>
-            <UserPlus size={16} /> {t('addButton')}
+            <UserPlus size={16} aria-hidden="true" /> {t('addButton')}
           </button>
         </div>
       </Dialog>
-      <Dialog dialogRef={confirmRef}>
+      <Dialog
+        dialogRef={confirmRef}
+        labelledBy="delete-all-title"
+        describedBy="delete-all-description"
+      >
         <div className="dialog-head">
           <div>
-            <h2>{t('deleteEverything')}</h2>
-            <p>{t('deleteDescription')}</p>
+            <h2 id="delete-all-title">{t('deleteEverything')}</h2>
+            <p id="delete-all-description">{t('deleteDescription')}</p>
           </div>
-          <button className="icon-btn" onClick={() => confirmRef.current?.close()}>
-            <X size={18} />
+          <button
+            className="icon-btn"
+            type="button"
+            aria-label={t('close')}
+            onClick={() => confirmRef.current?.close()}
+          >
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
         <div className="dialog-actions">

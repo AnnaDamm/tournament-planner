@@ -11,6 +11,7 @@ export function AppContent() {
         <AppDialogs
           participantType={routes.participantType}
           bulkRef={dialogs.bulkRef}
+          bulkInputRef={dialogs.bulkInputRef}
           confirmRef={dialogs.confirmRef}
           draft={dialogs.draft}
           setDraft={dialogs.setDraft}

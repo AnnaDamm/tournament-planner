@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
 import { t } from '../i18n'
@@ -7,21 +7,24 @@ import { PageTitle } from './PageTitle'
 type Props = { viewerUrl: string }
 
 export function SharePage({ viewerUrl }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [error, setError] = useState(false)
+  const [qrCode, setQrCode] = useState({
+    viewerUrl: '',
+    dataUrl: '',
+    failed: false,
+  })
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    setError(false)
-    void QRCode.toCanvas(canvas, viewerUrl, {
+    void QRCode.toDataURL(viewerUrl, {
       width: 280,
       margin: 2,
       errorCorrectionLevel: 'M',
       color: { dark: '#17201d', light: '#ffffff' },
-    }).catch(() => setError(true))
+    })
+      .then((dataUrl) => setQrCode({ viewerUrl, dataUrl, failed: false }))
+      .catch(() => setQrCode({ viewerUrl, dataUrl: '', failed: true }))
   }, [viewerUrl])
+
+  const currentQrCode = qrCode.viewerUrl === viewerUrl ? qrCode : null
 
   return (
     <>
@@ -39,11 +42,11 @@ export function SharePage({ viewerUrl }: Props) {
           </div>
         </div>
         <div className="share-qr">
-          {error ? (
+          {currentQrCode?.failed ? (
             <p role="alert">{t('qrError')}</p>
-          ) : (
-            <canvas ref={canvasRef} aria-label={t('viewerQrCode')} role="img" />
-          )}
+          ) : currentQrCode?.dataUrl ? (
+            <img src={currentQrCode.dataUrl} alt={t('viewerQrCode')} width="280" height="280" />
+          ) : null}
         </div>
       </section>
     </>

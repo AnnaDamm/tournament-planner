@@ -15,23 +15,24 @@ export function DocumentationPage() {
     <div className="docs-layout">
       <nav className="docs-nav" aria-label={locale === 'de' ? 'Dokumentation' : 'Documentation'}>
         <div className="docs-nav-title">
-          <BookOpen size={18} /> {locale === 'de' ? 'Dokumentation' : 'Documentation'}
+          <BookOpen size={18} aria-hidden="true" />{' '}
+          {locale === 'de' ? 'Dokumentation' : 'Documentation'}
         </div>
         {docs.map((item) => (
           <NavLink key={item.slug} to={`/docs/${item.slug}`}>
-            {item.title} <ChevronRight size={14} />
+            {item.title} <ChevronRight size={14} aria-hidden="true" />
           </NavLink>
         ))}
       </nav>
       <article className="docs-article">
-        <div className="docs-eyebrow">
+        <div className="docs-eyebrow" aria-hidden="true">
           TOURNY · {locale === 'de' ? 'DOKUMENTATION' : 'DOCUMENTATION'}
         </div>
         <h1>{page.title}</h1>
         <p className="docs-summary">{page.summary}</p>
-        {page.sections.map((section) => (
-          <section key={section.title}>
-            <h2>{section.title}</h2>
+        {page.sections.map((section, index) => (
+          <section key={section.title} aria-labelledby={`docs-section-${index}`}>
+            <h2 id={`docs-section-${index}`}>{section.title}</h2>
             {section.text?.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
@@ -42,7 +43,7 @@ export function DocumentationPage() {
                 ))}
               </ul>
             )}
-            {section.note && <aside className="docs-note">{section.note}</aside>}
+            {section.note && <div className="docs-note">{section.note}</div>}
           </section>
         ))}
       </article>

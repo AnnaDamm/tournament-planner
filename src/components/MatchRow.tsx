@@ -14,6 +14,8 @@ type Props = {
   onUpdate: (matches: Match[]) => void
   allMatches: Match[]
   onSwap?: (draggedId: string, targetId: string) => void
+  selectedParticipantId?: string | null
+  onKeyboardSwap?: (participantId: string) => void
   winningGames: number
   isRunning?: boolean
   readOnly?: boolean
@@ -67,6 +69,8 @@ export function MatchRow({
   onUpdate,
   allMatches,
   onSwap,
+  selectedParticipantId = null,
+  onKeyboardSwap,
   winningGames,
   isRunning = false,
   readOnly = false,
@@ -132,12 +136,14 @@ export function MatchRow({
     }, 200)
   }
   return (
-    <div
-      id={`match-${match.id}`}
-      className={`match ${isRunning ? 'running' : ''}`}
-      aria-label={isRunning ? t('running') : undefined}
-    >
-      <span className="match-no">{String(matchIndex + 1).padStart(2, '0')}</span>
+    <fieldset id={`match-${match.id}`} className={`match ${isRunning ? 'running' : ''}`}>
+      <legend className="sr-only">
+        {t('matchLabel')} {matchIndex + 1}: {name(match.a)} {t('versus')} {name(match.b)}
+        {isRunning ? `, ${t('running')}` : ''}
+      </legend>
+      <span className="match-no" aria-hidden="true">
+        {String(matchIndex + 1).padStart(2, '0')}
+      </span>
       <span
         className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
@@ -157,13 +163,25 @@ export function MatchRow({
           }
         }}
       >
-        {canReorder && <GripVertical size={16} />}
+        {canReorder && (
+          <button
+            className="drag-handle-button"
+            type="button"
+            aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
+            aria-pressed={selectedParticipantId === match.a}
+            onClick={() => onKeyboardSwap?.(match.a)}
+          >
+            <GripVertical size={16} aria-hidden="true" />
+          </button>
+        )}
         <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.a)}>
           {name(match.a)}
         </button>
         <small className="player-record">{record(match.a)}</small>
       </span>
-      <span className="versus">VS</span>
+      <span className="versus" aria-hidden="true">
+        VS
+      </span>
       <span
         className={`drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
@@ -183,7 +201,17 @@ export function MatchRow({
           }
         }}
       >
-        {canReorder && <GripVertical size={16} />}
+        {canReorder && (
+          <button
+            className="drag-handle-button"
+            type="button"
+            aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
+            aria-pressed={selectedParticipantId === match.b}
+            onClick={() => onKeyboardSwap?.(match.b)}
+          >
+            <GripVertical size={16} aria-hidden="true" />
+          </button>
+        )}
         <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.b)}>
           {name(match.b)}
         </button>
@@ -195,35 +223,39 @@ export function MatchRow({
           (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },
         ).map((set, setIndex) => (
           <div className="score" key={setIndex}>
-            <span className="set-label">{setIndex + 1}</span>
+            <span className="set-label" aria-hidden="true">
+              {setIndex + 1}
+            </span>
             {readOnly ? (
               <span className="score-value">{set.a || '–'}</span>
             ) : (
               <input
                 type="number"
                 min="0"
-                aria-label={`Set ${setIndex + 1} ${name(match.a)}`}
+                aria-label={`${t('setScore')} ${setIndex + 1}: ${name(match.a)}`}
                 value={set.a}
                 onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
                 onKeyUp={scheduleCommit}
+                onBlur={scheduleCommit}
               />
             )}
-            <b>:</b>
+            <b aria-hidden="true">:</b>
             {readOnly ? (
               <span className="score-value">{set.b || '–'}</span>
             ) : (
               <input
                 type="number"
                 min="0"
-                aria-label={`Set ${setIndex + 1} ${name(match.b)}`}
+                aria-label={`${t('setScore')} ${setIndex + 1}: ${name(match.b)}`}
                 value={set.b}
                 onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
                 onKeyUp={scheduleCommit}
+                onBlur={scheduleCommit}
               />
             )}
           </div>
         ))}
       </div>
-    </div>
+    </fieldset>
   )
 }

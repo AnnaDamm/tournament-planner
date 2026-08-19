@@ -18,6 +18,7 @@ type LayoutState = {
 
 type DialogState = {
   bulkRef: RefObject<HTMLDialogElement | null>
+  bulkInputRef: RefObject<HTMLTextAreaElement | null>
   confirmRef: RefObject<HTMLDialogElement | null>
   draft: string
   setDraft: (value: string) => void
