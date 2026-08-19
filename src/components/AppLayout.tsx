@@ -43,6 +43,25 @@ const scrollToTarget = (elementId: string, attemptsLeft = 10) => {
   }, 25)
 }
 
+const positionPopover = (trigger: HTMLElement | null, popover: HTMLElement | null) => {
+  if (!trigger || !popover) return
+  const viewportGap = 16
+  const triggerRect = trigger.getBoundingClientRect()
+  const popoverWidth = popover.offsetWidth
+  const popoverHeight = popover.offsetHeight
+  const preferredTop = triggerRect.bottom + 10
+  const left = Math.min(
+    Math.max(triggerRect.right - popoverWidth, viewportGap),
+    window.innerWidth - popoverWidth - viewportGap,
+  )
+  const top =
+    preferredTop + popoverHeight <= window.innerHeight - viewportGap
+      ? preferredTop
+      : Math.max(viewportGap, triggerRect.top - popoverHeight - 10)
+  popover.style.left = `${left}px`
+  popover.style.top = `${top}px`
+}
+
 // The layout owns the persistent cross-route search controls and their page-specific navigation.
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function AppLayout({
@@ -61,6 +80,7 @@ export function AppLayout({
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
+  const searchPopoverRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
   const mobileNavTriggerRef = useRef<HTMLButtonElement>(null)
@@ -121,12 +141,21 @@ export function AppLayout({
     setSearchTerm(new URLSearchParams(location.hash.slice(1)).get('search') ?? '')
   }, [location.hash])
 
+  useEffect(() => {
+    if (!searchOpen) return
+    const handleResize = () => positionPopover(searchTriggerRef.current, searchPopoverRef.current)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [searchOpen])
+
   const handleSearchToggle = (event: SyntheticEvent<HTMLElement>) => {
     const isOpen = (event.nativeEvent as ToggleEvent).newState === 'open'
     setSearchOpen(isOpen)
     requestAnimationFrame(() => {
-      if (isOpen) searchInputRef.current?.focus()
-      else searchTriggerRef.current?.focus()
+      if (isOpen) {
+        positionPopover(searchTriggerRef.current, searchPopoverRef.current)
+        searchInputRef.current?.focus()
+      } else searchTriggerRef.current?.focus()
     })
   }
   const navigation = [
@@ -232,6 +261,7 @@ export function AppLayout({
             </button>
             <section
               className="search-popover"
+              ref={searchPopoverRef}
               id="player-search-popover"
               aria-label={t('playerSearch')}
               onToggle={handleSearchToggle}
