@@ -97,7 +97,15 @@ git push origin v1.0.0
 
 The workflow installs dependencies, runs the production build, creates a `404.html` fallback for client-side routes, uploads `dist/` as a GitHub Pages artifact, and deploys it with the official Pages deployment action. In the repository settings, configure GitHub Pages to use **GitHub Actions** as its source.
 
-To create a release automatically, open **Actions → Create release tag → Run workflow** and choose `patch`, `minor`, or `major`. The workflow uses `pnpm version`, commits the version bump, creates a `v...` tag, and pushes it. That tag then starts the Pages deployment.
+To create a release automatically, run one of these commands:
+
+```bash
+pnpm release:patch
+pnpm release:minor
+pnpm release:major
+```
+
+The command uses `pnpm version`, commits the version bump, creates and pushes a `v...` tag, and that tag automatically starts the Pages build and deployment. The same versioning workflow can also be started manually under **Actions → Create release tag → Run workflow**.
 
 ## Features
 
