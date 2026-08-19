@@ -4,6 +4,8 @@ import {
   BarChart3,
   BookOpen,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Menu,
   Search,
   Settings2,
@@ -15,19 +17,54 @@ import { t } from '../i18n'
 
 type Props = {
   tournamentName: string
-  participantLabel: string
   participantNames: string[]
-  playerCount: number
+  participantTargets: { participantName: string; participantId: string }[]
+  nextMatchTargets: { participantName: string; matchId: string }[]
   roundCount: number
   currentRound: number
   children: ReactNode
 }
 
+type WindowWithFind = typeof window & {
+  find: (
+    text: string,
+    caseSensitive?: boolean,
+    backwards?: boolean,
+    wrapAround?: boolean,
+    wholeWord?: boolean,
+    searchInFrames?: boolean,
+    showDialog?: boolean,
+  ) => boolean
+}
+
+const findPlayer = (term: string, backwards = false) => {
+  if (!term.trim()) return
+  window.setTimeout(
+    () => (window as WindowWithFind).find(term.trim(), false, backwards, true, false, false, false),
+    0,
+  )
+}
+
+const scrollToTarget = (elementId: string, attemptsLeft = 10) => {
+  window.setTimeout(() => {
+    const targetElement = document.getElementById(elementId)
+    if (!targetElement) {
+      if (attemptsLeft > 1) scrollToTarget(elementId, attemptsLeft - 1)
+      return
+    }
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    targetElement.classList.add('search-target')
+    window.setTimeout(() => targetElement.classList.remove('search-target'), 1800)
+  }, 25)
+}
+
+// The layout owns the persistent cross-route search controls and their page-specific navigation.
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function AppLayout({
   tournamentName,
-  participantLabel,
   participantNames,
-  playerCount,
+  participantTargets,
+  nextMatchTargets,
   roundCount,
   currentRound,
   children,
@@ -36,30 +73,47 @@ export function AppLayout({
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
   const searchPopoverRef = useRef<HTMLDivElement>(null)
+  const findingCursorRef = useRef({ key: '', index: -1 })
+  const matchCursorRef = useRef({ key: '', index: -1 })
   const [searchOpen, setSearchOpen] = useState(false)
+  const [pageFindingCount, setPageFindingCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(window.location.hash.slice(1)).get('search') ?? '',
   )
   const pathWithSearch = (pathname: string) => ({ pathname, hash: window.location.hash })
-  const findPlayer = (term: string) => {
-    if (!term.trim()) return
-    window.setTimeout(
-      () =>
-        (
-          window as typeof window & {
-            find: (
-              text: string,
-              caseSensitive?: boolean,
-              backwards?: boolean,
-              wrapAround?: boolean,
-              wholeWord?: boolean,
-              searchInFrames?: boolean,
-              showDialog?: boolean,
-            ) => boolean
-          }
-        ).find(term.trim(), false, false, true, false, false, false),
-      0,
-    )
+  const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
+  const isTablePage = location.pathname === '/table'
+  const matchingParticipants = normalizedSearch
+    ? participantTargets.filter(({ participantName }) =>
+        participantName.toLocaleLowerCase().includes(normalizedSearch),
+      )
+    : []
+  const matchingMatchIds = normalizedSearch
+    ? [
+        ...new Set(
+          nextMatchTargets
+            .filter(({ participantName }) =>
+              participantName.toLocaleLowerCase().includes(normalizedSearch),
+            )
+            .map(({ matchId }) => matchId),
+        ),
+      ]
+    : []
+  const findingCount = isTablePage ? matchingParticipants.length : pageFindingCount
+  const navigateFinding = (direction: 1 | -1) => {
+    if (!isTablePage) {
+      findPlayer(searchTerm, direction < 0)
+      return
+    }
+    const cursor = findingCursorRef.current
+    const nextIndex =
+      cursor.key === normalizedSearch
+        ? (cursor.index + direction + matchingParticipants.length) % matchingParticipants.length
+        : direction > 0
+          ? 0
+          : matchingParticipants.length - 1
+    findingCursorRef.current = { key: normalizedSearch, index: nextIndex }
+    scrollToTarget(`player-${matchingParticipants[nextIndex].participantId}`)
   }
   const updateSearch = (value: string) => {
     setSearchTerm(value)
@@ -87,6 +141,23 @@ export function AppLayout({
   useEffect(() => {
     if (searchTerm) findPlayer(searchTerm)
   }, [location.pathname, searchTerm])
+
+  useEffect(() => {
+    if (!normalizedSearch || isTablePage) {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setPageFindingCount(0)
+      return
+    }
+    const content = document.querySelector('.content')?.textContent?.toLocaleLowerCase() ?? ''
+    let count = 0
+    let position = 0
+    while ((position = content.indexOf(normalizedSearch, position)) >= 0) {
+      count += 1
+      position += normalizedSearch.length
+    }
+    // oxlint-disable-next-line react/set-state-in-effect
+    setPageFindingCount(count)
+  }, [children, isTablePage, location.pathname, normalizedSearch])
 
   useEffect(() => {
     if (!searchOpen) return
@@ -204,16 +275,47 @@ export function AppLayout({
                     <option value={name} key={`${name}-${index}`} />
                   ))}
                 </datalist>
+                {findingCount > 1 && (
+                  <div className="finding-navigation">
+                    <button
+                      type="button"
+                      aria-label={t('previousFinding')}
+                      title={t('previousFinding')}
+                      onClick={() => navigateFinding(-1)}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span>{findingCount}</span>
+                    <button
+                      type="button"
+                      aria-label={t('nextFinding')}
+                      title={t('nextFinding')}
+                      onClick={() => navigateFinding(1)}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
                 <button
                   className="next-match-button"
                   type="button"
-                  disabled={!searchTerm.trim()}
+                  disabled={matchingMatchIds.length === 0}
                   onClick={() => {
-                    if (location.pathname !== '/rounds') navigate(pathWithSearch('/rounds'))
-                    else findPlayer(searchTerm)
+                    if (matchingMatchIds.length === 0) return
+                    const cursor = matchCursorRef.current
+                    const nextIndex =
+                      cursor.key === normalizedSearch
+                        ? (cursor.index + 1) % matchingMatchIds.length
+                        : 0
+                    matchCursorRef.current = { key: normalizedSearch, index: nextIndex }
+                    if (location.pathname !== '/rounds') {
+                      navigate(pathWithSearch('/rounds'))
+                    }
+                    scrollToTarget(`match-${matchingMatchIds[nextIndex]}`)
                   }}
                 >
-                  {t('nextMatch')} <ChevronDown size={15} />
+                  {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
+                  <ChevronDown size={15} />
                 </button>
               </div>
             )}

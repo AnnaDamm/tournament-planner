@@ -121,7 +121,11 @@ export function Table({
             {sorted.map((player) => {
               const gamesBehind = mostPlayed - player.played
               return (
-                <tr key={player.id} className={player.withdrawn ? 'withdrawn-row' : ''}>
+                <tr
+                  id={`player-${player.id}`}
+                  key={player.id}
+                  className={player.withdrawn ? 'withdrawn-row' : ''}
+                >
                   <td className="rank-cell" data-label={t('position')}>
                     <span className={`rank rank-${player.position} cell-value`}>
                       {player.position}

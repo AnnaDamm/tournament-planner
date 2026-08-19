@@ -22,6 +22,8 @@ import {
   createRoundPlan,
   fillUnknownRound,
   getCurrentRoundNumber,
+  getMatchResult,
+  getRunningMatchIdsByRound,
   isUnknownParticipantId,
   rerollRound,
   startReadyRounds,
@@ -38,6 +40,28 @@ const buildRoundWithResult = (
   courtCount: number,
 ) =>
   rounds.map((round) => (round.number === number ? { ...round, winningGames, courtCount } : round))
+
+const getNextMatchTargets = (players: Participant[], rounds: Round[], courtCount: number) => {
+  const runningMatchIds = new Set(
+    [...getRunningMatchIdsByRound(rounds, courtCount).values()].flatMap((ids) => [...ids]),
+  )
+  return players.flatMap((player) => {
+    return rounds
+      .flatMap((round) =>
+        round.matches.map((match) => ({
+          match,
+          winningGames: Math.max(1, round.winningGames || 1),
+        })),
+      )
+      .filter(
+        ({ match, winningGames }) =>
+          (match.a === player.id || match.b === player.id) &&
+          !getMatchResult(match, winningGames) &&
+          !runningMatchIds.has(match.id),
+      )
+      .map(({ match }) => ({ participantName: player.name, matchId: match.id }))
+  })
+}
 
 export function useTournamentController(): TournamentContextValue {
   const [players, setPlayers] = useState<Participant[]>(loadParticipants)
@@ -213,9 +237,12 @@ export function useTournamentController(): TournamentContextValue {
   return {
     layout: {
       tournamentName,
-      participantLabel,
       participantNames: players.map((player) => player.name),
-      playerCount: players.filter((player) => !player.withdrawn).length,
+      participantTargets: players.map((player) => ({
+        participantName: player.name,
+        participantId: player.id,
+      })),
+      nextMatchTargets: getNextMatchTargets(players, rounds, courtCount),
       roundCount: rounds.length,
       currentRound: getCurrentRoundNumber(rounds, courtCount),
     },
