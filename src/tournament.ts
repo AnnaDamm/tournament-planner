@@ -398,40 +398,42 @@ export const getRunningMatchIdsByRound = (
   const runningByRound = new Map<number, Set<string>>()
   const occupiedParticipants = new Set<string>()
   const blockedByPreviousRounds = new Set<string>()
-  let assignedCourts = 0
-
-  rounds.forEach((round) => {
+  const candidates = rounds.flatMap((round) => {
     const winningGames = Math.max(1, round.winningGames || 1)
     const incompleteMatches = round.matches.filter((match) => !getMatchResult(match, winningGames))
-    const runningIds = new Set<string>()
-
-    if (round.startedAt || includeUnstarted) {
-      for (const match of incompleteMatches) {
-        if (assignedCourts >= capacity || runningIds.size >= getRoundCourtCount(round, capacity)) {
-          break
-        }
-        if (isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b)) continue
-        if (
-          blockedByPreviousRounds.has(match.a) ||
-          blockedByPreviousRounds.has(match.b) ||
-          occupiedParticipants.has(match.a) ||
-          occupiedParticipants.has(match.b)
-        ) {
-          continue
-        }
-        runningIds.add(match.id)
-        occupiedParticipants.add(match.a)
-        occupiedParticipants.add(match.b)
-        assignedCourts += 1
-      }
-    }
-
-    if (runningIds.size > 0) runningByRound.set(round.number, runningIds)
+    const blockedParticipants = new Set(blockedByPreviousRounds)
     incompleteMatches.forEach((match) => {
       if (!isUnknownParticipantId(match.a)) blockedByPreviousRounds.add(match.a)
       if (!isUnknownParticipantId(match.b)) blockedByPreviousRounds.add(match.b)
     })
+
+    if (!round.startedAt && !includeUnstarted) return []
+    return incompleteMatches.map((match) => ({ round, match, blockedParticipants }))
   })
+  const prioritizedCandidates = candidates.sort(
+    (first, second) => Number(hasEnteredScore(second.match)) - Number(hasEnteredScore(first.match)),
+  )
+  let assignedCourts = 0
+
+  for (const { round, match, blockedParticipants } of prioritizedCandidates) {
+    if (assignedCourts >= capacity) break
+    const runningIds = runningByRound.get(round.number) ?? new Set<string>()
+    if (runningIds.size >= getRoundCourtCount(round, capacity)) continue
+    if (isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b)) continue
+    if (
+      blockedParticipants.has(match.a) ||
+      blockedParticipants.has(match.b) ||
+      occupiedParticipants.has(match.a) ||
+      occupiedParticipants.has(match.b)
+    ) {
+      continue
+    }
+    runningIds.add(match.id)
+    runningByRound.set(round.number, runningIds)
+    occupiedParticipants.add(match.a)
+    occupiedParticipants.add(match.b)
+    assignedCourts += 1
+  }
 
   return runningByRound
 }
