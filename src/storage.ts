@@ -1,4 +1,4 @@
-import type { Participant } from './components/Players'
+import type { Participant } from './components/Participant'
 
 export type StorageKey =
   'players' | 'rounds' | 'participantType' | 'courtCount' | 'defaultWinningGames' | 'tournamentName'

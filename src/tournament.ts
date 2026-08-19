@@ -1,4 +1,4 @@
-import type { Participant } from './components/Players'
+import type { Participant } from './components/Participant'
 import type { Match, Round, RoundStanding, SetScore } from './storage'
 
 export const UNKNOWN_PARTICIPANT_PREFIX = '__unknown__:'

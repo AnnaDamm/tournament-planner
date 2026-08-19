@@ -5,8 +5,6 @@ import { useTournamentController } from '../hooks/useTournamentController'
 
 type LayoutState = {
   tournamentName: string
-  participantLabel: string
-  playerCount: number
   roundCount: number
   currentRound: number
 }
