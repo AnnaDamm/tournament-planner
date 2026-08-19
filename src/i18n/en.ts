@@ -86,4 +86,7 @@ export const en = {
   playerSearch: 'Search players',
   clearSearch: 'Clear search',
   nextMatch: 'Next match',
+  noNextMatch: 'No upcoming match',
+  previousFinding: 'Previous result',
+  nextFinding: 'Next result',
 } as const

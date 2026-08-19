@@ -5,9 +5,9 @@ import { useTournamentController } from '../hooks/useTournamentController'
 
 type LayoutState = {
   tournamentName: string
-  participantLabel: string
   participantNames: string[]
-  playerCount: number
+  participantTargets: { participantName: string; participantId: string }[]
+  nextMatchTargets: { participantName: string; matchId: string }[]
   roundCount: number
   currentRound: number
 }

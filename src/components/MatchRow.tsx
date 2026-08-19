@@ -131,6 +131,7 @@ export function MatchRow({
   }
   return (
     <div
+      id={`match-${match.id}`}
       className={`match ${isRunning ? 'running' : ''}`}
       aria-label={isRunning ? t('running') : undefined}
     >

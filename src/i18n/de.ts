@@ -90,4 +90,7 @@ export const de: Translation = {
   playerSearch: 'Spieler suchen',
   clearSearch: 'Suche leeren',
   nextMatch: 'Nächstes Spiel',
+  noNextMatch: 'Kein kommendes Spiel',
+  previousFinding: 'Vorheriger Treffer',
+  nextFinding: 'Nächster Treffer',
 }

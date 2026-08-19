@@ -158,6 +158,29 @@ header {
   cursor: default;
   opacity: 0.45;
 }
+.finding-navigation {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  margin-top: 9px;
+  border: 1px solid #dfe7e0;
+  border-radius: 6px;
+  color: #76817c;
+  text-align: center;
+  font-size: 12px;
+}
+.finding-navigation button {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.finding-navigation button:hover {
+  background: #f0f3f0;
+}
 .round-status i {
   display: inline-block;
   width: 7px;
@@ -646,6 +669,25 @@ select {
 }
 .match.running {
   background: #fffdf0;
+}
+.match.search-target {
+  animation: search-target-pulse 1.8s ease-out;
+}
+.table-wrap tr.search-target {
+  animation: search-target-pulse 1.8s ease-out;
+  outline: 2px solid #9dd149;
+  outline-offset: -2px;
+}
+@keyframes search-target-pulse {
+  0%,
+  35% {
+    background: #e7f5d5;
+    box-shadow: 0 0 0 4px #b9ea5b66;
+  }
+  100% {
+    background: transparent;
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 .drag-hint.locked {
   cursor: default;
