@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tournament Planner</title>
+    <script>
+      const repositoryBase = '/tournament-planner/'
+      const relativePath = window.location.pathname.slice(repositoryBase.length)
+      const preview = relativePath.match(/^(pr-\d+)(?:\/|$)/)
+      const appBase = preview ? `${repositoryBase}${preview[1]}/` : repositoryBase
+      const route = window.location.pathname.slice(appBase.length)
+      const target = new URL(appBase, window.location.origin)
+
+      target.searchParams.set('route', `${route}${window.location.search}${window.location.hash}`)
+      window.location.replace(target)
+    </script>
+  </head>
+  <body></body>
+</html>
