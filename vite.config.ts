@@ -67,7 +67,7 @@ function inlineAssets(): Plugin {
 
 export default defineConfig(({ mode }) => ({
   root: 'src',
-  base: mode === 'production' ? '/tournament-planner/' : '/',
+  base: mode === 'production' ? (process.env.VITE_BASE_URL ?? '/tournament-planner/') : '/',
   plugins: [react(), tailwindcss(), serviceWorker(), inlineAssets()],
   build: {
     outDir: '../dist',
