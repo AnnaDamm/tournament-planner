@@ -8,6 +8,7 @@ export const en = {
   back: 'Back',
   menu: 'Menu',
   actions: 'Actions',
+  documentation: 'Documentation',
   add: 'Add player',
   addTeam: 'Add team',
   participants: 'PARTICIPANTS',

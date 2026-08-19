@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ArrowLeft, BarChart3, Menu, Settings2, Trophy, X } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Menu, Settings2, Trophy, X } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 
@@ -80,6 +80,14 @@ export function AppLayout({ tournamentName, roundCount, currentRound, children }
           </h1>
         </div>
         <div className="header-actions">
+          <button
+            className="icon-btn"
+            aria-label={t('documentation')}
+            title={t('documentation')}
+            onClick={() => navigate('/docs')}
+          >
+            <BookOpen size={18} />
+          </button>
           <button
             className="icon-btn settings-trigger"
             aria-label={isSettingsPage ? t('back') : t('settings')}

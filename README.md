@@ -18,6 +18,18 @@ A small local React/Vite application for organising sport-agnostic tournaments w
 
 [Open Tourny](https://annadamm.github.io/tournament-planner/)
 
+## Documentation
+
+Detailed user documentation is available in the deployed application:
+
+[Open the Tourny documentation](https://annadamm.github.io/tournament-planner/docs/)
+
+The documentation is bundled with the React application, available in English and German
+based on the browser language, and accessible offline after the application has been loaded.
+English remains the canonical source-code language.
+
+The repository Wiki serves as a small landing page that links to this canonical documentation.
+
 ## Requirements
 
 - Docker and Docker Compose

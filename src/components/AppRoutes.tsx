@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { Table, type Stat } from './Table'
+import { DocumentationPage } from './DocumentationPage'
 import type { Match, Participant, Round } from '../tournamentTypes'
 
 export type AppRoutesProps = {
@@ -134,6 +135,8 @@ export function AppRoutes({
           />
         }
       />
+      <Route path="/docs" element={<DocumentationPage />} />
+      <Route path="/docs/:slug" element={<DocumentationPage />} />
     </Routes>
   )
 }
