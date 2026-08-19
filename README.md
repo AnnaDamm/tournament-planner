@@ -25,8 +25,9 @@ standalone tournament manager. It works without a local host service and persist
 only in the browser's `localStorage`. Once the PWA has been loaded while online, it can
 also be opened offline; data is not synchronised with other devices.
 
-The local-network documentation and viewer QR-code actions are intentionally hidden in
-this mode.
+The local-network viewer controls are intentionally hidden in this mode. To open a second,
+read-only view in another tab, use the lock action in the toolbar. The lock is permanent for
+that tab and cannot be removed afterwards.
 
 ## Local master mode
 
@@ -36,9 +37,8 @@ complete snapshot whenever it changes. Every device that opens the LAN URL recei
 read-only live view through Server-Sent Events (SSE). There is no cloud service, database,
 or Internet requirement.
 
-The master sees a platform-aware Wi-Fi setup guide and a QR-code action. The QR code only
-contains the public viewer URL—viewers do not need a token or a special URL. A private,
-random master credential is supplied only to the master page and protects snapshot updates.
+A private, random master credential is supplied only to the master page and protects snapshot
+updates.
 
 ### Run directly with Node.js
 
@@ -47,9 +47,8 @@ pnpm install
 pnpm host
 ```
 
-The local host automatically selects a LAN IPv4 address for the QR code. Connect all
-devices to the same Wi-Fi or hotspot, then open the printed `Viewer URL` (or scan its QR
-code). Keep the master page open for the duration of the tournament.
+Connect all devices to the same Wi-Fi or hotspot, then open the local host URL on the viewer
+device. Keep the master page open for the duration of the tournament.
 
 ### Run the local host with Docker
 
@@ -65,8 +64,8 @@ multiple worktrees can run at the same time without sharing containers, networks
 On Windows, double-click `scripts\\start.bat` in File Explorer. It starts the same Docker
 Compose setup and keeps its window open if startup fails.
 
-Open the printed `http://localhost:<port>/` address on the tournament laptop as the master and
-use the QR-code action in the upper-right corner for the viewer URL. Allow incoming connections
+Open the printed `http://localhost:<port>/` address on the tournament laptop as the master.
+For other devices, use the laptop's LAN address and selected port. Allow incoming connections
 to the selected port in the laptop firewall when prompted.
 
 If the laptop has several active network adapters (for example a VPN), override the selected
@@ -83,8 +82,7 @@ a repeatable local URL in development.
 
 OrbStack also supplies automatic host-only service domains in the form
 `host.<compose-project>.orb.local`; the generated Compose project name makes these distinct per
-worktree as well. The QR code deliberately continues to use the laptop's LAN IP and selected
-port, because that is the portable address for phones and other devices on the tournament Wi-Fi.
+worktree as well.
 See the [OrbStack domain documentation](https://docs.orbstack.dev/docker/domains) for details.
 
 Tournament data remains in the master's browser `localStorage`; the relay only retains the
@@ -112,7 +110,16 @@ The repository Wiki serves as a small landing page that links to this canonical 
 
 ## Development
 
-Start the Vite development server:
+The default Compose setup is the Vite development server with live reload:
+
+```bash
+docker compose up --build
+```
+
+Open [http://localhost:5173](http://localhost:5173). The production-like LAN server remains
+available through `./scripts/start`.
+
+For direct host development, if Node.js and pnpm are installed:
 
 ```bash
 corepack enable
@@ -121,9 +128,6 @@ pnpm dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-Docker Compose is reserved for local master mode. The development server uses Vite directly,
-which keeps its live-reload workflow separate from the production-like LAN host.
 
 The pre-commit hook is configured automatically by `pnpm install` and runs Prettier, Oxlint and TypeScript checks before every commit. To enable it manually in an existing checkout:
 

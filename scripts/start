@@ -154,4 +154,4 @@ export TOURNY_VIEWER_URL="$viewer_url"
 
 echo "Compose project: $compose_project"
 echo "Viewer URL: $viewer_url"
-exec docker compose --project-name "$compose_project" up --build "$@"
+exec docker compose --project-name "$compose_project" --profile production up --build host "$@"

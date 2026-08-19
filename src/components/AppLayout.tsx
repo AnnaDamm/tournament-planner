@@ -353,14 +353,16 @@ export function AppLayout({
               </button>
             </section>
           </div>
-          <button
-            className="icon-btn"
-            aria-label={t('documentation')}
-            title={t('documentation')}
-            onClick={() => navigate(pathWithSearch('/docs'))}
-          >
-            <BookOpen size={18} aria-hidden="true" />
-          </button>
+          {!readOnly && (
+            <button
+              className="icon-btn"
+              aria-label={t('documentation')}
+              title={t('documentation')}
+              onClick={() => navigate(pathWithSearch('/docs'))}
+            >
+              <BookOpen size={18} aria-hidden="true" />
+            </button>
+          )}
           {localMaster && (
             <>
               <output
@@ -372,20 +374,22 @@ export function AppLayout({
               </output>
             </>
           )}
-          <button
-            className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
-            type="button"
-            aria-label={t('enableReadOnly')}
-            title={t('enableReadOnly')}
-            disabled={isReadOnlyTab}
-            onClick={toggleReadOnlyTab}
-          >
-            {isReadOnlyTab ? (
-              <Lock size={18} aria-hidden="true" />
-            ) : (
-              <LockOpen size={18} aria-hidden="true" />
-            )}
-          </button>
+          {!readOnly && (
+            <button
+              className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
+              type="button"
+              aria-label={t('enableReadOnly')}
+              title={t('enableReadOnly')}
+              disabled={isReadOnlyTab}
+              onClick={toggleReadOnlyTab}
+            >
+              {isReadOnlyTab ? (
+                <Lock size={18} aria-hidden="true" />
+              ) : (
+                <LockOpen size={18} aria-hidden="true" />
+              )}
+            </button>
+          )}
           {!readOnly && (
             <>
               <button
