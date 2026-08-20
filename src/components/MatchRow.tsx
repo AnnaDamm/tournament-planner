@@ -98,7 +98,7 @@ export function MatchRow({
     setDraftSets(initialSets)
     draftSetsRef.current = initialSets
   }, [initialSets])
-  const targetWins = Math.max(1, Math.min(9, Number(winningGames) || 1))
+  const targetWins = Math.max(1, Math.min(99, Number(winningGames) || 1))
   const matchResult = getMatchResult(match, targetWins)
   const canReorder = !readOnly && !hasEnteredScore(match)
   const { completedSets, winnerAt } = useMemo(
