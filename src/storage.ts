@@ -55,7 +55,7 @@ export const loadCourtCount = () => {
 export const saveCourtCount = (value: number) => write('courtCount', value)
 export const loadDefaultWinningGames = () => {
   const value = read<number>('defaultWinningGames', 1)
-  return Number.isFinite(value) ? Math.min(9, Math.max(1, Math.floor(value))) : 1
+  return Number.isFinite(value) ? Math.min(99, Math.max(1, Math.floor(value))) : 1
 }
 export const saveDefaultWinningGames = (value: number) => write('defaultWinningGames', value)
 export const loadTournamentName = () => {

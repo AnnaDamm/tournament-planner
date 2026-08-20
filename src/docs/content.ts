@@ -80,7 +80,7 @@ const en: DocPage[] = [
       {
         title: 'Default games to win',
         text: [
-          'Allowed values are 1 to 9. One is a single-game match, two is best of three, and three is best of five.',
+          'Allowed values are 1 to 99. One is a single-game match, two is best of three, and three is best of five.',
           'The first round uses this default. Later rounds inherit the preceding round. Existing rounds are not changed retroactively.',
         ],
       },
@@ -333,7 +333,7 @@ const de: DocPage[] = [
       {
         title: 'Standard-Gewinnsätze',
         text: [
-          'Erlaubt sind 1 bis 9: 1 ist ein Satz, 2 Best-of-3, 3 Best-of-5.',
+          'Erlaubt sind 1 bis 99: 1 ist ein Satz, 2 Best-of-3, 3 Best-of-5.',
           'Die erste Runde nutzt den Standard, spätere erben die vorherige Runde. Bestehende Runden ändern sich nicht.',
         ],
       },

@@ -128,14 +128,9 @@ export function SettingsPage({
               id="default-winning-games"
               type="number"
               min="1"
-              max="9"
+              max="99"
               value={defaultWinningGames}
-              onFocus={(event) => event.currentTarget.select()}
-              onChange={(event) =>
-                setDefaultWinningGames(
-                  Math.min(9, Math.max(1, Math.floor(Number(event.target.value) || 1))),
-                )
-              }
+              onChange={(event) => setDefaultWinningGames(Number(event.currentTarget.value))}
             />
           </div>
           <div className="settings-actions">
