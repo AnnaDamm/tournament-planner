@@ -5,6 +5,7 @@ import type { Round } from '../tournamentTypes'
 
 type Props = {
   round: Round
+  canCalculatePairings: boolean
   onSettings: () => void
   onStart: () => void
   onFillUnknown: () => void
@@ -14,12 +15,14 @@ type Props = {
 
 export function RoundActions({
   round,
+  canCalculatePairings,
   onSettings,
   onStart,
   onFillUnknown,
   onReroll,
   onDelete,
 }: Props) {
+  const needsPairing = round.matches.length === 0
   const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
   return (
     <div className="round-actions">
@@ -32,7 +35,7 @@ export function RoundActions({
       >
         <Settings2 size={16} aria-hidden="true" />
       </button>
-      {!round.startedAt && (
+      {!round.startedAt && !needsPairing && (
         <button
           className="button ghost"
           type="button"
@@ -56,16 +59,28 @@ export function RoundActions({
           <ListPlus size={16} aria-hidden="true" />
         </button>
       )}
-      {isUnstarted && (
+      {needsPairing && canCalculatePairings ? (
         <button
           className="button ghost"
           type="button"
-          aria-label={t('reroll')}
-          title={t('reroll')}
+          aria-label={t('calculatePairings')}
+          title={t('calculatePairings')}
           onClick={onReroll}
         >
           <Dices size={16} aria-hidden="true" />
         </button>
+      ) : (
+        isUnstarted && (
+          <button
+            className="button ghost"
+            type="button"
+            aria-label={t('reroll')}
+            title={t('reroll')}
+            onClick={onReroll}
+          >
+            <Dices size={16} aria-hidden="true" />
+          </button>
+        )
       )}
       {!round.matches.some((match) => match.scoreA || match.scoreB) && (
         <button

@@ -38,8 +38,8 @@ const en: DocPage[] = [
       {
         title: 'Create and start a round',
         text: [
-          'Open Rounds and select Create round. The first round is randomized; with an odd participant count, one participant receives a bye.',
-          'Before entering scores, you may reroll, swap participants or the bye using drag and drop, and override round settings. Start the first round with the play button.',
+          'Open Rounds and select Create round. This creates an empty round without calculating pairings.',
+          'Select Calculate pairings to generate the first randomized round or the ranking-based later round. With an odd participant count, one participant receives a bye. Before entering scores, you may reroll, swap participants or the bye using drag and drop, and override round settings.',
         ],
         links: [{ label: 'Open Rounds', to: '/rounds' }],
       },
@@ -48,6 +48,80 @@ const en: DocPage[] = [
         text: [
           'Enter non-negative, unequal scores. The match ends when one side reaches the configured number of wins.',
           'Later rounds may contain <not yet known> positions. Fill further resolves them when earlier results become available. Export JSON backups regularly.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'system-overview',
+    title: 'How the system works',
+    summary: 'The complete flow from pairing and court assignment to ranking positions.',
+    sections: [
+      {
+        title: 'Tournament data and active participants',
+        items: [
+          'Withdrawn participants are excluded from new pairings but remain visible in the table.',
+          'A completed match contributes one win and one loss, the won and lost sets, and the points from complete sets.',
+          'Open matches, unknown positions, and matches involving deleted or unknown participants do not contribute to the ranking.',
+        ],
+      },
+      {
+        title: 'How the first round is created',
+        text: [
+          'Creating the first round does not calculate pairings. After Calculate pairings is selected, active participants are paired randomly. Because it is the first round, there are no previous opponents to consider.',
+          'With an odd number of active participants, one person receives a bye. Participants with fewer previous byes are preferred, and equal bye counts are decided randomly.',
+          'The round display uses the ranking calculated from results before that round. For the first round there are no results yet, so the initial ranking is used. New court assignments follow the same official order, while the opponents themselves remain randomly drawn.',
+        ],
+      },
+      {
+        title: 'How later rounds are paired',
+        items: [
+          'Creating a later round only creates an empty round. Pairings and unknown positions are calculated only after Calculate pairings is selected.',
+          'The official ranking is calculated from all previous completed results.',
+          'Participants whose previous round is finalized are placed into the new round. Positions that are not decided yet are represented by not-yet-known placeholders.',
+          'Starting with the first person in ranking order, the system selects the first remaining person they have not played yet. The process repeats until no pair remains.',
+          'If a participant has already played every remaining opponent, the first available opponent is used as a fallback. A rematch is then unavoidable.',
+          'When unknown positions can be resolved, same-record opponents are preferred, then the next lower win group. Available candidates are selected in official ranking order and rematches are avoided where possible.',
+        ],
+      },
+      {
+        title: 'How results become a position',
+        items: [
+          'A set is counted only when both values are numeric, non-negative, and different.',
+          'A match is complete as soon as one side reaches the configured number of wins. Later set rows do not count.',
+          'A started bye counts as one win, but produces no sets or points.',
+          'The official position is sorted by: more wins, later last-loss round, more sets won, fewer sets lost, more own points scored, fewer opponent points conceded, then name alphabetically.',
+          'A participant without a loss ranks above every participant with a loss when the number of wins is equal. A later last loss is better than an earlier last loss.',
+        ],
+        links: [{ label: 'Open Table', to: '/table' }],
+      },
+      {
+        title: 'Official position versus table sorting',
+        text: [
+          'The position number always uses the official criteria above. Table headings can be sorted for a different view, but changing a heading does not change the official position or the pairing logic.',
+          'Each round has its own ranking based only on results from previous rounds. The table displays only the latest overall ranking; sorting a table heading does not change the per-round order or the pairing logic.',
+        ],
+      },
+      {
+        title: 'How courts and starts are assigned',
+        items: [
+          'The global court limit and the per-round court limit are applied together.',
+          'A match with a partial score has priority over a match without a score. Unknown positions cannot start, and a participant cannot play in two matches at the same time.',
+          'An earlier open round blocks later rounds for the affected participants. Later rounds start automatically when their positions are known and a court is available.',
+          'Each match stores its court number. Valid existing assignments are preserved; after a match finishes, its court is available for the next ready match.',
+          'The first round starts automatically when the first result is entered. A manually started round is also assigned the lowest available courts in the deterministic match order.',
+        ],
+        links: [{ label: 'Open Rounds', to: '/rounds' }],
+      },
+      {
+        title: 'Round lifecycle at a glance',
+        items: [
+          'Create an empty round.',
+          'Select Calculate pairings to create pairings or placeholders.',
+          'Resolve placeholders as earlier results become final.',
+          'Start ready matches within the available court capacity.',
+          'Enter results; completed matches update the standings and release their courts.',
+          'Use the updated official ranking for the next round.',
         ],
       },
     ],
@@ -107,8 +181,8 @@ const en: DocPage[] = [
       {
         title: 'Swiss pairing',
         text: [
-          'Active participants are grouped by win-loss record and randomized within those groups. Rematches are avoided whenever a complete rematch-free solution exists.',
-          'Odd groups receive a compatible participant from the next-lower win group where possible. A random fallback can contain a rematch.',
+          'Create a round first, then select Calculate pairings. The first round uses randomized Swiss pairing. From round two onward, active participants follow the official ranking: each remaining participant is paired with the first person in ranking order they have not played yet.',
+          'If no unused opponent remains, the first available opponent is used as a necessary fallback. Rematches can therefore occur when the participant history leaves no alternative.',
         ],
         links: [{ label: 'Open Rounds', to: '/rounds' }],
       },
@@ -141,6 +215,7 @@ const en: DocPage[] = [
           'An earlier open match blocks later matches.',
           'Partially entered matches have priority; unknown positions cannot run.',
           'Later rounds start automatically when a match is ready and capacity is free.',
+          'Each running match keeps its assigned court. Completed matches release the court for the next ready match.',
         ],
       },
     ],
@@ -167,8 +242,11 @@ const en: DocPage[] = [
         title: 'Official ranking',
         items: [
           'More wins',
-          'Better game difference',
-          'Better point difference',
+          'Later last loss round; participants without a loss rank above participants with a loss',
+          'More sets won',
+          'Fewer lost sets',
+          'More own points scored',
+          'Fewer opponent points conceded',
           'Name alphabetically',
         ],
         note: 'Head-to-head, Buchholz score, and strength of schedule are not tie-breakers.',
@@ -199,6 +277,17 @@ const en: DocPage[] = [
         text: [
           'Select the lock in the toolbar to reopen the current tab as read-only. The tab keeps its own local snapshot, cannot change or save tournament data, and the lock cannot be removed afterward. Open the GitHub Pages app in a second tab when you need a local read-only view.',
           'Local server viewers are read-only automatically. The lock and documentation controls are hidden in every read-only or viewer tab.',
+        ],
+      },
+      {
+        title: 'Read-only display modes',
+        items: [
+          'The magnifying-glass-plus button enables the large view. It enlarges the typography and controls; on large screens it uses the tablet layout with the navigation drawer and no side margin. The mode is encoded as focus=1 in the URL.',
+          'The update spinner enables automatic rotation between the table and rounds every 30 seconds. The mode is encoded as rotate=1 in the URL and can be combined with focus=1.',
+          'After 10 seconds without interaction, the read-only rounds view centers the first currently running match. Interacting with the page starts the idle timer again.',
+          'All simultaneously running rounds are grouped in one highlighted card in the read-only rounds view.',
+          'In browser fullscreen, the cursor hides after 5 seconds of inactivity. The header is overlaid without taking screen space and appears when the pointer reaches the top edge; it retracts shortly after the pointer leaves it.',
+          'Toolbar icon tooltips appear on hover and keyboard focus. Read-only display URLs can be shared directly, for example ?readonly=1&focus=1&rotate=1.',
         ],
       },
       {
@@ -291,8 +380,8 @@ const de: DocPage[] = [
       {
         title: 'Runde erstellen und starten',
         text: [
-          'Unter Runden wird die erste Runde zufällig gepaart; bei ungerader Anzahl erhält eine Person ein Bye.',
-          'Vor Ergebnissen kannst du neu auslosen, Namen oder Bye ziehen und Rundeneinstellungen ändern. Starte über das Play-Symbol.',
+          'Unter Runden legst du zunächst eine leere Runde an. Die Paarungen werden erst mit „Paarungen berechnen“ erzeugt; bei ungerader Anzahl erhält eine Person ein Bye.',
+          'Vor Ergebnissen kannst du neu auslosen, Namen oder Bye ziehen und Rundeneinstellungen ändern. Starte danach über das Play-Symbol.',
         ],
         links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
@@ -301,6 +390,80 @@ const de: DocPage[] = [
         text: [
           'Trage nichtnegative, unterschiedliche Werte ein. Die Begegnung endet mit der Zielzahl an Siegen.',
           'Weitere befüllen löst <noch nicht bekannt> auf, sobald frühere Ergebnisse feststehen. Exportiere regelmäßig JSON.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'system-overview',
+    title: 'So funktioniert das System',
+    summary: 'Der vollständige Ablauf von Paarung und Feldvergabe bis zur Ranglistenposition.',
+    sections: [
+      {
+        title: 'Turnierdaten und aktive Teilnehmende',
+        items: [
+          'Zurückgezogene Teilnehmende werden bei neuen Paarungen ausgeschlossen, bleiben aber in der Tabelle sichtbar.',
+          'Eine fertige Begegnung erzeugt einen Sieg und eine Niederlage sowie gewonnene/verlorene Sätze und die Punkte aus vollständigen Sätzen.',
+          'Offene Begegnungen, unbekannte Plätze und Begegnungen mit gelöschten oder unbekannten Personen zählen nicht für die Rangliste.',
+        ],
+      },
+      {
+        title: 'So entsteht die erste Runde',
+        text: [
+          'Das Anlegen der ersten Runde berechnet noch keine Paarungen. Erst mit „Paarungen berechnen“ werden die aktiven Teilnehmenden zufällig gepaart. Da es die erste Runde ist, gibt es keine früheren Gegner, die berücksichtigt werden müssen.',
+          'Bei einer ungeraden Anzahl aktiver Teilnehmender erhält eine Person ein Bye. Bevorzugt werden Personen mit wenigen bisherigen Byes; bei Gleichstand entscheidet der Zufall.',
+          'Die Rundenansicht nutzt die Rangliste, die aus den Ergebnissen vor dieser Runde berechnet wurde. In der ersten Runde gibt es noch keine Ergebnisse, daher gilt die Anfangsrangliste. Neue Spielfeldzuweisungen folgen derselben offiziellen Reihenfolge; die Gegner selbst bleiben zufällig ausgelost.',
+        ],
+      },
+      {
+        title: 'So werden Folgerunden gepaart',
+        items: [
+          'Das Anlegen einer Folgerunde erzeugt zunächst nur eine leere Runde. Paarungen und unbekannte Plätze werden erst mit „Paarungen berechnen“ erzeugt.',
+          'Die offizielle Rangliste wird aus allen bisher fertigen Ergebnissen berechnet.',
+          'Teilnehmende mit abgeschlossener vorheriger Runde werden in die neue Runde übernommen. Noch nicht entschiedene Plätze werden als noch nicht bekannt dargestellt.',
+          'Beginnend mit der ersten Person der Rangliste nimmt das System die erste noch verfügbare Person, gegen die sie noch nicht gespielt hat. Das wiederholt sich, bis keine Paarung mehr möglich ist.',
+          'Hat eine Person bereits gegen alle übrigen verfügbaren Personen gespielt, wird die erste verfügbare Person als Fallback genommen. Ein Rematch ist dann unvermeidbar.',
+          'Sobald unbekannte Plätze aufgelöst werden können, werden zunächst Personen mit gleichem Ergebnisstand und danach die nächste niedrigere Sieggruppe berücksichtigt. Kandidaten werden in offizieller Rangfolge gewählt und Rematches möglichst vermieden.',
+        ],
+      },
+      {
+        title: 'So entsteht eine Ranglistenposition',
+        items: [
+          'Ein Satz zählt nur, wenn beide Werte numerisch, nichtnegativ und unterschiedlich sind.',
+          'Eine Begegnung ist fertig, sobald eine Seite die konfigurierte Zahl an Satzsiegen erreicht. Spätere Satzzeilen werden nicht gewertet.',
+          'Ein gestartetes Bye zählt als Sieg, erzeugt aber keine Sätze und Punkte.',
+          'Die offizielle Position wird sortiert nach: mehr Siege, spätere Runde des letzten Verlusts, mehr gewonnene Sätze, weniger verlorene Sätze, mehr eigene Punkte, weniger gegnerische Punkte und anschließend alphabetisch nach Name.',
+          'Bei gleicher Siegzahl steht eine Person ohne Niederlage vor allen Personen mit Niederlage. Ein späterer letzter Verlust ist besser als ein früherer.',
+        ],
+        links: [{ label: 'Tabelle öffnen', to: '/table' }],
+      },
+      {
+        title: 'Offizielle Position und Tabellensortierung',
+        text: [
+          'Die Positionsnummer verwendet immer die offiziellen Kriterien. Die Tabellenspalten können für eine andere Ansicht sortiert werden; eine Änderung der Spaltensortierung verändert weder die offizielle Position noch die Paarungslogik.',
+          'Jede Runde hat eine eigene Rangliste, die nur aus den Ergebnissen der vorherigen Runden berechnet wird. Die Tabelle zeigt ausschließlich die aktuellste Gesamtrangliste; eine Spaltensortierung verändert weder die Reihenfolge innerhalb einer Runde noch die Paarungslogik.',
+        ],
+      },
+      {
+        title: 'So werden Spielfelder und Starts vergeben',
+        items: [
+          'Das globale Spielfeldlimit und das Limit der jeweiligen Runde gelten gemeinsam.',
+          'Eine Begegnung mit teilweise eingetragenem Ergebnis hat Vorrang vor einer Begegnung ohne Ergebnis. Unbekannte Plätze können nicht starten, und eine Person kann nicht gleichzeitig zweimal spielen.',
+          'Eine frühere offene Runde blockiert spätere Runden für die betroffenen Personen. Folgerunden starten automatisch, sobald ihre Plätze bekannt und Felder frei sind.',
+          'Jede Begegnung speichert ihre Feldnummer. Gültige bestehende Zuweisungen bleiben erhalten; nach dem Abschluss wird das Feld für die nächste bereite Begegnung frei.',
+          'Die erste Runde startet automatisch, sobald das erste Ergebnis eingetragen wird. Auch ein manueller Start vergibt die niedrigsten freien Felder in der deterministischen Reihenfolge.',
+        ],
+        links: [{ label: 'Runden öffnen', to: '/rounds' }],
+      },
+      {
+        title: 'Rundenablauf im Überblick',
+        items: [
+          'Leere Runde erstellen.',
+          'Mit „Paarungen berechnen“ Paarungen oder unbekannte Plätze erzeugen.',
+          'Unbekannte Plätze auflösen, sobald frühere Ergebnisse feststehen.',
+          'Bereite Begegnungen innerhalb der verfügbaren Feldkapazität starten.',
+          'Ergebnisse eintragen; fertige Begegnungen aktualisieren die Rangliste und geben ihre Felder frei.',
+          'Die aktualisierte offizielle Rangliste für die nächste Runde verwenden.',
         ],
       },
     ],
@@ -360,8 +523,8 @@ const de: DocPage[] = [
       {
         title: 'Schweizer Paarung',
         text: [
-          'Aktive Teilnehmende werden nach Siegen und Niederlagen gruppiert und zufällig gepaart. Rematches werden vermieden, wenn eine vollständige Lösung existiert.',
-          'Ungerade Gruppen erhalten möglichst jemanden aus der nächstniedrigeren Sieggruppe; die Zufallsreserve kann einen Rematch enthalten.',
+          'Lege zuerst eine Runde an und wähle dann „Paarungen berechnen“. Die erste Runde wird zufällig nach dem Schweizer System gepaart. Ab Runde zwei folgt die Auslosung der offiziellen Rangliste: Jede verbleibende Person spielt gegen die erste Person in der Reihenfolge, gegen die sie noch nicht gespielt hat.',
+          'Wenn kein ungespielter Gegner übrig bleibt, wird notwendigerweise die erste verfügbare Person genommen; dann kann ein Rematch entstehen.',
         ],
         links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
@@ -394,6 +557,7 @@ const de: DocPage[] = [
           'Frühere offene Begegnungen blockieren spätere.',
           'Begonnene Ergebnisse haben Vorrang; unbekannte Plätze können nicht laufen.',
           'Folgerunden starten automatisch bei Bereitschaft und Kapazität.',
+          'Jede laufende Begegnung speichert ihr Feld. Nach dem Abschluss wird das Feld für die nächste bereite Begegnung frei.',
         ],
       },
     ],
@@ -420,8 +584,11 @@ const de: DocPage[] = [
         title: 'Rangfolge',
         items: [
           'Mehr Siege',
-          'Bessere Satzdifferenz',
-          'Bessere Punktedifferenz',
+          'Spätere Runde des letzten Verlusts; ohne Verlust vor allen mit Verlust',
+          'Mehr gewonnene Sätze',
+          'Weniger verlorene Sätze',
+          'Mehr eigene Punkte',
+          'Weniger gegnerische Punkte',
           'Name alphabetisch',
         ],
         note: 'Direkter Vergleich, Buchholz und Gegnerstärke zählen nicht.',
@@ -452,6 +619,17 @@ const de: DocPage[] = [
         text: [
           'Über das Schloss in der Kopfleiste lässt sich der aktuelle Tab als Read-only-Ansicht neu öffnen. Der Tab nutzt einen eigenen lokalen Stand, kann keine Turnierdaten ändern oder speichern, und der Lock kann danach nicht mehr entfernt werden. Öffne die GitHub-Pages-App dafür in einem zweiten Tab.',
           'Viewer über den lokalen Server sind automatisch schreibgeschützt. Lock und Dokumentation sind in jedem Read-only- oder Viewer-Tab ausgeblendet.',
+        ],
+      },
+      {
+        title: 'Anzeigemodi in Read-only',
+        items: [
+          'Die Lupe mit Plus aktiviert die große Ansicht. Schrift und Bedienelemente werden größer; auf großen Bildschirmen wird das Tablet-Layout mit ausklappbarer Navigation und ohne seitlichen Rand verwendet. Der Modus steht als focus=1 in der URL.',
+          'Der Update-Kreisel aktiviert den automatischen Wechsel zwischen Tabelle und Runden alle 30 Sekunden. Der Modus steht als rotate=1 in der URL und kann mit focus=1 kombiniert werden.',
+          'Nach 10 Sekunden ohne Interaktion zentriert die Read-only-Rundenansicht die erste aktuell laufende Begegnung. Jede Interaktion startet den Idle-Timer neu.',
+          'Alle gleichzeitig laufenden Runden werden in der Read-only-Rundenansicht in einer hervorgehobenen Card gruppiert.',
+          'Im Browser-Fullscreen wird der Cursor nach 5 Sekunden Inaktivität ausgeblendet. Die Kopfleiste liegt über dem Inhalt und nimmt keinen Platz weg; sie erscheint am oberen Bildschirmrand und fährt kurz nach dem Verlassen wieder ein.',
+          'Tooltips für die Icons erscheinen bei Hover und Tastaturfokus. Read-only-Anzeigen können direkt geteilt werden, zum Beispiel ?readonly=1&focus=1&rotate=1.',
         ],
       },
       {

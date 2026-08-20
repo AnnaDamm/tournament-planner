@@ -16,6 +16,8 @@ export type Stat = Participant & {
 
 type Props = {
   sorted: Stat[]
+  players: Participant[]
+  defaultCourtCount: number
   participantLabel: string
   rounds: Round[]
   name: (id: string) => string
@@ -36,7 +38,6 @@ const hasDuplicateParticipantNames = (participants: Participant[]) =>
 const getColumns = (participantLabel: string) => [
   ['name', participantLabel],
   ['wins', t('wins')],
-  ['losses', t('losses')],
   ['played', t('games')],
   ['setsWon', t('sets')],
   ['points', t('points')],
@@ -44,6 +45,8 @@ const getColumns = (participantLabel: string) => [
 
 export function Table({
   sorted,
+  players,
+  defaultCourtCount,
   participantLabel,
   rounds,
   name,
@@ -60,15 +63,14 @@ export function Table({
   const [historyPlayer, setHistoryPlayer] = useState<Participant | null>(null)
   const mostPlayed = Math.max(0, ...sorted.map((player) => player.played))
   const hasDuplicateNames = hasDuplicateParticipantNames(sorted)
-  const addLabel = participantLabel === t('teams') ? t('addTeam') : t('add')
-
   return (
     <>
       <PageTitle eyebrow={t('ranking')} title={t('table')}>
         {!readOnly && (
           <div className="page-actions">
             <button className="button primary" onClick={onAdd}>
-              <Plus size={17} aria-hidden="true" /> {addLabel}
+              <Plus size={17} aria-hidden="true" />{' '}
+              {participantLabel === t('teams') ? t('addTeam') : t('add')}
             </button>
             {!editing ? (
               <button className="button ghost" onClick={() => setEditing(true)}>
@@ -178,9 +180,6 @@ export function Table({
                   <td data-label={t('wins')}>
                     <span className="cell-value">{player.wins}</span>
                   </td>
-                  <td data-label={t('losses')}>
-                    <span className="cell-value">{player.losses}</span>
-                  </td>
                   <td data-label={t('games')}>
                     <span className="cell-value">
                       {player.played}
@@ -235,7 +234,9 @@ export function Table({
       </div>
       <PlayerHistoryDialog
         player={historyPlayer}
+        players={players}
         rounds={rounds}
+        defaultCourtCount={defaultCourtCount}
         name={name}
         onClose={() => setHistoryPlayer(null)}
       />

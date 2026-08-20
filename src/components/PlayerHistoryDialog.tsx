@@ -1,12 +1,20 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
-import { getMatchResult, getMatchSets } from '../tournament'
+import {
+  compareRankingParticipants,
+  getMatchResult,
+  getMatchSets,
+  getRankingParticipants,
+  getRunningMatchIdsByRound,
+} from '../tournament'
 import type { Participant, Round } from '../tournamentTypes'
 
 type Props = {
   player: Participant | null
+  players: Participant[]
   rounds: Round[]
+  defaultCourtCount: number
   name: (id: string) => string
   onClose: () => void
 }
@@ -20,7 +28,14 @@ const formatSets = (playerId: string, match: Round['matches'][number]) =>
     })
     .join(', ')
 
-export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
+export function PlayerHistoryDialog({
+  player,
+  players,
+  rounds,
+  defaultCourtCount,
+  name,
+  onClose,
+}: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -28,38 +43,78 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
     if (!dialog) return
     if (player && !dialog.open) dialog.showModal()
     if (!player && dialog.open) dialog.close()
-  }, [player])
+    const handleBackdropClick = (event: MouseEvent) => {
+      if (event.target === dialog) onClose()
+    }
+    dialog.addEventListener('click', handleBackdropClick)
+    return () => dialog.removeEventListener('click', handleBackdropClick)
+  }, [onClose, player])
 
+  const positionsBeforeRounds = useMemo(
+    () =>
+      rounds.map(
+        (_, roundIndex) =>
+          new Map(
+            getRankingParticipants(players, rounds.slice(0, roundIndex))
+              .sort(compareRankingParticipants)
+              .map((participant, position) => [participant.id, position + 1]),
+          ),
+      ),
+    [players, rounds],
+  )
+  const positionsAfterRounds = useMemo(
+    () =>
+      rounds.map(
+        (_, roundIndex) =>
+          new Map(
+            getRankingParticipants(players, rounds.slice(0, roundIndex + 1))
+              .sort(compareRankingParticipants)
+              .map((participant, position) => [participant.id, position + 1]),
+          ),
+      ),
+    [players, rounds],
+  )
+  const runningMatchIdsByRound = useMemo(
+    () => getRunningMatchIdsByRound(rounds, defaultCourtCount),
+    [defaultCourtCount, rounds],
+  )
   const entries = player
-    ? rounds.flatMap((round) => {
-        const matches = round.matches
-          .filter((match) => match.a === player.id || match.b === player.id)
-          .map((match) => {
-            const opponentId = match.a === player.id ? match.b : match.a
-            const result = getMatchResult(match, Math.max(1, round.winningGames || 1))
-            const won = result?.winner === player.id
-            return {
-              key: `${round.number}-${match.id}`,
-              round: round.number,
-              opponent: name(opponentId),
-              score: formatSets(player.id, match),
-              outcome: result ? (won ? t('win') : t('loss')) : t('pending'),
-              outcomeClass: result ? (won ? 'positive' : 'negative') : '',
-            }
-          })
-        return round.bye === player.id
-          ? [
-              {
-                key: `${round.number}-bye`,
-                round: round.number,
-                opponent: t('bye'),
-                score: '—',
-                outcome: t('win'),
-                outcomeClass: 'positive',
-              },
-              ...matches,
-            ]
-          : matches
+    ? rounds.map((round, roundIndex) => {
+        const match = round.matches.find(
+          (candidate) => candidate.a === player.id || candidate.b === player.id,
+        )
+        const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
+        const won = result?.winner === player.id
+        const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
+        const isBye = round.bye === player.id
+        const isRunning = match
+          ? (runningMatchIdsByRound.get(round.number)?.has(match.id) ?? false)
+          : false
+        return {
+          key: `${round.number}-${match?.id ?? (isBye ? 'bye' : 'pending')}`,
+          round: round.number,
+          positionBefore: positionsBeforeRounds[roundIndex].get(player.id) ?? '—',
+          positionAfter: positionsAfterRounds[roundIndex].get(player.id) ?? '—',
+          opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
+          score: isBye || !match ? '—' : formatSets(player.id, match),
+          outcome: isRunning
+            ? t('running')
+            : isBye
+              ? t('win')
+              : result
+                ? won
+                  ? t('win')
+                  : t('loss')
+                : t('pending'),
+          outcomeClass: isRunning
+            ? 'running'
+            : isBye || result
+              ? won || isBye
+                ? 'positive'
+                : 'negative'
+              : '',
+          rowClass: isRunning ? 'running' : '',
+        }
       })
     : []
 
@@ -92,6 +147,8 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
             <thead>
               <tr>
                 <th scope="col">{t('round')}</th>
+                <th scope="col">{t('positionBeforeRound')}</th>
+                <th scope="col">{t('positionAfterRound')}</th>
                 <th scope="col">{t('opponent')}</th>
                 <th scope="col">{t('score')}</th>
                 <th scope="col">{t('result')}</th>
@@ -99,8 +156,10 @@ export function PlayerHistoryDialog({ player, rounds, name, onClose }: Props) {
             </thead>
             <tbody>
               {entries.map((entry) => (
-                <tr key={entry.key}>
+                <tr key={entry.key} className={entry.rowClass}>
                   <td>{entry.round}</td>
+                  <td>{entry.positionBefore}</td>
+                  <td>{entry.positionAfter}</td>
                   <td>{entry.opponent}</td>
                   <td>{entry.score}</td>
                   <td className={entry.outcomeClass}>{entry.outcome}</td>
