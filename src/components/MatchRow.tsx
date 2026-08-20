@@ -151,10 +151,11 @@ export function MatchRow({
     <fieldset id={`match-${match.id}`} className={`match ${isRunning ? 'running' : ''}`}>
       <legend className="sr-only">
         {t('matchLabel')} {matchIndex + 1}: {name(match.a)} {t('versus')} {name(match.b)}
+        {match.court ? `, ${t('court')} ${match.court}` : ''}
         {isRunning ? `, ${t('running')}` : ''}
       </legend>
-      <span className="match-no" aria-hidden="true">
-        {String(matchIndex + 1).padStart(2, '0')}
+      <span className="match-court" aria-hidden="true">
+        {match.court ?? '–'}
       </span>
       <span
         className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}

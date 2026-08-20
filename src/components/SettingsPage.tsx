@@ -42,7 +42,12 @@ export function SettingsPage({
     const dialog = dialogRef.current
     if (!dialog) return
     if (!dialog.open) dialog.showModal()
+    const handleBackdropClick = (event: MouseEvent) => {
+      if (event.target === dialog) navigate(-1)
+    }
+    dialog.addEventListener('click', handleBackdropClick)
     return () => {
+      dialog.removeEventListener('click', handleBackdropClick)
       if (dialog.open) dialog.close()
     }
   }, [navigate])

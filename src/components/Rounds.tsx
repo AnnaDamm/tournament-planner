@@ -1,17 +1,18 @@
-import { Clock, GripVertical, Plus, Trophy } from 'lucide-react'
+import { Plus, Trophy } from 'lucide-react'
 import { useState } from 'react'
-import { MatchRow } from './MatchRow'
 import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
-import { RoundActions } from './RoundActions'
+import { RoundSection } from './RoundSection'
 import { t } from '../i18n'
 import type { Match, Participant, Round } from '../tournamentTypes'
-import { getRunningMatchIdsByRound, isRoundComplete, isUnknownParticipantId } from '../tournament'
+import { getRunningMatchIdsByRound, isUnknownParticipantId } from '../tournament'
+import { useIdleRunningMatchScroll } from '../hooks/useIdleRunningMatchScroll'
 
 type Props = {
   rounds: Round[]
   players: Participant[]
+  participantOrderByRound: string[][]
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   defaultCourtCount: number
@@ -27,16 +28,23 @@ type Props = {
   readOnly?: boolean
 }
 
-const formatStartTime = (startedAt: string) => {
-  const date = new Date(startedAt)
-  return Number.isNaN(date.getTime())
-    ? startedAt
-    : new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(date)
-}
+const getCurrentRoundNumber = (rounds: Round[], runningMatchIdsByRound: Map<number, Set<string>>) =>
+  rounds.find((round) => (runningMatchIdsByRound.get(round.number)?.size ?? 0) > 0)?.number
+
+const getFirstRunningMatchId = (
+  rounds: Round[],
+  runningMatchIdsByRound: Map<number, Set<string>>,
+) =>
+  rounds
+    .flatMap((round) =>
+      round.matches.filter((match) => runningMatchIdsByRound.get(round.number)?.has(match.id)),
+    )
+    .at(0)?.id
 
 export function Rounds({
   rounds,
   players,
+  participantOrderByRound,
   name,
   record,
   defaultCourtCount,
@@ -60,6 +68,17 @@ export function Rounds({
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
   const runningMatchIdsByRound = getRunningMatchIdsByRound(rounds, defaultCourtCount)
+  const currentRoundNumber = getCurrentRoundNumber(rounds, runningMatchIdsByRound)
+  const firstRunningMatchId = getFirstRunningMatchId(rounds, runningMatchIdsByRound)
+  const runningRoundIndices = new Set(
+    rounds.flatMap((round, index) =>
+      (runningMatchIdsByRound.get(round.number)?.size ?? 0) > 0 ? [index] : [],
+    ),
+  )
+  const firstRunningRoundIndex = [...runningRoundIndices][0]
+  const lastRunningRoundIndex = [...runningRoundIndices].at(-1)
+  const groupRunningRounds = readOnly && firstRunningRoundIndex !== undefined
+  useIdleRunningMatchScroll(readOnly, firstRunningMatchId)
   const handleKeyboardSwap = (roundIndex: number, participantId: string) => {
     if (!keyboardMove || keyboardMove.roundIndex !== roundIndex) {
       setKeyboardMove({ roundIndex, participantId })
@@ -70,6 +89,34 @@ export function Rounds({
     }
     setKeyboardMove(null)
   }
+  const renderedRounds = rounds.map((round, roundIndex) => (
+    <RoundSection
+      key={round.number}
+      round={round}
+      roundIndex={roundIndex}
+      canCalculatePairings={roundIndex === 0 || rounds[roundIndex - 1].matches.length > 0}
+      participantOrder={participantOrderByRound[roundIndex] ?? []}
+      currentRoundNumber={currentRoundNumber}
+      runningMatchIds={runningMatchIdsByRound.get(round.number) ?? new Set<string>()}
+      name={name}
+      record={(id) => record(roundIndex, id)}
+      onPlayerClick={(id) => {
+        if (!isUnknownParticipantId(id)) setHistoryPlayerId(id)
+      }}
+      onUpdate={(matches) => onUpdate(roundIndex, matches)}
+      onSettings={() => setSettingsRoundNumber(round.number)}
+      onStart={() => onStart(round.number)}
+      onFillUnknown={() => onFillUnknown(round.number)}
+      onReroll={() => onReroll(round.number)}
+      onDelete={() => onDelete(round.number)}
+      onSwapPlayers={(draggedId, targetId) => onSwapPlayers(roundIndex, draggedId, targetId)}
+      keyboardMove={keyboardMove}
+      onKeyboardSwap={(participantId) => handleKeyboardSwap(roundIndex, participantId)}
+      readOnly={readOnly}
+    />
+  ))
+  const currentGroupStart = firstRunningRoundIndex ?? 0
+  const currentGroupEnd = lastRunningRoundIndex ?? -1
   return (
     <>
       <PageTitle eyebrow={t('schedule')} title={t('rounds')} />
@@ -81,123 +128,17 @@ export function Rounds({
         </div>
       ) : (
         <div className="round-list">
-          {rounds.map((round, roundIndex) => {
-            const canReorderBye = !readOnly && !isRoundComplete(round)
-            const runningMatchIds = runningMatchIdsByRound.get(round.number) ?? new Set<string>()
-            return (
-              <section
-                className="round-card"
-                key={round.number}
-                aria-labelledby={`round-${round.number}-title`}
-              >
-                <div className="round-head">
-                  <div>
-                    <span className="round-kicker">
-                      <span aria-hidden="true">
-                        {t('round')} {String(round.number).padStart(2, '0')}
-                      </span>
-                      {round.startedAt && (
-                        <time className="round-started" dateTime={round.startedAt}>
-                          <Clock size={12} aria-hidden="true" /> {formatStartTime(round.startedAt)}
-                        </time>
-                      )}
-                    </span>
-                    <div className="round-title-line">
-                      <h2 id={`round-${round.number}-title`}>
-                        <span className="sr-only">
-                          {t('round')} {round.number} –
-                        </span>
-                        {round.matches.length} {t('match')}
-                      </h2>
-                      {round.bye && (
-                        <span
-                          className={`bye-pill ${canReorderBye ? '' : 'locked'}`}
-                          draggable={canReorderBye}
-                          onDragStart={(event) => {
-                            if (!canReorderBye) return
-                            event.dataTransfer.setData('text/plain', round.bye ?? '')
-                            event.dataTransfer.setData(
-                              'application/x-courtly-round',
-                              String(roundIndex),
-                            )
-                          }}
-                          onDragOver={(event) => canReorderBye && event.preventDefault()}
-                          onDrop={(event) => {
-                            if (
-                              canReorderBye &&
-                              event.dataTransfer.getData('application/x-courtly-round') ===
-                                String(roundIndex)
-                            ) {
-                              onSwapPlayers(
-                                roundIndex,
-                                event.dataTransfer.getData('text/plain'),
-                                round.bye ?? '',
-                              )
-                            }
-                          }}
-                        >
-                          {canReorderBye && (
-                            <button
-                              className="drag-handle-button"
-                              type="button"
-                              aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
-                              aria-pressed={
-                                keyboardMove?.roundIndex === roundIndex &&
-                                keyboardMove.participantId === round.bye
-                              }
-                              onClick={() => handleKeyboardSwap(roundIndex, round.bye ?? '')}
-                            >
-                              <GripVertical size={14} aria-hidden="true" />
-                            </button>
-                          )}
-                          {t('bye')}: {name(round.bye)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {!readOnly && (
-                    <RoundActions
-                      round={round}
-                      onSettings={() => setSettingsRoundNumber(round.number)}
-                      onStart={() => onStart(round.number)}
-                      onFillUnknown={() => onFillUnknown(round.number)}
-                      onReroll={() => onReroll(round.number)}
-                      onDelete={() => onDelete(round.number)}
-                    />
-                  )}
-                </div>
-                <div className="matches">
-                  {round.matches.map((match, matchIndex) => (
-                    <MatchRow
-                      key={match.id}
-                      match={match}
-                      matchIndex={matchIndex}
-                      roundIndex={roundIndex}
-                      name={name}
-                      record={(id) => record(roundIndex, id)}
-                      onPlayerClick={(id) => {
-                        if (!isUnknownParticipantId(id)) setHistoryPlayerId(id)
-                      }}
-                      onUpdate={(matches) => onUpdate(roundIndex, matches)}
-                      allMatches={round.matches}
-                      winningGames={round.winningGames ?? 1}
-                      isRunning={runningMatchIds.has(match.id)}
-                      onSwap={(draggedId, targetId) =>
-                        onSwapPlayers(roundIndex, draggedId, targetId)
-                      }
-                      selectedParticipantId={
-                        keyboardMove?.roundIndex === roundIndex ? keyboardMove.participantId : null
-                      }
-                      onKeyboardSwap={(participantId) =>
-                        handleKeyboardSwap(roundIndex, participantId)
-                      }
-                      readOnly={readOnly}
-                    />
-                  ))}
-                </div>
-              </section>
-            )
-          })}
+          {groupRunningRounds ? (
+            <>
+              {renderedRounds.slice(0, currentGroupStart)}
+              <div className="current-round-group">
+                {renderedRounds.slice(currentGroupStart, currentGroupEnd + 1)}
+              </div>
+              {renderedRounds.slice(currentGroupEnd + 1)}
+            </>
+          ) : (
+            renderedRounds
+          )}
         </div>
       )}
       {!readOnly && (
@@ -210,7 +151,9 @@ export function Rounds({
       </p>
       <PlayerHistoryDialog
         player={historyPlayer}
+        players={players}
         rounds={rounds}
+        defaultCourtCount={defaultCourtCount}
         name={name}
         onClose={() => setHistoryPlayerId(null)}
       />

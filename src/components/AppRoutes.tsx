@@ -19,6 +19,7 @@ export type AppRoutesProps = {
   defaultWinningGames: number
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
+  participantOrderByRound: string[][]
   sorted: Stat[]
   sort: string
   desc: boolean
@@ -56,6 +57,7 @@ export function AppRoutes({
   defaultWinningGames,
   name,
   record,
+  participantOrderByRound,
   sorted,
   sort,
   desc,
@@ -89,6 +91,8 @@ export function AppRoutes({
         element={
           <Table
             sorted={sorted}
+            players={players}
+            defaultCourtCount={courtCount}
             participantLabel={participantLabel}
             rounds={rounds}
             name={name}
@@ -119,6 +123,7 @@ export function AppRoutes({
           <Rounds
             rounds={rounds}
             players={players}
+            participantOrderByRound={participantOrderByRound}
             name={name}
             record={record}
             defaultCourtCount={courtCount}

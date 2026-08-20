@@ -18,6 +18,7 @@ export type Match = {
   b: string
   scoreA: string
   scoreB: string
+  court?: number
   sets?: SetScore[]
 }
 

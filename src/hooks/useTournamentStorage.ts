@@ -16,6 +16,7 @@ import {
   type StorageKey,
 } from '../storage'
 import type { Participant, Round } from '../tournamentTypes'
+import { startReadyRounds } from '../tournament'
 
 export function useTournamentStorage(
   players: Participant[],
@@ -40,7 +41,7 @@ export function useTournamentStorage(
     return subscribeToStorage((key) => {
       skipRemoteSave.current.add(key)
       if (key === 'players') setPlayers(loadParticipants())
-      if (key === 'rounds') setRounds(loadRounds())
+      if (key === 'rounds') setRounds(startReadyRounds(loadRounds(), loadCourtCount()))
       if (key === 'participantType') setParticipantType(loadParticipantType())
       if (key === 'courtCount') setCourtCount(loadCourtCount())
       if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())

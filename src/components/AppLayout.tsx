@@ -8,10 +8,13 @@ import {
   ChevronRight,
   LockOpen,
   Menu,
+  RefreshCw,
   Search,
   Settings2,
   Trophy,
   X,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
@@ -79,7 +82,10 @@ export function AppLayout({
   const navigate = useNavigate()
   const location = useLocation()
   const isSettingsPage = location.pathname === '/settings'
-  const isReadOnlyTab = new URLSearchParams(location.search).get('readonly') === '1'
+  const locationSearchParams = new URLSearchParams(location.search)
+  const isReadOnlyTab = locationSearchParams.get('readonly') === '1'
+  const readonlyFocusMode = readOnly && locationSearchParams.get('focus') === '1'
+  const readonlyRotationMode = readOnly && locationSearchParams.get('rotate') === '1'
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
   const searchPopoverRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -88,6 +94,8 @@ export function AppLayout({
   const mobileNavCloseRef = useRef<HTMLButtonElement>(null)
   const findingCursorRef = useRef({ key: '', index: -1 })
   const matchCursorRef = useRef({ key: '', index: -1 })
+  const fullscreenIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fullscreenHeaderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
@@ -97,6 +105,20 @@ export function AppLayout({
     search: location.search,
     hash: location.hash,
   })
+  const toggleViewParam = (param: 'focus' | 'rotate', enabled: boolean) => {
+    const nextSearchParams = new URLSearchParams(location.search)
+    if (enabled) nextSearchParams.set(param, '1')
+    else nextSearchParams.delete(param)
+    const nextSearch = nextSearchParams.toString()
+    navigate(
+      {
+        pathname: location.pathname,
+        search: nextSearch ? `?${nextSearch}` : '',
+        hash: location.hash,
+      },
+      { replace: true },
+    )
+  }
   const readOnlyUrl = new URL(window.location.href)
   readOnlyUrl.searchParams.set('readonly', '1')
   const normalizedSearch = searchTerm.trim().toLocaleLowerCase()
@@ -154,6 +176,97 @@ export function AppLayout({
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [searchOpen])
+
+  useEffect(() => {
+    const cursorHiddenClass = 'fullscreen-cursor-hidden'
+    const headerOverlayActiveClass = 'header-overlay-active'
+    const fullscreenHeaderVisibleClass = 'fullscreen-header-visible'
+    const fullscreenHeader = document.querySelector<HTMLElement>('header')
+    const isFullscreenMode = () => {
+      const screenSize = window.screen
+      return (
+        Boolean(document.fullscreenElement) ||
+        Boolean(
+          screenSize &&
+          window.innerWidth === screenSize.width &&
+          window.innerHeight === screenSize.height,
+        )
+      )
+    }
+    const clearIdleTimer = () => {
+      if (fullscreenIdleTimerRef.current) clearTimeout(fullscreenIdleTimerRef.current)
+      fullscreenIdleTimerRef.current = null
+    }
+    const setCursorHidden = (hidden: boolean) =>
+      document.documentElement.classList.toggle(cursorHiddenClass, hidden)
+    const clearHeaderTimer = () => {
+      if (fullscreenHeaderTimerRef.current) clearTimeout(fullscreenHeaderTimerRef.current)
+      fullscreenHeaderTimerRef.current = null
+    }
+    const setHeaderVisible = (visible: boolean) =>
+      document.documentElement.classList.toggle(fullscreenHeaderVisibleClass, visible)
+    const scheduleHeaderHide = () => {
+      clearHeaderTimer()
+      fullscreenHeaderTimerRef.current = setTimeout(() => setHeaderVisible(false), 500)
+    }
+    const scheduleCursorHide = () => {
+      clearIdleTimer()
+      if (!isFullscreenMode()) return
+      fullscreenIdleTimerRef.current = setTimeout(() => setCursorHidden(true), 3_000)
+    }
+    const handleDisplayModeChange = () => {
+      clearIdleTimer()
+      clearHeaderTimer()
+      const isFullscreen = isFullscreenMode()
+      const isHeaderOverlayActive = readonlyFocusMode || isFullscreen
+      document.documentElement.classList.toggle(headerOverlayActiveClass, isHeaderOverlayActive)
+      setHeaderVisible(false)
+      setCursorHidden(false)
+      if (isFullscreen) scheduleCursorHide()
+    }
+    const handlePointerActivity = (event: PointerEvent) => {
+      const isFullscreen = isFullscreenMode()
+      if (isFullscreen) {
+        setCursorHidden(false)
+        scheduleCursorHide()
+      }
+      if (!readonlyFocusMode && !isFullscreen) return
+      const headerHeight = fullscreenHeader?.offsetHeight ?? 108
+      if (event.clientY <= 100) {
+        clearHeaderTimer()
+        setHeaderVisible(true)
+      } else if (event.clientY > headerHeight) {
+        scheduleHeaderHide()
+      }
+    }
+
+    document.addEventListener('fullscreenchange', handleDisplayModeChange)
+    window.addEventListener('resize', handleDisplayModeChange)
+    window.addEventListener('pointermove', handlePointerActivity)
+    fullscreenHeader?.addEventListener('pointerleave', scheduleHeaderHide)
+    handleDisplayModeChange()
+
+    return () => {
+      clearIdleTimer()
+      clearHeaderTimer()
+      document.documentElement.classList.remove(headerOverlayActiveClass)
+      setHeaderVisible(false)
+      setCursorHidden(false)
+      document.removeEventListener('fullscreenchange', handleDisplayModeChange)
+      window.removeEventListener('resize', handleDisplayModeChange)
+      window.removeEventListener('pointermove', handlePointerActivity)
+      fullscreenHeader?.removeEventListener('pointerleave', scheduleHeaderHide)
+    }
+  }, [readonlyFocusMode])
+
+  useEffect(() => {
+    if (!readonlyRotationMode) return
+    const interval = window.setInterval(() => {
+      const nextPath = location.pathname === '/rounds' ? '/table' : '/rounds'
+      navigate({ pathname: nextPath, search: location.search, hash: location.hash })
+    }, 30_000)
+    return () => window.clearInterval(interval)
+  }, [location.hash, location.pathname, location.search, navigate, readonlyRotationMode])
 
   const handleSearchToggle = (event: SyntheticEvent<HTMLElement>) => {
     const isOpen = (event.nativeEvent as ToggleEvent).newState === 'open'
@@ -228,7 +341,7 @@ export function AppLayout({
   )
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${readonlyFocusMode ? 'readonly-focus-mode' : ''}`}>
       <a className="skip-link" href="#main-content">
         {t('skipToContent')}
       </a>
@@ -372,18 +485,61 @@ export function AppLayout({
               </output>
             </>
           )}
-          {!readOnly && (
-            <a
-              className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
-              href={readOnlyUrl.toString()}
-              aria-label={t('enableReadOnly')}
-              title={t('enableReadOnly')}
-            >
-              <LockOpen size={18} aria-hidden="true" />
-            </a>
+          {readOnly && (
+            <div className="header-tooltip">
+              <button
+                className={`icon-btn ${readonlyFocusMode ? 'active' : ''}`}
+                type="button"
+                aria-label={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+                title={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+                aria-pressed={readonlyFocusMode}
+                onClick={() => toggleViewParam('focus', !readonlyFocusMode)}
+              >
+                {readonlyFocusMode ? (
+                  <ZoomOut size={18} aria-hidden="true" />
+                ) : (
+                  <ZoomIn size={18} aria-hidden="true" />
+                )}
+              </button>
+              <div className="tooltip-popover" aria-hidden="true">
+                {t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+              </div>
+            </div>
+          )}
+          {readOnly && (
+            <div className="header-tooltip">
+              <button
+                className={`icon-btn ${readonlyRotationMode ? 'active view-rotation-active' : ''}`}
+                type="button"
+                aria-label={t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
+                title={t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
+                aria-pressed={readonlyRotationMode}
+                onClick={() => toggleViewParam('rotate', !readonlyRotationMode)}
+              >
+                <RefreshCw size={18} aria-hidden="true" />
+              </button>
+              <div className="tooltip-popover" aria-hidden="true">
+                {t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
+              </div>
+            </div>
           )}
           {!readOnly && (
-            <>
+            <div className="header-tooltip">
+              <a
+                className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
+                href={readOnlyUrl.toString()}
+                aria-label={t('enableReadOnly')}
+                title={t('enableReadOnly')}
+              >
+                <LockOpen size={18} aria-hidden="true" />
+              </a>
+              <div className="tooltip-popover" aria-hidden="true">
+                {t('enableReadOnly')}
+              </div>
+            </div>
+          )}
+          {!readOnly && (
+            <div className="header-tooltip">
               <button
                 className="icon-btn settings-trigger"
                 aria-label={isSettingsPage ? t('back') : t('settings')}
@@ -400,7 +556,7 @@ export function AppLayout({
               <div className="tooltip-popover" aria-hidden="true">
                 {isSettingsPage ? t('back') : t('settings')}
               </div>
-            </>
+            </div>
           )}
         </div>
       </header>
