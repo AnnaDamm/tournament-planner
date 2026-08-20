@@ -22,8 +22,10 @@ export function RoundSettingsDialog({
   onClose,
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const [winningGames, setWinningGames] = useState(round?.winningGames ?? defaultWinningGames)
-  const [courtCount, setCourtCount] = useState(round?.courtCount ?? defaultCourtCount)
+  const [winningGames, setWinningGames] = useState(
+    String(round?.winningGames ?? defaultWinningGames),
+  )
+  const [courtCount, setCourtCount] = useState(String(round?.courtCount ?? defaultCourtCount))
 
   useEffect(() => {
     if (round && !dialogRef.current?.open) dialogRef.current?.showModal()
@@ -36,7 +38,11 @@ export function RoundSettingsDialog({
     onClose()
   }
   const save = () => {
-    onSave(round.number, clampWinningGames(winningGames), clampCourtCount(courtCount))
+    onSave(
+      round.number,
+      clampWinningGames(Number(winningGames)),
+      clampCourtCount(Number(courtCount)),
+    )
     close()
   }
 
@@ -68,7 +74,8 @@ export function RoundSettingsDialog({
             min="1"
             max="99"
             value={winningGames}
-            onChange={(event) => setWinningGames(Number(event.currentTarget.value))}
+            onChange={(event) => setWinningGames(event.currentTarget.value)}
+            onBlur={() => setWinningGames(String(clampWinningGames(Number(winningGames))))}
           />
         </label>
         <label htmlFor="round-court-count">
@@ -78,7 +85,8 @@ export function RoundSettingsDialog({
             type="number"
             min="1"
             value={courtCount}
-            onChange={(event) => setCourtCount(clampCourtCount(Number(event.target.value)))}
+            onChange={(event) => setCourtCount(event.currentTarget.value)}
+            onBlur={() => setCourtCount(String(clampCourtCount(Number(courtCount))))}
           />
         </label>
       </div>
