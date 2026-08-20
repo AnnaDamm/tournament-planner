@@ -68,6 +68,7 @@ export function RoundSettingsDialog({
             min="1"
             max="9"
             value={winningGames}
+            onFocus={(event) => event.currentTarget.select()}
             onChange={(event) => setWinningGames(clampWinningGames(Number(event.target.value)))}
           />
         </label>
