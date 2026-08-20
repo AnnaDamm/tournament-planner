@@ -2,7 +2,7 @@ const baseUrl = new URL("/tournament-planner/", self.location.origin);
 const previewRoot = `${baseUrl.pathname}previews/`;
 const isPreviewWorker = /\/previews\/pr-\d+\/$/.test(baseUrl.pathname);
 const cachePrefix = `tourny-${encodeURIComponent(baseUrl.pathname)}-`;
-const cacheName = `${cachePrefix}2.0.1`;
+const cacheName = `${cachePrefix}2.0.1-565d8286d18156e3`;
 const offlineUrls = [
 	baseUrl.pathname,
 	`${baseUrl.pathname}index.html`,
@@ -34,7 +34,7 @@ self.addEventListener("fetch", (event) => {
 async function networkFirst(request) {
 	const cache = await caches.open(cacheName);
 	try {
-		const response = await fetch(request);
+		const response = await fetch(new Request(request, { cache: "no-store" }));
 		if (response.ok) await cache.put(`${baseUrl.pathname}index.html`, response.clone());
 		return response;
 	} catch {
