@@ -26,17 +26,29 @@ export function RoundSettingsDialog({
     String(round?.winningGames ?? defaultWinningGames),
   )
   const [courtCount, setCourtCount] = useState(String(round?.courtCount ?? defaultCourtCount))
+  const close = () => {
+    dialogRef.current?.close()
+    onClose()
+  }
 
   useEffect(() => {
     if (round && !dialogRef.current?.open) dialogRef.current?.showModal()
   }, [round])
 
-  if (!round) return null
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    const handleBackdropClick = (event: MouseEvent) => {
+      if (event.target === dialog) {
+        dialog.close()
+        onClose()
+      }
+    }
+    dialog.addEventListener('click', handleBackdropClick)
+    return () => dialog.removeEventListener('click', handleBackdropClick)
+  }, [onClose])
 
-  const close = () => {
-    dialogRef.current?.close()
-    onClose()
-  }
+  if (!round) return null
   const save = () => {
     onSave(
       round.number,

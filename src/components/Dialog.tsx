@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from 'react'
+import { useEffect, type ReactNode, type RefObject } from 'react'
 
 type Props = {
   dialogRef: RefObject<HTMLDialogElement | null>
@@ -8,6 +8,16 @@ type Props = {
 }
 
 export function Dialog({ dialogRef, children, labelledBy, describedBy }: Props) {
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    const handleBackdropClick = (event: MouseEvent) => {
+      if (event.target === dialog) dialog.close()
+    }
+    dialog.addEventListener('click', handleBackdropClick)
+    return () => dialog.removeEventListener('click', handleBackdropClick)
+  }, [dialogRef])
+
   return (
     <dialog
       ref={dialogRef}

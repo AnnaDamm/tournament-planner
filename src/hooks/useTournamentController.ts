@@ -10,13 +10,13 @@ import {
 } from '../tournamentActions'
 import { downloadTournament } from '../tournamentExport'
 import {
-  createRoundPlan,
   fillUnknownRound,
   getCurrentRoundNumber,
   getMatchResult,
   getRunningMatchIdsByRound,
   isUnknownParticipantId,
   rerollRound,
+  assignCourtsToMatches,
   startReadyRounds,
   startRoundInRounds,
 } from '../tournament'
@@ -32,6 +32,46 @@ const buildRoundWithResult = (
   courtCount: number,
 ) =>
   rounds.map((round) => (round.number === number ? { ...round, winningGames, courtCount } : round))
+
+const updateRoundSettings = (
+  rounds: Round[],
+  number: number,
+  winningGames: number,
+  roundCourtCount: number,
+  defaultCourtCount: number,
+) =>
+  startReadyRounds(
+    buildRoundWithResult(rounds, number, winningGames, roundCourtCount),
+    defaultCourtCount,
+  )
+
+const deleteRoundAndStartReadyRounds = (rounds: Round[], number: number, courtCount: number) =>
+  startReadyRounds(
+    rounds.filter((round) => round.number !== number),
+    courtCount,
+  )
+
+const rerollRoundAndStartReadyRounds = (
+  players: Participant[],
+  rounds: Round[],
+  number: number,
+  courtCount: number,
+) => startReadyRounds(rerollRound(players, rounds, number), courtCount)
+
+const fillRoundAndStartReadyRounds = (
+  rounds: Round[],
+  number: number,
+  players: Participant[],
+  courtCount: number,
+) => {
+  const index = rounds.findIndex((round) => round.number === number)
+  if (index < 0) return rounds
+  const filled = fillUnknownRound(rounds[index], players, rounds.slice(0, index))
+  return startReadyRounds(
+    rounds.map((round, roundIndex) => (roundIndex === index ? filled : round)),
+    courtCount,
+  )
+}
 
 const openBulkDialog = (dialog: HTMLDialogElement | null, input: HTMLTextAreaElement | null) => {
   if (!dialog) return
@@ -88,17 +128,20 @@ export function useTournamentController(): TournamentContextValue {
   const bulkRef = useRef<HTMLDialogElement>(null)
   const bulkInputRef = useRef<HTMLTextAreaElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
-
   useEffect(() => {
     document.title = `${tournamentName} — Tournament Manager`
   }, [tournamentName])
 
-  const { standingsBeforeRounds, sorted } = useTournamentDerivedState(players, rounds, sort, desc)
+  const { standingsBeforeRounds, participantOrderByRound, sorted } = useTournamentDerivedState(
+    players,
+    rounds,
+    sort,
+    desc,
+  )
   const nextMatchTargets = useMemo(
     () => getNextMatchTargets(players, rounds, courtCount),
     [courtCount, players, rounds],
   )
-
   const participantLabel = participantType === 'teams' ? t('teams') : t('players')
   const name = (id: string) =>
     isUnknownParticipantId(id)
@@ -117,29 +160,25 @@ export function useTournamentController(): TournamentContextValue {
         courtCount,
       ),
     )
-  const startRound = (number: number) => setRounds((current) => startRoundInRounds(current, number))
+  const startRound = (number: number) =>
+    setRounds((current) => assignCourtsToMatches(startRoundInRounds(current, number), courtCount))
   const swapRoundPlayers = (roundIndex: number, draggedId: string, targetId: string) =>
     setRounds((current) => swapRoundPlayersInRounds(current, roundIndex, draggedId, targetId))
   const makeRound = () => {
     if (players.filter((player) => !player.withdrawn).length < 2) return
     setRounds((current) => {
       const number = current.length + 1
-      const plan = createRoundPlan(players, current, number)
       const previousRound = current.at(-1)
-      return startReadyRounds(
-        [
-          ...current,
-          {
-            number,
-            bye: plan.bye,
-            winningGames: previousRound?.winningGames ?? defaultWinningGames,
-            courtCount: previousRound?.courtCount ?? courtCount,
-            matches: plan.matches,
-            standings: plan.standings,
-          },
-        ],
-        courtCount,
-      )
+      return [
+        ...current,
+        {
+          number,
+          bye: null,
+          winningGames: previousRound?.winningGames ?? defaultWinningGames,
+          courtCount: previousRound?.courtCount ?? courtCount,
+          matches: [],
+        },
+      ]
     })
   }
   const addBulk = () => {
@@ -176,7 +215,7 @@ export function useTournamentController(): TournamentContextValue {
       if (!snapshot) return false
       setTournamentName(snapshot.tournamentName)
       setPlayers(snapshot.players)
-      setRounds(snapshot.rounds)
+      setRounds(startReadyRounds(snapshot.rounds, snapshot.courtCount))
       setParticipantType(snapshot.participantType)
       setCourtCount(snapshot.courtCount)
       setDefaultWinningGames(snapshot.defaultWinningGames)
@@ -185,7 +224,6 @@ export function useTournamentController(): TournamentContextValue {
       return false
     }
   }
-
   const routes: AppRoutesProps = {
     tournamentName,
     localMaster,
@@ -198,6 +236,7 @@ export function useTournamentController(): TournamentContextValue {
     defaultWinningGames,
     name,
     record: recordBeforeRound,
+    participantOrderByRound,
     sorted,
     sort,
     desc,
@@ -211,18 +250,15 @@ export function useTournamentController(): TournamentContextValue {
     onStartRound: startRound,
     onUpdateRound: updateRound,
     onSetRoundSettings: (number, winningGames, roundCourtCount) =>
-      setRounds((current) => buildRoundWithResult(current, number, winningGames, roundCourtCount)),
+      setRounds((current) =>
+        updateRoundSettings(current, number, winningGames, roundCourtCount, courtCount),
+      ),
     onDeleteRound: (number) =>
-      setRounds((current) => current.filter((round) => round.number !== number)),
+      setRounds((current) => deleteRoundAndStartReadyRounds(current, number, courtCount)),
     onFillUnknown: (number) =>
-      setRounds((current) => {
-        const index = current.findIndex((round) => round.number === number)
-        if (index < 0) return current
-        const previousRounds = current.slice(0, index)
-        const filled = fillUnknownRound(current[index], players, previousRounds)
-        return current.map((round, roundIndex) => (roundIndex === index ? filled : round))
-      }),
-    onReroll: (number) => setRounds((current) => rerollRound(players, current, number)),
+      setRounds((current) => fillRoundAndStartReadyRounds(current, number, players, courtCount)),
+    onReroll: (number) =>
+      setRounds((current) => rerollRoundAndStartReadyRounds(players, current, number, courtCount)),
     onSwapPlayers: swapRoundPlayers,
     setParticipantType,
     setCourtCount: (value) => {
@@ -235,7 +271,6 @@ export function useTournamentController(): TournamentContextValue {
     onImport: importTournament,
     onDeleteAll: () => confirmRef.current?.showModal(),
   }
-
   return {
     layout: {
       tournamentName,

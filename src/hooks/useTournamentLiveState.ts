@@ -71,7 +71,7 @@ export function useTournamentLiveState() {
     onSnapshot: (incoming) => {
       setTournamentName(incoming.tournamentName)
       setPlayers(incoming.players)
-      setRounds(incoming.rounds)
+      setRounds(startReadyRounds(incoming.rounds, incoming.courtCount))
       setParticipantType(incoming.participantType)
       setCourtCount(incoming.courtCount)
       setDefaultWinningGames(incoming.defaultWinningGames)

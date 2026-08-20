@@ -22,6 +22,8 @@ const isMatch = (value: unknown): value is Match =>
   typeof value.b === 'string' &&
   typeof value.scoreA === 'string' &&
   typeof value.scoreB === 'string' &&
+  (value.court === undefined ||
+    (isFiniteNumber(value.court) && Number.isInteger(value.court) && value.court >= 1)) &&
   (value.sets === undefined ||
     (Array.isArray(value.sets) &&
       value.sets.every(
