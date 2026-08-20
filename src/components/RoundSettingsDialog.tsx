@@ -11,7 +11,7 @@ type Props = {
   onClose: () => void
 }
 
-const clampWinningGames = (value: number) => Math.min(9, Math.max(1, Math.floor(value) || 1))
+const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
 const clampCourtCount = (value: number) => Math.max(1, Math.floor(value) || 1)
 
 export function RoundSettingsDialog({
@@ -66,10 +66,9 @@ export function RoundSettingsDialog({
             id="round-winning-games"
             type="number"
             min="1"
-            max="9"
+            max="99"
             value={winningGames}
-            onFocus={(event) => event.currentTarget.select()}
-            onChange={(event) => setWinningGames(clampWinningGames(Number(event.target.value)))}
+            onChange={(event) => setWinningGames(Number(event.currentTarget.value))}
           />
         </label>
         <label htmlFor="round-court-count">
