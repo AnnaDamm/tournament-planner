@@ -54,6 +54,6 @@ export const parseTournamentSnapshot = (value: unknown): TournamentSnapshot | nu
     rounds: value.rounds,
     participantType: value.participantType,
     courtCount: Math.max(1, Math.floor(value.courtCount)),
-    defaultWinningGames: Math.min(9, Math.max(1, Math.floor(value.defaultWinningGames))),
+    defaultWinningGames: Math.min(99, Math.max(1, Math.floor(value.defaultWinningGames))),
   }
 }
