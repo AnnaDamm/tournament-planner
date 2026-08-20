@@ -3,6 +3,9 @@ import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 
+const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
+const clampCourtCount = (value: number) => Math.max(1, Math.floor(value) || 1)
+
 type Props = {
   tournamentName: string
   setTournamentName: (value: string) => void
@@ -111,12 +114,15 @@ export function SettingsPage({
             </label>
             <input
               id="court-count"
+              key={courtCount}
               type="number"
               min="1"
-              value={courtCount}
-              onChange={(event) =>
-                setCourtCount(Math.max(1, Math.floor(Number(event.target.value) || 1)))
-              }
+              defaultValue={courtCount}
+              onBlur={(event) => {
+                const value = clampCourtCount(Number(event.currentTarget.value))
+                event.currentTarget.value = String(value)
+                setCourtCount(value)
+              }}
             />
           </div>
           <div className="settings-field">
@@ -126,11 +132,16 @@ export function SettingsPage({
             </label>
             <input
               id="default-winning-games"
+              key={defaultWinningGames}
               type="number"
               min="1"
               max="99"
-              value={defaultWinningGames}
-              onChange={(event) => setDefaultWinningGames(Number(event.currentTarget.value))}
+              defaultValue={defaultWinningGames}
+              onBlur={(event) => {
+                const value = clampWinningGames(Number(event.currentTarget.value))
+                event.currentTarget.value = String(value)
+                setDefaultWinningGames(value)
+              }}
             />
           </div>
           <div className="settings-actions">
