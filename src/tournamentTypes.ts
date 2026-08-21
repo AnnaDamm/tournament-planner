@@ -50,4 +50,5 @@ export type TournamentSnapshot = {
   participantType: 'players' | 'teams'
   courtCount: number
   defaultWinningGames: number
+  scheduledStart?: string
 }

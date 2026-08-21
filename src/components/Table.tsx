@@ -1,4 +1,14 @@
-import { Check, ChevronDown, Flag, Pencil, Plus, Undo2, X } from 'lucide-react'
+import {
+  Check,
+  ChevronDown,
+  Flag,
+  GripVertical,
+  Pencil,
+  Plus,
+  Shuffle,
+  Undo2,
+  X,
+} from 'lucide-react'
 import { useState } from 'react'
 import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
@@ -28,6 +38,9 @@ type Props = {
   onDelete: (id: string) => void
   onRename: (player: Participant, name: string) => void
   onToggleWithdraw: (id: string) => void
+  onReorder: (draggedId: string, targetId: string) => void
+  onShuffle: () => void
+  canSeed: boolean
   readOnly?: boolean
 }
 
@@ -43,6 +56,7 @@ const getColumns = (participantLabel: string) => [
   ['points', t('points')],
 ]
 
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function Table({
   sorted,
   players,
@@ -57,6 +71,9 @@ export function Table({
   onDelete,
   onRename,
   onToggleWithdraw,
+  onReorder,
+  onShuffle,
+  canSeed,
   readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false)
@@ -68,6 +85,11 @@ export function Table({
       <PageTitle eyebrow={t('ranking')} title={t('table')}>
         {!readOnly && (
           <div className="page-actions">
+            {canSeed && (
+              <button className="button ghost" onClick={onShuffle}>
+                <Shuffle size={16} aria-hidden="true" /> {t('shuffle')}
+              </button>
+            )}
             <button className="button primary" onClick={onAdd}>
               <Plus size={17} aria-hidden="true" />{' '}
               {participantLabel === t('teams') ? t('addTeam') : t('add')}
@@ -146,6 +168,14 @@ export function Table({
                   id={`player-${player.id}`}
                   key={player.id}
                   className={player.withdrawn ? 'withdrawn-row' : ''}
+                  draggable={canSeed}
+                  onDragStart={(event) => event.dataTransfer.setData('text/plain', player.id)}
+                  onDragOver={(event) => canSeed && event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    const draggedId = event.dataTransfer.getData('text/plain')
+                    if (draggedId && draggedId !== player.id) onReorder(draggedId, player.id)
+                  }}
                 >
                   <td className="rank-cell" data-label={t('position')}>
                     <span className={`rank rank-${player.position} cell-value`}>
@@ -153,6 +183,7 @@ export function Table({
                     </span>
                   </td>
                   <td className="name-cell" data-label={participantLabel}>
+                    {canSeed && <GripVertical className="seed-grip" size={16} aria-hidden="true" />}
                     {editing ? (
                       <input
                         className="player-name-input"

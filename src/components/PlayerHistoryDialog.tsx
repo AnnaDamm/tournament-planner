@@ -50,18 +50,6 @@ export function PlayerHistoryDialog({
     return () => dialog.removeEventListener('click', handleBackdropClick)
   }, [onClose, player])
 
-  const positionsBeforeRounds = useMemo(
-    () =>
-      rounds.map(
-        (_, roundIndex) =>
-          new Map(
-            getRankingParticipants(players, rounds.slice(0, roundIndex))
-              .sort(compareRankingParticipants)
-              .map((participant, position) => [participant.id, position + 1]),
-          ),
-      ),
-    [players, rounds],
-  )
   const positionsAfterRounds = useMemo(
     () =>
       rounds.map(
@@ -78,8 +66,19 @@ export function PlayerHistoryDialog({
     () => getRunningMatchIdsByRound(rounds, defaultCourtCount),
     [defaultCourtCount, rounds],
   )
+  const playedRoundIndexes = player
+    ? rounds.flatMap((round, roundIndex) =>
+        round.bye === player.id ||
+        round.matches.some((match) => match.a === player.id || match.b === player.id)
+          ? [roundIndex]
+          : [],
+      )
+    : []
+  const withdrawalRoundIndex = player?.withdrawn
+    ? Math.min((playedRoundIndexes.at(-1) ?? -1) + 1, rounds.length - 1)
+    : -1
   const entries = player
-    ? rounds.map((round, roundIndex) => {
+    ? rounds.flatMap((round, roundIndex) => {
         const match = round.matches.find(
           (candidate) => candidate.a === player.id || candidate.b === player.id,
         )
@@ -87,34 +86,42 @@ export function PlayerHistoryDialog({
         const won = result?.winner === player.id
         const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
         const isBye = round.bye === player.id
+        const isWithdrawal = !match && !isBye && roundIndex === withdrawalRoundIndex
+        if (!match && !isBye && !isWithdrawal) return []
         const isRunning = match
           ? (runningMatchIdsByRound.get(round.number)?.has(match.id) ?? false)
           : false
-        return {
-          key: `${round.number}-${match?.id ?? (isBye ? 'bye' : 'pending')}`,
-          round: round.number,
-          positionBefore: positionsBeforeRounds[roundIndex].get(player.id) ?? '—',
-          positionAfter: positionsAfterRounds[roundIndex].get(player.id) ?? '—',
-          opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
-          score: isBye || !match ? '—' : formatSets(player.id, match),
-          outcome: isRunning
-            ? t('running')
-            : isBye
-              ? t('win')
-              : result
-                ? won
+        return [
+          {
+            key: `${round.number}-${match?.id ?? (isBye ? 'bye' : 'pending')}`,
+            round: round.number,
+            positionAfter:
+              roundIndex === 0 ? '—' : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
+            opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
+            score: isBye || !match ? '—' : formatSets(player.id, match),
+            outcome: isWithdrawal
+              ? t('withdrawn')
+              : isRunning
+                ? t('running')
+                : isBye
                   ? t('win')
-                  : t('loss')
-                : t('pending'),
-          outcomeClass: isRunning
-            ? 'running'
-            : isBye || result
-              ? won || isBye
-                ? 'positive'
-                : 'negative'
-              : '',
-          rowClass: isRunning ? 'running' : '',
-        }
+                  : result
+                    ? won
+                      ? t('win')
+                      : t('loss')
+                    : t('pending'),
+            outcomeClass: isWithdrawal
+              ? 'negative'
+              : isRunning
+                ? 'running'
+                : isBye || result
+                  ? won || isBye
+                    ? 'positive'
+                    : 'negative'
+                  : '',
+            rowClass: isRunning ? 'running' : '',
+          },
+        ]
       })
     : []
 
@@ -147,7 +154,6 @@ export function PlayerHistoryDialog({
             <thead>
               <tr>
                 <th scope="col">{t('round')}</th>
-                <th scope="col">{t('positionBeforeRound')}</th>
                 <th scope="col">{t('positionAfterRound')}</th>
                 <th scope="col">{t('opponent')}</th>
                 <th scope="col">{t('score')}</th>
@@ -158,7 +164,6 @@ export function PlayerHistoryDialog({
               {entries.map((entry) => (
                 <tr key={entry.key} className={entry.rowClass}>
                   <td>{entry.round}</td>
-                  <td>{entry.positionBefore}</td>
                   <td>{entry.positionAfter}</td>
                   <td>{entry.opponent}</td>
                   <td>{entry.score}</td>

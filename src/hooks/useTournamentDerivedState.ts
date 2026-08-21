@@ -38,16 +38,22 @@ export function useTournamentDerivedState(
   )
   const positions = useMemo(
     () =>
-      new Map(sortStats(stats, 'position', true).map((player, index) => [player.id, index + 1])),
-    [stats],
+      new Map(
+        (rounds.some((round) => round.startedAt) ? sortStats(stats, 'position', true) : stats).map(
+          (player, index) => [player.id, index + 1],
+        ),
+      ),
+    [rounds, stats],
   )
   const sorted = useMemo(
     () =>
-      sortStats(stats, sort, desc).map((player) => ({
-        ...player,
-        position: positions.get(player.id) ?? 0,
-      })),
-    [positions, sort, desc, stats],
+      (rounds.some((round) => round.startedAt) ? sortStats(stats, sort, desc) : stats).map(
+        (player) => ({
+          ...player,
+          position: positions.get(player.id) ?? 0,
+        }),
+      ),
+    [positions, sort, desc, stats, rounds],
   )
 
   return { standingsBeforeRounds, participantOrderByRound, sorted }
