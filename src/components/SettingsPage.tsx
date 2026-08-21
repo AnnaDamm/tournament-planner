@@ -15,6 +15,8 @@ type Props = {
   setCourtCount: (value: number) => void
   defaultWinningGames: number
   setDefaultWinningGames: (value: number) => void
+  scheduledStart: string
+  setScheduledStart: (value: string) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
@@ -29,6 +31,8 @@ export function SettingsPage({
   setCourtCount,
   defaultWinningGames,
   setDefaultWinningGames,
+  scheduledStart,
+  setScheduledStart,
   onExport,
   onImport,
   onDeleteAll,
@@ -85,6 +89,18 @@ export function SettingsPage({
           </button>
         </div>
         <div className="round-card settings-card">
+          <div className="settings-field">
+            <label htmlFor="scheduled-start">
+              <b>{t('scheduledStart')}</b>
+              <small>{t('scheduledStartHelp')}</small>
+            </label>
+            <input
+              id="scheduled-start"
+              type="datetime-local"
+              value={scheduledStart}
+              onChange={(event) => setScheduledStart(event.target.value)}
+            />
+          </div>
           <div className="settings-field">
             <label htmlFor="tournament-name">
               <b>{t('tournamentName')}</b>
