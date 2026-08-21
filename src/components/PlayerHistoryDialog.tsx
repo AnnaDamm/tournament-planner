@@ -19,14 +19,25 @@ type Props = {
   onClose: () => void
 }
 
-const formatSets = (playerId: string, match: Round['matches'][number]) =>
-  getMatchSets(match)
-    .map((set) => {
-      const score = `${set.a || '–'}:${set.b || '–'}`
-      if (match.a === playerId) return score
-      return `${set.b || '–'}:${set.a || '–'}`
-    })
-    .join(', ')
+const getPlayerScores = (playerId: string, match: Round['matches'][number]) =>
+  getMatchSets(match).map((set) =>
+    match.a === playerId
+      ? { own: set.a || '–', opponent: set.b || '–' }
+      : { own: set.b || '–', opponent: set.a || '–' },
+  )
+
+const getSetScore = (playerId: string, match: Round['matches'][number]) =>
+  getPlayerScores(playerId, match).reduce(
+    (score, set) => {
+      const own = Number(set.own)
+      const opponent = Number(set.opponent)
+      if (!Number.isFinite(own) || !Number.isFinite(opponent) || own === opponent) return score
+      if (own > opponent) score.own += 1
+      if (opponent > own) score.opponent += 1
+      return score
+    },
+    { own: 0, opponent: 0 },
+  )
 
 export function PlayerHistoryDialog({
   player,
@@ -95,10 +106,12 @@ export function PlayerHistoryDialog({
           {
             key: `${round.number}-${match?.id ?? (isBye ? 'bye' : 'pending')}`,
             round: round.number,
-            positionAfter:
-              roundIndex === 0 ? '—' : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
+            positionAfter: isWithdrawal
+              ? '—'
+              : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
             opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
-            score: isBye || !match ? '—' : formatSets(player.id, match),
+            sets: isBye || !match ? null : getSetScore(player.id, match),
+            score: isBye || !match ? [] : getPlayerScores(player.id, match),
             outcome: isWithdrawal
               ? t('withdrawn')
               : isRunning
@@ -156,6 +169,7 @@ export function PlayerHistoryDialog({
                 <th scope="col">{t('round')}</th>
                 <th scope="col">{t('positionAfterRound')}</th>
                 <th scope="col">{t('opponent')}</th>
+                <th scope="col">{t('sets')}</th>
                 <th scope="col">{t('score')}</th>
                 <th scope="col">{t('result')}</th>
               </tr>
@@ -166,7 +180,25 @@ export function PlayerHistoryDialog({
                   <td>{entry.round}</td>
                   <td>{entry.positionAfter}</td>
                   <td>{entry.opponent}</td>
-                  <td>{entry.score}</td>
+                  <td>
+                    {entry.sets ? (
+                      <>
+                        <strong>{entry.sets.own}</strong>:{entry.sets.opponent}
+                      </>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                  <td>
+                    {entry.score.length > 0
+                      ? entry.score.map((set, index) => (
+                          <span key={index}>
+                            {index > 0 && ', '}
+                            <strong>{set.own}</strong>:{set.opponent}
+                          </span>
+                        ))
+                      : '—'}
+                  </td>
                   <td className={entry.outcomeClass}>{entry.outcome}</td>
                 </tr>
               ))}
