@@ -17,6 +17,7 @@ export type AppRoutesProps = {
   participantType: 'players' | 'teams'
   courtCount: number
   defaultWinningGames: number
+  scheduledStart: string
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   participantOrderByRound: string[][]
@@ -27,6 +28,8 @@ export type AppRoutesProps = {
   onDeleteParticipant: (id: string) => void
   onRename: (player: Participant, name: string) => void
   onToggleWithdraw: (id: string) => void
+  onReorderParticipants: (draggedId: string, targetId: string) => void
+  onShuffleParticipants: () => void
   onToggleSort: (key: string) => void
   onCreateRound: () => void
   onStartRound: (number: number) => void
@@ -40,6 +43,7 @@ export type AppRoutesProps = {
   setCourtCount: (value: number) => void
   setDefaultWinningGames: (value: number) => void
   setTournamentName: (value: string) => void
+  setScheduledStart: (value: string) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
@@ -55,6 +59,7 @@ export function AppRoutes({
   participantType,
   courtCount,
   defaultWinningGames,
+  scheduledStart,
   name,
   record,
   participantOrderByRound,
@@ -65,6 +70,8 @@ export function AppRoutes({
   onDeleteParticipant,
   onRename,
   onToggleWithdraw,
+  onReorderParticipants,
+  onShuffleParticipants,
   onToggleSort,
   onCreateRound,
   onStartRound,
@@ -78,6 +85,7 @@ export function AppRoutes({
   setCourtCount,
   setDefaultWinningGames,
   setTournamentName,
+  setScheduledStart,
   onExport,
   onImport,
   onDeleteAll,
@@ -103,6 +111,9 @@ export function AppRoutes({
             onDelete={onDeleteParticipant}
             onRename={onRename}
             onToggleWithdraw={onToggleWithdraw}
+            onReorder={onReorderParticipants}
+            onShuffle={onShuffleParticipants}
+            canSeed={!readOnly && !rounds.some((round) => round.startedAt)}
             readOnly={readOnly}
           />
         }
@@ -155,6 +166,8 @@ export function AppRoutes({
               setCourtCount={setCourtCount}
               defaultWinningGames={defaultWinningGames}
               setDefaultWinningGames={setDefaultWinningGames}
+              scheduledStart={scheduledStart}
+              setScheduledStart={setScheduledStart}
               onExport={onExport}
               onImport={onImport}
               onDeleteAll={onDeleteAll}

@@ -1,7 +1,13 @@
 import type { Participant, Round } from './tournamentTypes'
 
 export type StorageKey =
-  'players' | 'rounds' | 'participantType' | 'courtCount' | 'defaultWinningGames' | 'tournamentName'
+  | 'players'
+  | 'rounds'
+  | 'participantType'
+  | 'courtCount'
+  | 'defaultWinningGames'
+  | 'tournamentName'
+  | 'scheduledStart'
 
 type StorageMessage = { key: StorageKey; source: string }
 
@@ -12,6 +18,7 @@ const storageKeys: StorageKey[] = [
   'courtCount',
   'defaultWinningGames',
   'tournamentName',
+  'scheduledStart',
 ]
 const tabId = Math.random().toString(36).slice(2)
 const storagePrefix = `${import.meta.env.BASE_URL}:`
@@ -64,6 +71,11 @@ export const loadTournamentName = () => {
 }
 export const saveTournamentName = (value: string) =>
   write('tournamentName', value.trim() || 'Tourny')
+export const loadScheduledStart = () => {
+  const value = read<unknown>('scheduledStart', '')
+  return typeof value === 'string' ? value : ''
+}
+export const saveScheduledStart = (value: string) => write('scheduledStart', value)
 export const loadParticipantType = (): 'players' | 'teams' =>
   localStorage.getItem(storageKey('participantType')) === 'teams' ? 'teams' : 'players'
 export const saveParticipantType = (value: 'players' | 'teams') => write('participantType', value)

@@ -6,12 +6,14 @@ import {
   loadCourtCount,
   loadDefaultWinningGames,
   loadTournamentName,
+  loadScheduledStart,
   saveParticipantType,
   saveParticipants,
   saveRounds,
   saveCourtCount,
   saveDefaultWinningGames,
   saveTournamentName,
+  saveScheduledStart,
   subscribeToStorage,
   type StorageKey,
 } from '../storage'
@@ -31,6 +33,8 @@ export function useTournamentStorage(
   setDefaultWinningGames: (value: number) => void,
   tournamentName: string,
   setTournamentName: (value: string) => void,
+  scheduledStart: string,
+  setScheduledStart: (value: string) => void,
   enabled = true,
   writable = enabled,
 ) {
@@ -46,6 +50,7 @@ export function useTournamentStorage(
       if (key === 'courtCount') setCourtCount(loadCourtCount())
       if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())
       if (key === 'tournamentName') setTournamentName(loadTournamentName())
+      if (key === 'scheduledStart') setScheduledStart(loadScheduledStart())
     })
   }, [
     setCourtCount,
@@ -54,6 +59,7 @@ export function useTournamentStorage(
     setPlayers,
     setRounds,
     setTournamentName,
+    setScheduledStart,
     enabled,
   ])
   useEffect(() => {
@@ -86,4 +92,9 @@ export function useTournamentStorage(
     if (skipRemoteSave.current.delete('tournamentName')) return
     saveTournamentName(tournamentName)
   }, [enabled, tournamentName, writable])
+  useEffect(() => {
+    if (!enabled || !writable) return
+    if (skipRemoteSave.current.delete('scheduledStart')) return
+    saveScheduledStart(scheduledStart)
+  }, [enabled, scheduledStart, writable])
 }

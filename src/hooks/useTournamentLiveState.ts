@@ -6,6 +6,7 @@ import {
   loadParticipants,
   loadRounds,
   loadTournamentName,
+  loadScheduledStart,
 } from '../storage'
 import { getLocalSession, isReadOnlyTab } from '../liveSharing'
 import { startReadyRounds } from '../tournament'
@@ -34,6 +35,7 @@ export function useTournamentLiveState() {
   const [participantType, setParticipantType] = useState<'players' | 'teams'>(() =>
     isViewer ? 'players' : loadParticipantType(),
   )
+  const [scheduledStart, setScheduledStart] = useState(() => (isViewer ? '' : loadScheduledStart()))
 
   useTournamentStorage(
     players,
@@ -48,6 +50,8 @@ export function useTournamentLiveState() {
     setDefaultWinningGames,
     tournamentName,
     setTournamentName,
+    scheduledStart,
+    setScheduledStart,
     true,
     !readOnly,
   )
@@ -61,8 +65,17 @@ export function useTournamentLiveState() {
       participantType,
       courtCount,
       defaultWinningGames,
+      scheduledStart,
     }),
-    [courtCount, defaultWinningGames, participantType, players, rounds, tournamentName],
+    [
+      courtCount,
+      defaultWinningGames,
+      participantType,
+      players,
+      rounds,
+      scheduledStart,
+      tournamentName,
+    ],
   )
 
   const isLive = useLiveTournamentSync({
@@ -75,6 +88,7 @@ export function useTournamentLiveState() {
       setParticipantType(incoming.participantType)
       setCourtCount(incoming.courtCount)
       setDefaultWinningGames(incoming.defaultWinningGames)
+      setScheduledStart(incoming.scheduledStart ?? '')
     },
   })
 
@@ -94,5 +108,7 @@ export function useTournamentLiveState() {
     setRounds,
     participantType,
     setParticipantType,
+    scheduledStart,
+    setScheduledStart,
   }
 }

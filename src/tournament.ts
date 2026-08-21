@@ -265,9 +265,10 @@ export const createRoundPlan = (
 ) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds)
-  const ranking = getRankingParticipants(activePlayers, previousRounds).sort(
-    compareRankingParticipants,
-  )
+  const ranking =
+    roundNumber === 1
+      ? getRankingParticipants(activePlayers, previousRounds)
+      : getRankingParticipants(activePlayers, previousRounds).sort(compareRankingParticipants)
   const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(ranking.map((standing) => [standing.id, standing]))
   const createMatches = (pairs: Array<[string, string]>) =>
@@ -306,6 +307,19 @@ export const createRoundPlan = (
       standings,
       bye,
       matches: createMatches(pairByRanking(pairingIds, previousRounds)),
+    }
+  }
+
+  if (roundNumber === 1) {
+    return {
+      standings,
+      bye,
+      matches: createMatches(
+        Array.from({ length: knownPlayers.length / 2 }, (_, index) => [
+          knownPlayers[index * 2].id,
+          knownPlayers[index * 2 + 1].id,
+        ]),
+      ),
     }
   }
 
