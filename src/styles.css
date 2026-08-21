@@ -1205,6 +1205,21 @@ html.header-overlay-active.fullscreen-header-visible header {
   padding: 10px;
   font: inherit;
 }
+.settings-field input[type='datetime-local'] {
+  width: 100%;
+  border: 1px solid #b9c7bd;
+  border-radius: 7px;
+  background: #fff;
+  color: inherit;
+  padding: 10px;
+  font: inherit;
+}
+.seed-grip {
+  margin-right: 8px;
+  vertical-align: middle;
+  color: #9aa49f;
+  cursor: grab;
+}
 .settings-actions {
   display: flex;
   flex-wrap: wrap;

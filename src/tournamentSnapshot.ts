@@ -57,5 +57,6 @@ export const parseTournamentSnapshot = (value: unknown): TournamentSnapshot | nu
     participantType: value.participantType,
     courtCount: Math.max(1, Math.floor(value.courtCount)),
     defaultWinningGames: Math.min(99, Math.max(1, Math.floor(value.defaultWinningGames))),
+    scheduledStart: typeof value.scheduledStart === 'string' ? value.scheduledStart : '',
   }
 }
