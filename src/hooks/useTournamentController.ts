@@ -253,7 +253,14 @@ export function useTournamentController(): TournamentContextValue {
       : players.find((player) => player.id === id)?.name || t('unknown')
   const recordBeforeRound = (roundIndex: number, id: string) => {
     const player = standingsBeforeRounds[roundIndex]?.find((item) => item.id === id)
-    return player ? `${player.wins}:${player.losses}` : '—'
+    if (!player) return '—'
+
+    const round = rounds[roundIndex]
+    const match = round?.matches.find((item) => item.a === id || item.b === id)
+    const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
+    const nextWins = result?.winner === id ? player.wins + 1 : player.wins
+
+    return `${t('roundPoints')}: ${player.wins}${result ? ` -> ${nextWins}` : ''}`
   }
   const toggleSort = (key: string) =>
     sort === key ? setDesc((value) => !value) : (setSort(key), setDesc(key !== 'name'))
