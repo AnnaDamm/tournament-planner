@@ -21,14 +21,10 @@ export const isByeCounted = (round: Round, nextRound?: Round) =>
   Boolean(nextRound?.startedAt && hasValidBye(round))
 
 const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
-  const byeCounts = new Map(candidateIds.map((id) => [id, 0]))
-  previousRounds.forEach((round, index) => {
-    if (isByeCounted(round, previousRounds[index + 1]) && byeCounts.has(round.bye!)) {
-      byeCounts.set(round.bye!, (byeCounts.get(round.bye!) ?? 0) + 1)
-    }
-  })
-  const lowestByeCount = Math.min(...byeCounts.values())
-  return randomItem(candidateIds.filter((id) => byeCounts.get(id) === lowestByeCount))
+  const previousByeIds = new Set(previousRounds.filter(hasValidBye).map((round) => round.bye!))
+  if (previousByeIds.size === 0) return randomItem(candidateIds)
+
+  return [...candidateIds].reverse().find((id) => !previousByeIds.has(id)) ?? candidateIds.at(-1)!
 }
 
 export const getMatchSets = (match: Match): SetScore[] =>
@@ -481,9 +477,10 @@ const chooseCandidate = (
 export const fillUnknownRound = (round: Round, players: Participant[], previousRounds: Round[]) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds)
-  const participantOrder = getRankingParticipants(activePlayers, previousRounds)
-    .sort(compareRankingParticipants)
-    .map((player) => player.id)
+  const ranking = getRankingParticipants(activePlayers, previousRounds).sort(
+    compareRankingParticipants,
+  )
+  const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(standings.map((standing) => [standing.id, standing]))
   const finalizedIds = finalizedParticipantIds(activePlayers, previousRounds)
   const usedIds = new Set<string>()
@@ -495,7 +492,7 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
     collect(match.a)
     collect(match.b)
   })
-  const available = activePlayers.filter(
+  const available: Participant[] = ranking.filter(
     (player) => finalizedIds.has(player.id) && !usedIds.has(player.id),
   )
   let bye = round.bye
