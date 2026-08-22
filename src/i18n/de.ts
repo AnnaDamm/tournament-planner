@@ -44,7 +44,7 @@ export const de: Translation = {
   oddQuestion: 'Wer erhält den automatischen Sieg?',
   automatic: 'Automatisch nach Tabellenplatz',
   choose: 'Teilnehmenden auswählen',
-  bye: 'Bye',
+  bye: 'Freilos',
   match: 'Begegnungen',
   round: 'RUNDE',
   currentRound: 'Aktuelle Runde',
