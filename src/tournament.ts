@@ -265,10 +265,8 @@ export const createRoundPlan = (
 ) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds)
-  const ranking =
-    roundNumber === 1
-      ? getRankingParticipants(activePlayers, previousRounds)
-      : getRankingParticipants(activePlayers, previousRounds).sort(compareRankingParticipants)
+  const ranking = getRankingParticipants(activePlayers, previousRounds)
+  if (roundNumber > 1) ranking.sort(compareRankingParticipants)
   const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(ranking.map((standing) => [standing.id, standing]))
   const createMatches = (pairs: Array<[string, string]>) =>
@@ -688,15 +686,21 @@ const canAssignCourt = (
   return (assignedByRound.get(round.number) ?? 0) < getRoundCourtCount(round, capacity)
 }
 
-export const assignCourtsToMatches = (rounds: Round[], defaultCourtCount = 1) => {
+export const assignCourtsToMatches = (
+  rounds: Round[],
+  defaultCourtCount = 1,
+  startedAt = new Date().toISOString(),
+) => {
   const capacity = Math.max(1, Math.floor(defaultCourtCount) || 1)
   const candidates = getCourtCandidates(rounds)
   const usedCourts = new Set<number>()
   const occupiedParticipants = new Set<string>()
   const assignedByRound = new Map<number, number>()
   const assignedCourts = new Map<string, number>()
+  const assignedStartTimes = new Map<string, string>()
   const assign = (candidate: CourtCandidate, court: number) => {
     assignedCourts.set(candidate.match.id, court)
+    if (!candidate.match.startedAt) assignedStartTimes.set(candidate.match.id, startedAt)
     usedCourts.add(court)
     assignedByRound.set(
       candidate.round.number,
@@ -734,12 +738,58 @@ export const assignCourtsToMatches = (rounds: Round[], defaultCourtCount = 1) =>
     ...round,
     matches: round.matches.map((match) => {
       const court = assignedCourts.get(match.id)
-      if (match.court === court) return match
+      const startedAt = assignedStartTimes.get(match.id)
+      if (match.court === court && (!startedAt || match.startedAt === startedAt)) return match
       changed = true
-      return { ...match, court }
+      return { ...match, court, startedAt: match.startedAt ?? startedAt }
     }),
   }))
   return changed ? next : rounds
+}
+
+export const calculateExpectedMatchStarts = (
+  rounds: Round[],
+  courtCount: number,
+  durationMinutes: number,
+  breakMinutes: number,
+  scheduledStart = '',
+  expectedMatchCount = 0,
+) => {
+  const capacity = Math.max(1, Math.floor(courtCount) || 1)
+  const duration = Math.max(1, durationMinutes) * 60_000
+  const pause = Math.max(0, breakMinutes) * 60_000
+  let nextRoundStart = Number.isNaN(new Date(scheduledStart).getTime())
+    ? undefined
+    : new Date(scheduledStart).getTime()
+
+  return rounds.map((round) => {
+    const actualStarts = round.matches
+      .map((match) => match.startedAt)
+      .filter((value): value is string => Boolean(value))
+      .map((value) => new Date(value).getTime())
+      .filter(Number.isFinite)
+    const roundStartedAt = round.startedAt ? new Date(round.startedAt).getTime() : NaN
+    const roundStart = actualStarts.length
+      ? Math.min(...actualStarts)
+      : Number.isFinite(roundStartedAt)
+        ? roundStartedAt
+        : nextRoundStart
+
+    if (!Number.isFinite(roundStart)) {
+      return round
+    }
+
+    const matches = round.matches.map((match, index) => ({
+      ...match,
+      predictedStart: new Date(
+        roundStart + Math.floor(index / capacity) * (duration + pause),
+      ).toISOString(),
+    }))
+    const matchCount = round.matches.length || expectedMatchCount
+    const batches = Math.ceil(matchCount / capacity)
+    nextRoundStart = roundStart + batches * duration + Math.max(0, batches - 1) * pause
+    return { ...round, predictedStart: new Date(roundStart).toISOString(), matches }
+  })
 }
 
 export const startRoundInRounds = (
@@ -767,5 +817,5 @@ export const startReadyRounds = (
     }
     return round
   })
-  return assignCourtsToMatches(changed ? next : rounds, defaultCourtCount)
+  return assignCourtsToMatches(changed ? next : rounds, defaultCourtCount, startedAt)
 }

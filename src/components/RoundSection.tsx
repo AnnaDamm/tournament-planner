@@ -1,4 +1,4 @@
-import { Clock, GripVertical } from 'lucide-react'
+import { CalendarClock, Clock, GripVertical } from 'lucide-react'
 import { MatchRow } from './MatchRow'
 import { RoundActions } from './RoundActions'
 import { t } from '../i18n'
@@ -66,9 +66,18 @@ export function RoundSection({
             <span aria-hidden="true">
               {t('round')} {String(round.number).padStart(2, '0')}
             </span>
-            {round.startedAt && (
-              <time className="round-started" dateTime={round.startedAt}>
-                <Clock size={12} aria-hidden="true" /> {formatStartTime(round.startedAt)}
+            {(round.startedAt || round.predictedStart) && (
+              <time
+                className="round-started"
+                dateTime={round.startedAt ?? round.predictedStart}
+                title={t(round.startedAt ? 'startedAt' : 'expectedStart')}
+              >
+                {round.startedAt ? (
+                  <Clock size={12} aria-hidden="true" />
+                ) : (
+                  <CalendarClock size={12} aria-hidden="true" />
+                )}{' '}
+                {formatStartTime(round.startedAt ?? round.predictedStart!)}
               </time>
             )}
           </span>
@@ -102,6 +111,7 @@ export function RoundSection({
                     className="drag-handle-button"
                     type="button"
                     aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
+                    title={`${t('moveParticipant')}: ${name(round.bye)}`}
                     aria-pressed={
                       keyboardMove?.roundIndex === roundIndex &&
                       keyboardMove.participantId === round.bye

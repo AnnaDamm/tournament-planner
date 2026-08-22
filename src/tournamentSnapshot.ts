@@ -24,6 +24,8 @@ const isMatch = (value: unknown): value is Match =>
   typeof value.scoreB === 'string' &&
   (value.court === undefined ||
     (isFiniteNumber(value.court) && Number.isInteger(value.court) && value.court >= 1)) &&
+  (value.predictedStart === undefined || typeof value.predictedStart === 'string') &&
+  (value.startedAt === undefined || typeof value.startedAt === 'string') &&
   (value.sets === undefined ||
     (Array.isArray(value.sets) &&
       value.sets.every(
@@ -33,6 +35,7 @@ const isMatch = (value: unknown): value is Match =>
 const isRound = (value: unknown): value is Round =>
   isRecord(value) &&
   isFiniteNumber(value.number) &&
+  (value.predictedStart === undefined || typeof value.predictedStart === 'string') &&
   isFiniteNumber(value.winningGames) &&
   Array.isArray(value.matches) &&
   value.matches.every(isMatch) &&
@@ -57,6 +60,14 @@ export const parseTournamentSnapshot = (value: unknown): TournamentSnapshot | nu
     participantType: value.participantType,
     courtCount: Math.max(1, Math.floor(value.courtCount)),
     defaultWinningGames: Math.min(99, Math.max(1, Math.floor(value.defaultWinningGames))),
+    expectedDurationMinutes:
+      typeof value.expectedDurationMinutes === 'number'
+        ? Math.max(1, Math.floor(value.expectedDurationMinutes))
+        : 25,
+    breakBetweenMatchesMinutes:
+      typeof value.breakBetweenMatchesMinutes === 'number'
+        ? Math.max(0, Math.floor(value.breakBetweenMatchesMinutes))
+        : 5,
     scheduledStart: typeof value.scheduledStart === 'string' ? value.scheduledStart : '',
   }
 }

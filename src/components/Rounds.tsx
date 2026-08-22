@@ -142,7 +142,7 @@ export function Rounds({
         </div>
       )}
       {!readOnly && (
-        <button className="button primary" onClick={onCreate}>
+        <button className="button primary" onClick={onCreate} title={t('create')}>
           <Plus size={16} aria-hidden="true" /> {t('create')}
         </button>
       )}

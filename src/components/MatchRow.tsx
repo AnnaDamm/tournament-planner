@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { GripVertical } from 'lucide-react'
+import { CalendarClock, Clock, GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
 import { getMatchResult, hasEnteredScore } from '../tournament'
@@ -60,6 +60,14 @@ const trimSetsAfterWinner = (sets: SetScore[], winningGames: number) => {
   return lastEnteredIndex >= 0 ? sets.slice(0, lastEnteredIndex + 1) : []
 }
 
+const formatStartTime = (value: string) => {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(date)
+}
+
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function MatchRow({
   match,
   matchIndex,
@@ -157,6 +165,20 @@ export function MatchRow({
       <span className="match-court" aria-hidden="true">
         {match.court ?? '–'}
       </span>
+      {(match.startedAt || match.predictedStart) && (
+        <time
+          className="match-start"
+          dateTime={match.startedAt ?? match.predictedStart}
+          title={t(match.startedAt ? 'startedAt' : 'expectedStart')}
+        >
+          {match.startedAt ? (
+            <Clock size={12} aria-hidden="true" />
+          ) : (
+            <CalendarClock size={12} aria-hidden="true" />
+          )}{' '}
+          {formatStartTime(match.startedAt ?? match.predictedStart!)}
+        </time>
+      )}
       <span
         className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
         draggable={canReorder}
@@ -181,13 +203,19 @@ export function MatchRow({
             className="drag-handle-button"
             type="button"
             aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
+            title={`${t('moveParticipant')}: ${name(match.a)}`}
             aria-pressed={selectedParticipantId === match.a}
             onClick={() => onKeyboardSwap?.(match.a)}
           >
             <GripVertical size={16} aria-hidden="true" />
           </button>
         )}
-        <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.a)}>
+        <button
+          type="button"
+          className="match-player-name"
+          title={`${t('history')}: ${name(match.a)}`}
+          onClick={() => onPlayerClick(match.a)}
+        >
           {name(match.a)}
         </button>
         <small className="player-record">{record(match.a)}</small>
@@ -225,13 +253,19 @@ export function MatchRow({
             className="drag-handle-button"
             type="button"
             aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
+            title={`${t('moveParticipant')}: ${name(match.b)}`}
             aria-pressed={selectedParticipantId === match.b}
             onClick={() => onKeyboardSwap?.(match.b)}
           >
             <GripVertical size={16} aria-hidden="true" />
           </button>
         )}
-        <button type="button" className="match-player-name" onClick={() => onPlayerClick(match.b)}>
+        <button
+          type="button"
+          className="match-player-name"
+          title={`${t('history')}: ${name(match.b)}`}
+          onClick={() => onPlayerClick(match.b)}
+        >
           {name(match.b)}
         </button>
         <small className="player-record">{record(match.b)}</small>

@@ -20,6 +20,8 @@ export type Match = {
   scoreB: string
   court?: number
   sets?: SetScore[]
+  predictedStart?: string
+  startedAt?: string
 }
 
 export type RoundStanding = {
@@ -34,6 +36,7 @@ export type RoundStanding = {
 
 export type Round = {
   number: number
+  predictedStart?: string
   startedAt?: string
   bye?: string | null
   winningGames: number
@@ -50,5 +53,7 @@ export type TournamentSnapshot = {
   participantType: 'players' | 'teams'
   courtCount: number
   defaultWinningGames: number
+  expectedDurationMinutes?: number
+  breakBetweenMatchesMinutes?: number
   scheduledStart?: string
 }

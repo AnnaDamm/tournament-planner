@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { LocalMasterConfig } from '../liveSharing'
 import type { Match, Participant, Round } from '../tournamentTypes'
+import { hasEnteredScore } from '../tournament'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { SharePage } from './SharePage'
@@ -44,6 +45,10 @@ export type AppRoutesProps = {
   setDefaultWinningGames: (value: number) => void
   setTournamentName: (value: string) => void
   setScheduledStart: (value: string) => void
+  expectedDurationMinutes: number
+  setExpectedDurationMinutes: (value: number) => void
+  breakBetweenMatchesMinutes: number
+  setBreakBetweenMatchesMinutes: (value: number) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
@@ -86,6 +91,10 @@ export function AppRoutes({
   setDefaultWinningGames,
   setTournamentName,
   setScheduledStart,
+  expectedDurationMinutes,
+  setExpectedDurationMinutes,
+  breakBetweenMatchesMinutes,
+  setBreakBetweenMatchesMinutes,
   onExport,
   onImport,
   onDeleteAll,
@@ -113,7 +122,10 @@ export function AppRoutes({
             onToggleWithdraw={onToggleWithdraw}
             onReorder={onReorderParticipants}
             onShuffle={onShuffleParticipants}
-            canSeed={!readOnly && !rounds.some((round) => round.startedAt)}
+            canSeed={
+              !readOnly &&
+              !rounds.some((round) => round.matches.some((match) => hasEnteredScore(match)))
+            }
             readOnly={readOnly}
           />
         }
@@ -168,6 +180,10 @@ export function AppRoutes({
               setDefaultWinningGames={setDefaultWinningGames}
               scheduledStart={scheduledStart}
               setScheduledStart={setScheduledStart}
+              expectedDurationMinutes={expectedDurationMinutes}
+              setExpectedDurationMinutes={setExpectedDurationMinutes}
+              breakBetweenMatchesMinutes={breakBetweenMatchesMinutes}
+              setBreakBetweenMatchesMinutes={setBreakBetweenMatchesMinutes}
               onExport={onExport}
               onImport={onImport}
               onDeleteAll={onDeleteAll}

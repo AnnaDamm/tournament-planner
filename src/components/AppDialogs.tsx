@@ -42,6 +42,7 @@ export function AppDialogs({
             className="icon-btn"
             type="button"
             aria-label={t('close')}
+            title={t('close')}
             onClick={() => bulkRef.current?.close()}
           >
             <X size={18} aria-hidden="true" />
@@ -61,10 +62,15 @@ export function AppDialogs({
           placeholder={'North Stars\nRiver Club\n...'}
         />
         <div className="dialog-actions">
-          <button className="button ghost" type="button" onClick={() => bulkRef.current?.close()}>
+          <button
+            className="button ghost"
+            type="button"
+            title={t('cancel')}
+            onClick={() => bulkRef.current?.close()}
+          >
             {t('cancel')}
           </button>
-          <button className="button primary" onClick={onAdd}>
+          <button className="button primary" onClick={onAdd} title={t('addButton')}>
             <UserPlus size={16} aria-hidden="true" /> {t('addButton')}
           </button>
         </div>
@@ -83,16 +89,21 @@ export function AppDialogs({
             className="icon-btn"
             type="button"
             aria-label={t('close')}
+            title={t('close')}
             onClick={() => confirmRef.current?.close()}
           >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
         <div className="dialog-actions">
-          <button className="button ghost" onClick={() => confirmRef.current?.close()}>
+          <button
+            className="button ghost"
+            title={t('cancel')}
+            onClick={() => confirmRef.current?.close()}
+          >
             {t('cancel')}
           </button>
-          <button className="button danger" onClick={onDeleteAll}>
+          <button className="button danger" onClick={onDeleteAll} title={t('deleteAll')}>
             {t('deleteAll')}
           </button>
         </div>

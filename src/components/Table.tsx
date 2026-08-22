@@ -86,20 +86,24 @@ export function Table({
         {!readOnly && (
           <div className="page-actions">
             {canSeed && (
-              <button className="button ghost" onClick={onShuffle}>
+              <button className="button ghost" onClick={onShuffle} title={t('shuffle')}>
                 <Shuffle size={16} aria-hidden="true" /> {t('shuffle')}
               </button>
             )}
-            <button className="button primary" onClick={onAdd}>
+            <button
+              className="button primary"
+              onClick={onAdd}
+              title={participantLabel === t('teams') ? t('addTeam') : t('add')}
+            >
               <Plus size={17} aria-hidden="true" />{' '}
               {participantLabel === t('teams') ? t('addTeam') : t('add')}
             </button>
             {!editing ? (
-              <button className="button ghost" onClick={() => setEditing(true)}>
+              <button className="button ghost" onClick={() => setEditing(true)} title={t('edit')}>
                 <Pencil size={16} aria-hidden="true" /> {t('edit')}
               </button>
             ) : (
-              <button className="button ghost" onClick={() => setEditing(false)}>
+              <button className="button ghost" onClick={() => setEditing(false)} title={t('done')}>
                 <Check size={16} aria-hidden="true" /> {t('done')}
               </button>
             )}
@@ -128,6 +132,7 @@ export function Table({
               >
                 <button
                   className={sort === 'position' ? 'sort-active' : ''}
+                  title={t('position')}
                   onClick={() => toggleSort('position')}
                 >
                   {t('position')}
@@ -146,6 +151,7 @@ export function Table({
                 >
                   <button
                     className={sort === key ? 'sort-active' : ''}
+                    title={label}
                     onClick={() => toggleSort(key)}
                   >
                     {label}
@@ -199,6 +205,7 @@ export function Table({
                             ? 'player-name-button table-player-name withdrawn-name'
                             : 'player-name-button table-player-name'
                         }
+                        title={`${t('history')}: ${player.name}`}
                         onClick={() => setHistoryPlayer(player)}
                       >
                         {player.name}

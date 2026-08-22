@@ -5,6 +5,8 @@ import { t } from '../i18n'
 
 const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
 const clampCourtCount = (value: number) => Math.max(1, Math.floor(value) || 1)
+const clampDuration = (value: number) => Math.max(1, Math.floor(value) || 1)
+const clampBreak = (value: number) => Math.max(0, Math.floor(value) || 0)
 
 type Props = {
   tournamentName: string
@@ -17,11 +19,16 @@ type Props = {
   setDefaultWinningGames: (value: number) => void
   scheduledStart: string
   setScheduledStart: (value: string) => void
+  expectedDurationMinutes: number
+  setExpectedDurationMinutes: (value: number) => void
+  breakBetweenMatchesMinutes: number
+  setBreakBetweenMatchesMinutes: (value: number) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
 }
 
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function SettingsPage({
   tournamentName,
   setTournamentName,
@@ -33,6 +40,10 @@ export function SettingsPage({
   setDefaultWinningGames,
   scheduledStart,
   setScheduledStart,
+  expectedDurationMinutes,
+  setExpectedDurationMinutes,
+  breakBetweenMatchesMinutes,
+  setBreakBetweenMatchesMinutes,
   onExport,
   onImport,
   onDeleteAll,
@@ -83,12 +94,49 @@ export function SettingsPage({
             className="icon-btn settings-drawer-close"
             type="button"
             aria-label={t('back')}
+            title={t('back')}
             onClick={() => navigate(-1)}
           >
             <ArrowLeft size={20} aria-hidden="true" />
           </button>
         </div>
         <div className="round-card settings-card">
+          <div className="settings-field">
+            <label htmlFor="expected-duration">
+              <b>{t('expectedDuration')}</b>
+              <small>{t('expectedDurationHelp')}</small>
+            </label>
+            <input
+              id="expected-duration"
+              key={expectedDurationMinutes}
+              type="number"
+              min="1"
+              defaultValue={expectedDurationMinutes}
+              onBlur={(event) => {
+                const value = clampDuration(Number(event.currentTarget.value))
+                event.currentTarget.value = String(value)
+                setExpectedDurationMinutes(value)
+              }}
+            />
+          </div>
+          <div className="settings-field">
+            <label htmlFor="break-between-matches">
+              <b>{t('breakBetweenMatches')}</b>
+              <small>{t('breakBetweenMatchesHelp')}</small>
+            </label>
+            <input
+              id="break-between-matches"
+              key={breakBetweenMatchesMinutes}
+              type="number"
+              min="0"
+              defaultValue={breakBetweenMatchesMinutes}
+              onBlur={(event) => {
+                const value = clampBreak(Number(event.currentTarget.value))
+                event.currentTarget.value = String(value)
+                setBreakBetweenMatchesMinutes(value)
+              }}
+            />
+          </div>
           <div className="settings-field">
             <label htmlFor="scheduled-start">
               <b>{t('scheduledStart')}</b>
@@ -166,12 +214,18 @@ export function SettingsPage({
             />
           </div>
           <div className="settings-actions">
-            <button className="button ghost" type="button" onClick={onExport}>
+            <button
+              className="button ghost"
+              type="button"
+              onClick={onExport}
+              title={t('exportData')}
+            >
               <Download size={16} aria-hidden="true" /> {t('exportData')}
             </button>
             <button
               className="button ghost"
               type="button"
+              title={t('importData')}
               onClick={() => importInputRef.current?.click()}
             >
               <Upload size={16} aria-hidden="true" /> {t('importData')}
@@ -194,7 +248,11 @@ export function SettingsPage({
             </p>
           )}
         </div>
-        <button className="button danger delete-all-button" onClick={onDeleteAll}>
+        <button
+          className="button danger delete-all-button"
+          onClick={onDeleteAll}
+          title={t('deleteAll')}
+        >
           {t('deleteAll')}
         </button>
       </section>

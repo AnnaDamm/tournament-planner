@@ -42,3 +42,10 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
 - Do not work around a failed host hook with `--no-verify` before the equivalent
   Docker checks have succeeded. Report when a host-only check cannot run and use
   the Docker path instead.
+
+## Accessibility
+
+- Always provide an accessible name for every interactive control.
+- Icon-only buttons must have a meaningful `aria-label` and a matching `title` tooltip.
+- Mark decorative icons with `aria-hidden="true"` and associate form controls with visible labels.
+- Preserve keyboard access, focus states, semantic HTML, and live-region announcements when changing UI behaviour.
