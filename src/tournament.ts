@@ -357,13 +357,14 @@ export const createRoundPlan = (
   }
 
   if (roundNumber === 1) {
+    const halfSize = knownPlayers.length / 2
     return {
       standings,
       bye,
       matches: createMatches(
-        Array.from({ length: knownPlayers.length / 2 }, (_, index) => [
-          knownPlayers[index * 2].id,
-          knownPlayers[index * 2 + 1].id,
+        Array.from({ length: halfSize }, (_, index) => [
+          knownPlayers[index].id,
+          knownPlayers[index + halfSize].id,
         ]),
       ),
     }
