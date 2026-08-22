@@ -7,6 +7,7 @@ import {
   getMatchSets,
   getRankingParticipants,
   getRunningMatchIdsByRound,
+  isByeCounted,
 } from '../tournament'
 import type { Participant, Round } from '../tournamentTypes'
 
@@ -63,14 +64,18 @@ export function PlayerHistoryDialog({
 
   const positionsAfterRounds = useMemo(
     () =>
-      rounds.map(
-        (_, roundIndex) =>
-          new Map(
-            getRankingParticipants(players, rounds.slice(0, roundIndex + 1))
-              .sort(compareRankingParticipants)
-              .map((participant, position) => [participant.id, position + 1]),
-          ),
-      ),
+      rounds.map((_, roundIndex) => {
+        const roundsThroughCurrent = rounds.slice(0, roundIndex + 1)
+        const nextRound = rounds[roundIndex + 1]
+        const rankingRounds = nextRound?.startedAt
+          ? [...roundsThroughCurrent, { ...nextRound, bye: null, matches: [] }]
+          : roundsThroughCurrent
+        return new Map(
+          getRankingParticipants(players, rankingRounds)
+            .sort(compareRankingParticipants)
+            .map((participant, position) => [participant.id, position + 1]),
+        )
+      }),
     [players, rounds],
   )
   const runningMatchIdsByRound = useMemo(
@@ -79,7 +84,7 @@ export function PlayerHistoryDialog({
   )
   const playedRoundIndexes = player
     ? rounds.flatMap((round, roundIndex) =>
-        round.bye === player.id ||
+        (isByeCounted(round, rounds[roundIndex + 1]) && round.bye === player.id) ||
         round.matches.some((match) => match.a === player.id || match.b === player.id)
           ? [roundIndex]
           : [],
@@ -96,7 +101,7 @@ export function PlayerHistoryDialog({
         const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
         const won = result?.winner === player.id
         const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
-        const isBye = round.bye === player.id
+        const isBye = isByeCounted(round, rounds[roundIndex + 1]) && round.bye === player.id
         const isWithdrawal = !match && !isBye && roundIndex === withdrawalRoundIndex
         if (!match && !isBye && !isWithdrawal) return []
         const isRunning = match
@@ -106,9 +111,10 @@ export function PlayerHistoryDialog({
           {
             key: `${round.number}-${match?.id ?? (isBye ? 'bye' : 'pending')}`,
             round: round.number,
-            positionAfter: isWithdrawal
-              ? '—'
-              : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
+            positionAfter:
+              isWithdrawal || (!isBye && !result)
+                ? '—'
+                : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
             opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
             sets: isBye || !match ? null : getSetScore(player.id, match),
             score: isBye || !match ? [] : getPlayerScores(player.id, match),

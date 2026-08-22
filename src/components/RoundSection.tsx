@@ -8,6 +8,7 @@ import type { Match, Round } from '../tournamentTypes'
 type Props = {
   round: Round
   roundIndex: number
+  nextRoundStarted: boolean
   canCalculatePairings: boolean
   participantOrder: string[]
   currentRoundNumber: number | undefined
@@ -30,6 +31,7 @@ type Props = {
 export function RoundSection({
   round,
   roundIndex,
+  nextRoundStarted,
   canCalculatePairings,
   participantOrder,
   currentRoundNumber,
@@ -48,7 +50,7 @@ export function RoundSection({
   onKeyboardSwap,
   readOnly,
 }: Props) {
-  const canReorderBye = !readOnly && !isRoundComplete(round)
+  const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(round)
   const isCurrentRound = runningMatchIds.size > 0
   const orderedMatches = sortMatchesByParticipantOrder(round.matches, participantOrder)
 

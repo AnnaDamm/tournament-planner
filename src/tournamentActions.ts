@@ -26,6 +26,8 @@ export const swapRoundPlayers = (
   return rounds.map((round, index) => {
     if (index !== roundIndex) return round
     if (isRoundComplete(round)) return round
+    if (rounds[roundIndex + 1]?.startedAt && (round.bye === draggedId || round.bye === targetId))
+      return round
     const draggedMatch = round.matches.find(
       (match) => match.a === draggedId || match.b === draggedId,
     )
