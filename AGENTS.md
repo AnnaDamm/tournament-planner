@@ -42,6 +42,8 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
 - Do not work around a failed host hook with `--no-verify` before the equivalent
   Docker checks have succeeded. Report when a host-only check cannot run and use
   the Docker path instead.
+- Always run the repository's pre-commit hooks at the end of the task as the
+  final quality checks.
 
 ## Accessibility
 
