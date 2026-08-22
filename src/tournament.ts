@@ -259,18 +259,51 @@ const pairGroup = (group: string[], rounds: Round[]): Array<[string, string]> =>
 }
 
 const pairByRanking = (participantIds: string[], previousRounds: Round[]) => {
-  const remaining = [...participantIds]
-  const pairs: Array<[string, string]> = []
-  while (remaining.length >= 2) {
-    const first = remaining.shift()!
-    const opponentIndex = remaining.findIndex(
-      (candidate) => !hasPlayed(first, candidate, previousRounds),
-    )
-    const fallbackIndex = opponentIndex >= 0 ? opponentIndex : 0
-    const [second] = remaining.splice(fallbackIndex, 1)
-    pairs.push([first, second])
+  const fixedPairs: Array<[string, string]> = []
+  const fixedParticipantIds = new Set<string>()
+
+  const getUnfixedParticipantIds = () =>
+    participantIds.filter((participantId) => !fixedParticipantIds.has(participantId))
+
+  const findBottomFix = (unfixedParticipantIds: string[]): [string, string] | null => {
+    const bottomIndex = unfixedParticipantIds.length - 1
+    const bottomId = unfixedParticipantIds[bottomIndex]
+    if (!bottomId) return null
+
+    for (let index = bottomIndex - 1; index >= 0; index -= 1) {
+      const opponentId = unfixedParticipantIds[index]
+      if (!hasPlayed(bottomId, opponentId, previousRounds)) return [opponentId, bottomId]
+    }
+    return null
   }
-  return pairs
+
+  while (true) {
+    const unfixedParticipantIds = getUnfixedParticipantIds()
+    const remaining = [...unfixedParticipantIds]
+    const pairs: Array<[string, string]> = [...fixedPairs]
+    let fixedThisIteration = false
+
+    while (remaining.length >= 2) {
+      const first = remaining.shift()!
+      const opponentIndex = remaining.findIndex(
+        (candidate) => !hasPlayed(first, candidate, previousRounds),
+      )
+      if (opponentIndex < 0) {
+        const bottomFix = findBottomFix(unfixedParticipantIds)
+        if (!bottomFix) return [...fixedPairs, ...pairGroup(unfixedParticipantIds, previousRounds)]
+        fixedPairs.push(bottomFix)
+        fixedParticipantIds.add(bottomFix[0])
+        fixedParticipantIds.add(bottomFix[1])
+        fixedThisIteration = true
+        break
+      }
+
+      const [second] = remaining.splice(opponentIndex, 1)
+      pairs.push([first, second])
+    }
+
+    if (!fixedThisIteration) return pairs
+  }
 }
 
 export const createRoundPlan = (
