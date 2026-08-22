@@ -70,6 +70,8 @@ body:has(dialog[open]) {
 }
 .app-shell {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 header {
   height: 78px;
@@ -249,6 +251,7 @@ header {
 }
 main {
   display: flex;
+  flex: 1 0 auto;
   max-width: 1440px;
   margin: auto;
 }
@@ -293,6 +296,65 @@ aside {
   padding: 53px 5vw;
   width: 100%;
   max-width: 1120px;
+}
+.app-footer {
+  border-top: 1px solid #e5eae6;
+  padding: 11px clamp(16px, 5vw, 112px);
+  color: #617068;
+  font-size: clamp(11px, 0.7vw, 13px);
+}
+.app-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 3200px;
+  margin: auto;
+}
+.app-footer-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #617068;
+  font-weight: 700;
+}
+.app-footer-name img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+.app-footer-link-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+.app-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 18px;
+}
+.app-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.app-footer a:hover {
+  color: #4f7c2e;
+  text-decoration: underline;
+}
+@media (max-width: 600px) {
+  .app-footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .app-footer-links {
+    justify-content: flex-start;
+  }
 }
 .page-title {
   display: flex;
@@ -1117,6 +1179,7 @@ html.header-overlay-active.fullscreen-header-visible header {
   }
   .app-shell,
   header,
+  .app-footer,
   .player-card,
   .table-wrap,
   .round-card,
@@ -1125,6 +1188,7 @@ html.header-overlay-active.fullscreen-header-visible header {
   }
   header,
   aside,
+  .app-footer,
   .table-wrap,
   .player-card,
   .round-card {
@@ -1177,6 +1241,9 @@ html.header-overlay-active.fullscreen-header-visible header {
   }
   .brand-title {
     color: #f4faf5;
+  }
+  .app-footer-name {
+    color: #b4c5ab;
   }
   .player-info small,
   .section-head span,
