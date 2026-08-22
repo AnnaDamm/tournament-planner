@@ -787,7 +787,7 @@ export const calculateExpectedMatchStarts = (
     }))
     const matchCount = round.matches.length || expectedMatchCount
     const batches = Math.ceil(matchCount / capacity)
-    nextRoundStart = roundStart + batches * duration + Math.max(0, batches - 1) * pause
+    nextRoundStart = roundStart + batches * duration + batches * pause
     return { ...round, predictedStart: new Date(roundStart).toISOString(), matches }
   })
 }
