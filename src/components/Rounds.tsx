@@ -94,6 +94,7 @@ export function Rounds({
       key={round.number}
       round={round}
       roundIndex={roundIndex}
+      nextRoundStarted={Boolean(rounds[roundIndex + 1]?.startedAt)}
       canCalculatePairings={roundIndex === 0 || rounds[roundIndex - 1].matches.length > 0}
       participantOrder={participantOrderByRound[roundIndex] ?? []}
       currentRoundNumber={currentRoundNumber}

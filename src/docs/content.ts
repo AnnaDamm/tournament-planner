@@ -69,7 +69,7 @@ const en: DocPage[] = [
         title: 'How the first round is created',
         text: [
           'Creating the first round does not calculate pairings. After Calculate pairings is selected, active participants are paired randomly. Because it is the first round, there are no previous opponents to consider.',
-          'With an odd number of active participants, one person receives a bye. Participants with fewer previous byes are preferred, and equal bye counts are decided randomly.',
+          'With an odd number of active participants, one person receives a bye. Participants with fewer already-counted byes are preferred, and equal bye counts are decided randomly.',
           'The round display uses the ranking calculated from results before that round. For the first round there are no results yet, so the initial ranking is used. New court assignments follow the same official order, while the opponents themselves remain randomly drawn.',
         ],
       },
@@ -89,7 +89,7 @@ const en: DocPage[] = [
         items: [
           'A set is counted only when both values are numeric, non-negative, and different.',
           'A match is complete as soon as one side reaches the configured number of wins. Later set rows do not count.',
-          'A started bye counts as one win, but produces no sets or points.',
+          'A bye counts as one win when the following round starts, but produces no sets or points.',
           'The official position is sorted by: more wins, later last-loss round, more sets won, fewer sets lost, more own points scored, fewer opponent points conceded, then name alphabetically.',
           'A participant without a loss ranks above every participant with a loss when the number of wins is equal. A later last loss is better than an earlier last loss.',
         ],
@@ -189,7 +189,7 @@ const en: DocPage[] = [
       {
         title: 'Byes',
         text: [
-          'Participants with the fewest previous byes are preferred, with random tie-breaking. A bye counts as one win after the round starts but awards no games or points.',
+          'Participants with the fewest already-counted byes are preferred, with random tie-breaking. A bye counts as one win when the following round starts but awards no games or points.',
         ],
       },
       {
@@ -235,7 +235,7 @@ const en: DocPage[] = [
       {
         title: 'Scoring',
         text: [
-          'A completed match records a win, loss, games, and points. A started bye records only a win. Open matches and matches with unknown or deleted participants do not count.',
+          'A completed match records a win, loss, games, and points. A bye records only a win when the following round starts. Open matches and matches with unknown or deleted participants do not count.',
         ],
       },
       {
@@ -380,8 +380,8 @@ const de: DocPage[] = [
       {
         title: 'Runde erstellen und starten',
         text: [
-          'Unter Runden legst du zunächst eine leere Runde an. Die Paarungen werden erst mit „Paarungen berechnen“ erzeugt; bei ungerader Anzahl erhält eine Person ein Bye.',
-          'Vor Ergebnissen kannst du neu auslosen, Namen oder Bye ziehen und Rundeneinstellungen ändern. Starte danach über das Play-Symbol.',
+          'Unter Runden legst du zunächst eine leere Runde an. Die Paarungen werden erst mit „Paarungen berechnen“ erzeugt; bei ungerader Anzahl erhält eine Person ein Freilos.',
+          'Vor Ergebnissen kannst du neu auslosen, Namen oder Freilos ziehen und Rundeneinstellungen ändern. Starte danach über das Play-Symbol.',
         ],
         links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
@@ -411,7 +411,7 @@ const de: DocPage[] = [
         title: 'So entsteht die erste Runde',
         text: [
           'Das Anlegen der ersten Runde berechnet noch keine Paarungen. Erst mit „Paarungen berechnen“ werden die aktiven Teilnehmenden zufällig gepaart. Da es die erste Runde ist, gibt es keine früheren Gegner, die berücksichtigt werden müssen.',
-          'Bei einer ungeraden Anzahl aktiver Teilnehmender erhält eine Person ein Bye. Bevorzugt werden Personen mit wenigen bisherigen Byes; bei Gleichstand entscheidet der Zufall.',
+          'Bei einer ungeraden Anzahl aktiver Teilnehmender erhält eine Person ein Freilos. Bevorzugt werden Personen mit wenigen bereits gewerteten Freilosen; bei Gleichstand entscheidet der Zufall.',
           'Die Rundenansicht nutzt die Rangliste, die aus den Ergebnissen vor dieser Runde berechnet wurde. In der ersten Runde gibt es noch keine Ergebnisse, daher gilt die Anfangsrangliste. Neue Spielfeldzuweisungen folgen derselben offiziellen Reihenfolge; die Gegner selbst bleiben zufällig ausgelost.',
         ],
       },
@@ -431,7 +431,7 @@ const de: DocPage[] = [
         items: [
           'Ein Satz zählt nur, wenn beide Werte numerisch, nichtnegativ und unterschiedlich sind.',
           'Eine Begegnung ist fertig, sobald eine Seite die konfigurierte Zahl an Satzsiegen erreicht. Spätere Satzzeilen werden nicht gewertet.',
-          'Ein gestartetes Bye zählt als Sieg, erzeugt aber keine Sätze und Punkte.',
+          'Ein Freilos zählt als Sieg, sobald die folgende Runde startet, erzeugt aber keine Sätze und Punkte.',
           'Die offizielle Position wird sortiert nach: mehr Siege, spätere Runde des letzten Verlusts, mehr gewonnene Sätze, weniger verlorene Sätze, mehr eigene Punkte, weniger gegnerische Punkte und anschließend alphabetisch nach Name.',
           'Bei gleicher Siegzahl steht eine Person ohne Niederlage vor allen Personen mit Niederlage. Ein späterer letzter Verlust ist besser als ein früherer.',
         ],
@@ -518,7 +518,7 @@ const de: DocPage[] = [
   {
     slug: 'rounds-and-pairings',
     title: 'Runden und Paarungen',
-    summary: 'Schweizer System, Byes, unbekannte Plätze und parallele Spielfelder.',
+    summary: 'Schweizer System, Freilose, unbekannte Plätze und parallele Spielfelder.',
     sections: [
       {
         title: 'Schweizer Paarung',
@@ -529,9 +529,9 @@ const de: DocPage[] = [
         links: [{ label: 'Runden öffnen', to: '/rounds' }],
       },
       {
-        title: 'Byes',
+        title: 'Freilose',
         text: [
-          'Bevorzugt werden Personen mit wenigen bisherigen Byes, Gleichstände entscheidet der Zufall. Ein gestartetes Bye zählt als Sieg ohne Sätze oder Punkte.',
+          'Bevorzugt werden Personen mit wenigen bereits gewerteten Freilosen, Gleichstände entscheidet der Zufall. Ein Freilos zählt als Sieg, sobald die folgende Runde startet, ohne Sätze oder Punkte.',
         ],
       },
       {
@@ -543,7 +543,7 @@ const de: DocPage[] = [
       {
         title: 'Manuelle Änderungen',
         items: [
-          'Namen derselben Runde einschließlich Bye können gezogen werden.',
+          'Namen derselben Runde einschließlich Freilos können gezogen werden.',
           'Begegnungen mit Eingabe und fertige Runden sind gesperrt.',
           'Neu auslosen und Löschen gehen nur ohne Ergebnisse.',
           'Mittlere Runden werden beim Löschen nicht neu nummeriert.',
@@ -577,7 +577,7 @@ const de: DocPage[] = [
       {
         title: 'Wertung',
         text: [
-          'Fertige Begegnungen erzeugen Sieg, Niederlage, Sätze und Punkte. Gestartete Byes nur einen Sieg. Offene, unbekannte oder gelöschte Begegnungen zählen nicht.',
+          'Fertige Begegnungen erzeugen Sieg, Niederlage, Sätze und Punkte. Gewertete Freilose erzeugen nur einen Sieg. Offene, unbekannte oder gelöschte Begegnungen zählen nicht.',
         ],
       },
       {

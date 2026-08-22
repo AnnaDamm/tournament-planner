@@ -9,11 +9,22 @@ const unknownParticipantId = (roundNumber: number, index: number) =>
 
 const randomItem = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)]
 
+const hasMatchParticipant = (round: Round, participantId: string) =>
+  round.matches.some((match) => match.a === participantId || match.b === participantId)
+
+const hasValidBye = (round: Round) =>
+  Boolean(
+    round.bye && !isUnknownParticipantId(round.bye!) && !hasMatchParticipant(round, round.bye!),
+  )
+
+export const isByeCounted = (round: Round, nextRound?: Round) =>
+  Boolean(nextRound?.startedAt && hasValidBye(round))
+
 const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
   const byeCounts = new Map(candidateIds.map((id) => [id, 0]))
-  previousRounds.forEach((round) => {
-    if (round.bye && byeCounts.has(round.bye)) {
-      byeCounts.set(round.bye, (byeCounts.get(round.bye) ?? 0) + 1)
+  previousRounds.forEach((round, index) => {
+    if (isByeCounted(round, previousRounds[index + 1]) && byeCounts.has(round.bye!)) {
+      byeCounts.set(round.bye!, (byeCounts.get(round.bye!) ?? 0) + 1)
     }
   })
   const lowestByeCount = Math.min(...byeCounts.values())
@@ -72,9 +83,13 @@ const newStanding = (player: Participant): RoundStanding => ({
   setsLost: 0,
 })
 
-const applyRoundToStandings = (standings: Map<string, RoundStanding>, round: Round) => {
-  if (round.startedAt && round.bye && !isUnknownParticipantId(round.bye)) {
-    const byeStanding = standings.get(round.bye)
+const applyRoundToStandings = (
+  standings: Map<string, RoundStanding>,
+  round: Round,
+  nextRound?: Round,
+) => {
+  if (isByeCounted(round, nextRound)) {
+    const byeStanding = standings.get(round.bye!)
     if (byeStanding) byeStanding.wins += 1
   }
 
@@ -119,16 +134,16 @@ const standingsSnapshot = (players: Participant[], standings: Map<string, RoundS
 
 export const calculateStandings = (players: Participant[], rounds: Round[]) => {
   const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
-  rounds.forEach((round) => applyRoundToStandings(standings, round))
+  rounds.forEach((round, index) => applyRoundToStandings(standings, round, rounds[index + 1]))
 
   return standingsSnapshot(players, standings)
 }
 
 export const calculateStandingsBeforeRounds = (players: Participant[], rounds: Round[]) => {
   const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
-  return rounds.map((round) => {
+  return rounds.map((round, index) => {
     const snapshot = standingsSnapshot(players, standings)
-    applyRoundToStandings(standings, round)
+    applyRoundToStandings(standings, round, rounds[index + 1])
     return snapshot
   })
 }
@@ -203,7 +218,7 @@ const finalizedParticipantIds = (players: Participant[], rounds: Round[]) => {
   const lastRound = rounds.at(-1)!
   const finalized = new Set<string>()
 
-  if (lastRound.bye && !isUnknownParticipantId(lastRound.bye)) finalized.add(lastRound.bye)
+  if (hasValidBye(lastRound)) finalized.add(lastRound.bye!)
   lastRound.matches.forEach((match) => {
     if (!getMatchResult(match, Math.max(1, lastRound.winningGames || 1))) return
     if (!isUnknownParticipantId(match.a)) finalized.add(match.a)
