@@ -68,9 +68,9 @@ const en: DocPage[] = [
       {
         title: 'How the first round is created',
         text: [
-          'Creating the first round does not calculate pairings. After Calculate pairings is selected, active participants are paired randomly. Because it is the first round, there are no previous opponents to consider.',
+          'Creating the first round does not calculate pairings. After Calculate pairings is selected, active participants are split into two halves and paired by matching positions across the halves. Because it is the first round, there are no previous opponents to consider.',
           'With an odd number of active participants, one person receives a bye. Participants with fewer already-counted byes are preferred, and equal bye counts are decided randomly.',
-          'The round display uses the ranking calculated from results before that round. For the first round there are no results yet, so the initial ranking is used. New court assignments follow the same official order, while the opponents themselves remain randomly drawn.',
+          'The round display uses the ranking calculated from results before that round. For the first round there are no results yet, so the initial ranking is used. New court assignments and pairings follow that order.',
         ],
       },
       {
@@ -181,7 +181,7 @@ const en: DocPage[] = [
       {
         title: 'Swiss pairing',
         text: [
-          'Create a round first, then select Calculate pairings. The first round uses randomized Swiss pairing. From round two onward, active participants follow the official ranking: each remaining participant is paired with the first person in ranking order they have not played yet.',
+          'Create a round first, then select Calculate pairings. In the first round, active participants are split into two halves and paired by matching positions across the halves. From round two onward, active participants follow the official ranking: each remaining participant is paired with the first person in ranking order they have not played yet.',
           'If no unused opponent remains, the first available opponent is used as a necessary fallback. Rematches can therefore occur when the participant history leaves no alternative.',
         ],
         links: [{ label: 'Open Rounds', to: '/rounds' }],
@@ -410,9 +410,9 @@ const de: DocPage[] = [
       {
         title: 'So entsteht die erste Runde',
         text: [
-          'Das Anlegen der ersten Runde berechnet noch keine Paarungen. Erst mit „Paarungen berechnen“ werden die aktiven Teilnehmenden zufällig gepaart. Da es die erste Runde ist, gibt es keine früheren Gegner, die berücksichtigt werden müssen.',
+          'Das Anlegen der ersten Runde berechnet noch keine Paarungen. Erst mit „Paarungen berechnen“ werden die aktiven Teilnehmenden in zwei Hälften geteilt und jeweils die Positionen beider Hälften gegeneinander gepaart. Da es die erste Runde ist, gibt es keine früheren Gegner, die berücksichtigt werden müssen.',
           'Bei einer ungeraden Anzahl aktiver Teilnehmender erhält eine Person ein Freilos. Bevorzugt werden Personen mit wenigen bereits gewerteten Freilosen; bei Gleichstand entscheidet der Zufall.',
-          'Die Rundenansicht nutzt die Rangliste, die aus den Ergebnissen vor dieser Runde berechnet wurde. In der ersten Runde gibt es noch keine Ergebnisse, daher gilt die Anfangsrangliste. Neue Spielfeldzuweisungen folgen derselben offiziellen Reihenfolge; die Gegner selbst bleiben zufällig ausgelost.',
+          'Die Rundenansicht nutzt die Rangliste, die aus den Ergebnissen vor dieser Runde berechnet wurde. In der ersten Runde gibt es noch keine Ergebnisse, daher gilt die Anfangsrangliste. Spielfeldzuweisungen und Paarungen folgen dieser Reihenfolge.',
         ],
       },
       {
@@ -523,7 +523,7 @@ const de: DocPage[] = [
       {
         title: 'Schweizer Paarung',
         text: [
-          'Lege zuerst eine Runde an und wähle dann „Paarungen berechnen“. Die erste Runde wird zufällig nach dem Schweizer System gepaart. Ab Runde zwei folgt die Auslosung der offiziellen Rangliste: Jede verbleibende Person spielt gegen die erste Person in der Reihenfolge, gegen die sie noch nicht gespielt hat.',
+          'Lege zuerst eine Runde an und wähle dann „Paarungen berechnen“. In der ersten Runde werden die aktiven Teilnehmenden in zwei Hälften geteilt und jeweils die Positionen beider Hälften gegeneinander gepaart. Ab Runde zwei folgt die Auslosung der offiziellen Rangliste: Jede verbleibende Person spielt gegen die erste Person in der Reihenfolge, gegen die sie noch nicht gespielt hat.',
           'Wenn kein ungespielter Gegner übrig bleibt, wird notwendigerweise die erste verfügbare Person genommen; dann kann ein Rematch entstehen.',
         ],
         links: [{ label: 'Runden öffnen', to: '/rounds' }],
