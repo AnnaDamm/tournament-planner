@@ -7,6 +7,8 @@ export type StorageKey =
   | 'courtCount'
   | 'defaultWinningGames'
   | 'tournamentName'
+  | 'expectedDurationMinutes'
+  | 'breakBetweenMatchesMinutes'
   | 'scheduledStart'
 
 type StorageMessage = { key: StorageKey; source: string }
@@ -18,6 +20,8 @@ const storageKeys: StorageKey[] = [
   'courtCount',
   'defaultWinningGames',
   'tournamentName',
+  'expectedDurationMinutes',
+  'breakBetweenMatchesMinutes',
   'scheduledStart',
 ]
 const tabId = Math.random().toString(36).slice(2)
@@ -71,11 +75,29 @@ export const loadTournamentName = () => {
 }
 export const saveTournamentName = (value: string) =>
   write('tournamentName', value.trim() || 'Tourny')
+export const loadExpectedDurationMinutes = () => {
+  const value = read<number>('expectedDurationMinutes', 25)
+  return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 25
+}
+export const saveExpectedDurationMinutes = (value: number) =>
+  write('expectedDurationMinutes', value)
+export const loadBreakBetweenMatchesMinutes = () => {
+  const value = read<number>('breakBetweenMatchesMinutes', 5)
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 5
+}
+export const saveBreakBetweenMatchesMinutes = (value: number) =>
+  write('breakBetweenMatchesMinutes', value)
 export const loadScheduledStart = () => {
   const value = read<unknown>('scheduledStart', '')
   return typeof value === 'string' ? value : ''
 }
 export const saveScheduledStart = (value: string) => write('scheduledStart', value)
+export const getDefaultScheduledStart = () => {
+  const date = new Date()
+  date.setHours(date.getHours() + 1, 0, 0, 0)
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:00`
+}
 export const loadParticipantType = (): 'players' | 'teams' =>
   localStorage.getItem(storageKey('participantType')) === 'teams' ? 'teams' : 'players'
 export const saveParticipantType = (value: 'players' | 'teams') => write('participantType', value)

@@ -1,4 +1,4 @@
-import { Dices, ListPlus, Play, Settings2, X } from 'lucide-react'
+import { ArrowDown, Calculator, ListPlus, Play, Settings2, X } from 'lucide-react'
 import { t } from '../i18n'
 import { hasEnteredScore, isUnknownParticipantId } from '../tournament'
 import type { Round } from '../tournamentTypes'
@@ -60,26 +60,42 @@ export function RoundActions({
         </button>
       )}
       {needsPairing && canCalculatePairings ? (
-        <button
-          className="button ghost"
-          type="button"
-          aria-label={t('calculatePairings')}
-          title={t('calculatePairings')}
-          onClick={onReroll}
-        >
-          <Dices size={16} aria-hidden="true" />
-        </button>
-      ) : (
-        isUnstarted && (
+        <div className="header-tooltip">
           <button
             className="button ghost"
             type="button"
-            aria-label={t('reroll')}
-            title={t('reroll')}
+            aria-label={t('calculatePairings')}
+            title={t('calculatePairings')}
             onClick={onReroll}
           >
-            <Dices size={16} aria-hidden="true" />
+            <span className="pairing-calculate-icon" aria-hidden="true">
+              <Calculator size={16} />
+              <ArrowDown className="pairing-calculate-arrow" size={9} />
+            </span>
           </button>
+          <div className="tooltip-popover" aria-hidden="true">
+            {t('calculatePairings')}
+          </div>
+        </div>
+      ) : (
+        isUnstarted && (
+          <div className="header-tooltip">
+            <button
+              className="button ghost"
+              type="button"
+              aria-label={t('reroll')}
+              title={t('reroll')}
+              onClick={onReroll}
+            >
+              <span className="pairing-calculate-icon" aria-hidden="true">
+                <Calculator size={16} />
+                <ArrowDown className="pairing-calculate-arrow" size={9} />
+              </span>
+            </button>
+            <div className="tooltip-popover" aria-hidden="true">
+              {t('reroll')}
+            </div>
+          </div>
         )
       )}
       {!round.matches.some((match) => match.scoreA || match.scoreB) && (

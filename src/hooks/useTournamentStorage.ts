@@ -14,6 +14,10 @@ import {
   saveDefaultWinningGames,
   saveTournamentName,
   saveScheduledStart,
+  loadExpectedDurationMinutes,
+  saveExpectedDurationMinutes,
+  loadBreakBetweenMatchesMinutes,
+  saveBreakBetweenMatchesMinutes,
   subscribeToStorage,
   type StorageKey,
 } from '../storage'
@@ -35,6 +39,10 @@ export function useTournamentStorage(
   setTournamentName: (value: string) => void,
   scheduledStart: string,
   setScheduledStart: (value: string) => void,
+  expectedDurationMinutes: number,
+  setExpectedDurationMinutes: (value: number) => void,
+  breakBetweenMatchesMinutes: number,
+  setBreakBetweenMatchesMinutes: (value: number) => void,
   enabled = true,
   writable = enabled,
 ) {
@@ -51,6 +59,10 @@ export function useTournamentStorage(
       if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())
       if (key === 'tournamentName') setTournamentName(loadTournamentName())
       if (key === 'scheduledStart') setScheduledStart(loadScheduledStart())
+      if (key === 'expectedDurationMinutes')
+        setExpectedDurationMinutes(loadExpectedDurationMinutes())
+      if (key === 'breakBetweenMatchesMinutes')
+        setBreakBetweenMatchesMinutes(loadBreakBetweenMatchesMinutes())
     })
   }, [
     setCourtCount,
@@ -60,6 +72,8 @@ export function useTournamentStorage(
     setRounds,
     setTournamentName,
     setScheduledStart,
+    setExpectedDurationMinutes,
+    setBreakBetweenMatchesMinutes,
     enabled,
   ])
   useEffect(() => {
@@ -97,4 +111,14 @@ export function useTournamentStorage(
     if (skipRemoteSave.current.delete('scheduledStart')) return
     saveScheduledStart(scheduledStart)
   }, [enabled, scheduledStart, writable])
+  useEffect(() => {
+    if (!enabled || !writable) return
+    if (skipRemoteSave.current.delete('expectedDurationMinutes')) return
+    saveExpectedDurationMinutes(expectedDurationMinutes)
+  }, [enabled, expectedDurationMinutes, writable])
+  useEffect(() => {
+    if (!enabled || !writable) return
+    if (skipRemoteSave.current.delete('breakBetweenMatchesMinutes')) return
+    saveBreakBetweenMatchesMinutes(breakBetweenMatchesMinutes)
+  }, [breakBetweenMatchesMinutes, enabled, writable])
 }

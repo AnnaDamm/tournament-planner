@@ -152,7 +152,7 @@ export function PlayerHistoryDialog({
           <h2 id="player-history-title">{player?.name}</h2>
           <p id="player-history-description">{t('history')}</p>
         </div>
-        <button className="icon-btn" onClick={onClose} aria-label={t('close')}>
+        <button className="icon-btn" onClick={onClose} aria-label={t('close')} title={t('close')}>
           <X size={18} aria-hidden="true" />
         </button>
       </div>

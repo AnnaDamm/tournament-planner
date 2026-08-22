@@ -628,6 +628,19 @@ select {
   gap: 8px;
   white-space: nowrap;
 }
+.pairing-calculate-icon {
+  position: relative;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+.pairing-calculate-arrow {
+  position: absolute;
+  right: -4px;
+  bottom: -3px;
+  border-radius: 50%;
+  background: #fff;
+}
 .round-games input {
   width: 48px;
 }
@@ -705,6 +718,14 @@ select {
   width: 20px;
   font-weight: 900;
   text-align: center;
+}
+.match-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #7d8981;
+  font-size: 11px;
+  white-space: nowrap;
 }
 .drag-hint {
   display: flex;
@@ -1310,10 +1331,47 @@ html.header-overlay-active.fullscreen-header-visible header {
   transform: rotate(45deg);
 }
 .header-tooltip:hover .tooltip-popover,
-.header-tooltip:focus-within .tooltip-popover {
+.header-tooltip:has(:focus-visible) .tooltip-popover {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
+}
+
+button[title] {
+  position: relative;
+}
+button[title]::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-3px);
+  border-radius: 6px;
+  background: #17201d;
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  box-shadow: 0 6px 18px rgb(23 32 29 / 24%);
+  white-space: nowrap;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease,
+    visibility 140ms ease;
+}
+button[title]:hover::after,
+button[title]:focus-visible::after {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+.header-tooltip > button[title]::after {
+  display: none;
 }
 
 .app-shell:has(.settings-modal[open]) .header-actions {
@@ -1732,6 +1790,7 @@ aside {
     grid-template-columns: 24px minmax(0, 1fr) 24px minmax(0, 1fr);
     grid-template-areas:
       'court player-a versus player-b'
+      '. start start .'
       '. scores scores scores';
     gap: 12px 7px;
     align-items: center;
@@ -1741,6 +1800,11 @@ aside {
   .match-court {
     grid-area: court;
     width: auto;
+  }
+
+  .match-start {
+    grid-area: start;
+    justify-self: center;
   }
 
   .match-player {

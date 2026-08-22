@@ -7,6 +7,9 @@ import {
   loadRounds,
   loadTournamentName,
   loadScheduledStart,
+  loadExpectedDurationMinutes,
+  loadBreakBetweenMatchesMinutes,
+  getDefaultScheduledStart,
 } from '../storage'
 import { getLocalSession, isReadOnlyTab } from '../liveSharing'
 import { startReadyRounds } from '../tournament'
@@ -29,13 +32,28 @@ export function useTournamentLiveState() {
   const [defaultWinningGames, setDefaultWinningGames] = useState(() =>
     isViewer ? 1 : loadDefaultWinningGames(),
   )
-  const [rounds, setRounds] = useState<Round[]>(() =>
-    isViewer ? [] : startReadyRounds(loadRounds(), loadCourtCount()),
+  const initialRounds = useMemo(
+    () => (isViewer ? [] : startReadyRounds(loadRounds(), loadCourtCount())),
+    [isViewer],
   )
+  const [rounds, setRounds] = useState<Round[]>(initialRounds)
   const [participantType, setParticipantType] = useState<'players' | 'teams'>(() =>
     isViewer ? 'players' : loadParticipantType(),
   )
-  const [scheduledStart, setScheduledStart] = useState(() => (isViewer ? '' : loadScheduledStart()))
+  const [scheduledStart, setScheduledStart] = useState(() => {
+    if (isViewer) return ''
+    const storedStart = loadScheduledStart()
+    return (
+      storedStart ||
+      (initialRounds.some((round) => round.startedAt) ? '' : getDefaultScheduledStart())
+    )
+  })
+  const [expectedDurationMinutes, setExpectedDurationMinutes] = useState(() =>
+    isViewer ? 25 : loadExpectedDurationMinutes(),
+  )
+  const [breakBetweenMatchesMinutes, setBreakBetweenMatchesMinutes] = useState(() =>
+    isViewer ? 5 : loadBreakBetweenMatchesMinutes(),
+  )
 
   useTournamentStorage(
     players,
@@ -52,6 +70,10 @@ export function useTournamentLiveState() {
     setTournamentName,
     scheduledStart,
     setScheduledStart,
+    expectedDurationMinutes,
+    setExpectedDurationMinutes,
+    breakBetweenMatchesMinutes,
+    setBreakBetweenMatchesMinutes,
     true,
     !readOnly,
   )
@@ -66,6 +88,8 @@ export function useTournamentLiveState() {
       courtCount,
       defaultWinningGames,
       scheduledStart,
+      expectedDurationMinutes,
+      breakBetweenMatchesMinutes,
     }),
     [
       courtCount,
@@ -75,6 +99,8 @@ export function useTournamentLiveState() {
       rounds,
       scheduledStart,
       tournamentName,
+      expectedDurationMinutes,
+      breakBetweenMatchesMinutes,
     ],
   )
 
@@ -89,6 +115,8 @@ export function useTournamentLiveState() {
       setCourtCount(incoming.courtCount)
       setDefaultWinningGames(incoming.defaultWinningGames)
       setScheduledStart(incoming.scheduledStart ?? '')
+      setExpectedDurationMinutes(incoming.expectedDurationMinutes ?? 25)
+      setBreakBetweenMatchesMinutes(incoming.breakBetweenMatchesMinutes ?? 5)
     },
   })
 
@@ -110,5 +138,9 @@ export function useTournamentLiveState() {
     setParticipantType,
     scheduledStart,
     setScheduledStart,
+    expectedDurationMinutes,
+    setExpectedDurationMinutes,
+    breakBetweenMatchesMinutes,
+    setBreakBetweenMatchesMinutes,
   }
 }

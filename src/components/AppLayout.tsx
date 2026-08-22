@@ -308,6 +308,7 @@ export function AppLayout({
             ref={mobileNavCloseRef}
             type="button"
             aria-label={t('close')}
+            title={t('close')}
             popoverTarget="mobile-nav"
             popoverTargetAction="hide"
             onClick={closeMobileNav}
@@ -351,6 +352,7 @@ export function AppLayout({
           ref={mobileNavTriggerRef}
           type="button"
           aria-label={t('menu')}
+          title={t('menu')}
           aria-controls="mobile-nav"
           popoverTarget="mobile-nav"
           popoverTargetAction="toggle"
@@ -372,6 +374,7 @@ export function AppLayout({
               ref={searchTriggerRef}
               type="button"
               aria-label={t('playerSearch')}
+              title={t('playerSearch')}
               aria-expanded={searchOpen}
               aria-controls="player-search-popover"
               popoverTarget="player-search-popover"
@@ -405,6 +408,7 @@ export function AppLayout({
                   <button
                     type="button"
                     aria-label={t('clearSearch')}
+                    title={t('clearSearch')}
                     onClick={() => updateSearch('')}
                   >
                     <X size={15} aria-hidden="true" />
@@ -445,6 +449,7 @@ export function AppLayout({
                 className="next-match-button"
                 type="button"
                 disabled={matchingMatchIds.length === 0}
+                title={matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}
                 onClick={() => {
                   if (matchingMatchIds.length === 0) return
                   const cursor = matchCursorRef.current
@@ -543,6 +548,7 @@ export function AppLayout({
               <button
                 className="icon-btn settings-trigger"
                 aria-label={isSettingsPage ? t('back') : t('settings')}
+                title={isSettingsPage ? t('back') : t('settings')}
                 onClick={() =>
                   isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings'))
                 }

@@ -29,11 +29,11 @@ export function useTournamentDerivedState(
   )
   const participantOrderByRound = useMemo(
     () =>
-      rounds.map((_, roundIndex) =>
-        getRankingParticipants(players, rounds.slice(0, roundIndex))
-          .sort(compareRankingParticipants)
-          .map((player) => player.id),
-      ),
+      rounds.map((_, roundIndex) => {
+        const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex))
+        if (roundIndex > 0) ranking.sort(compareRankingParticipants)
+        return ranking.map((player) => player.id)
+      }),
     [players, rounds],
   )
   const positions = useMemo(

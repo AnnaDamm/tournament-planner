@@ -73,7 +73,13 @@ export function RoundSettingsDialog({
             {t('round')} {String(round.number).padStart(2, '0')}
           </p>
         </div>
-        <button className="icon-btn" type="button" onClick={close} aria-label={t('close')}>
+        <button
+          className="icon-btn"
+          type="button"
+          onClick={close}
+          aria-label={t('close')}
+          title={t('close')}
+        >
           <X size={18} aria-hidden="true" />
         </button>
       </div>
@@ -103,10 +109,10 @@ export function RoundSettingsDialog({
         </label>
       </div>
       <div className="dialog-actions">
-        <button className="button ghost" type="button" onClick={close}>
+        <button className="button ghost" type="button" onClick={close} title={t('cancel')}>
           {t('cancel')}
         </button>
-        <button className="button primary" type="button" onClick={save}>
+        <button className="button primary" type="button" onClick={save} title={t('save')}>
           {t('save')}
         </button>
       </div>
