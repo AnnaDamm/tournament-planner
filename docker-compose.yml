@@ -1,8 +1,22 @@
 services:
+  install:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+      - tourny-node-modules:/app/node_modules
+    environment:
+      CI: 'true'
+    command: pnpm install --frozen-lockfile
+
   dev:
     build:
       context: .
       target: development
+    depends_on:
+      install:
+        condition: service_completed_successfully
     ports:
       - '5173:5173'
     environment:

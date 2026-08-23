@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="TypeScriptCompiler">
-    <option name="nodeInterpreterTextField" value="docker-compose://[$PROJECT_DIR/docker-compose.yml]:app/node" />
+    <option name="nodeInterpreterTextField" value="docker-compose://[$PROJECT_DIR/docker-compose.yml]:dev/node" />
   </component>
 </project>
