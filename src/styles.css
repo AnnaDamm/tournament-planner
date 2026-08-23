@@ -882,6 +882,23 @@ select {
   background: #c9f268;
   color: #233117;
 }
+.compare-button {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 3px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #8b9690;
+  cursor: pointer;
+}
+.compare-button:hover {
+  background: #e7f5d5;
+  color: #4f7c2e;
+}
 .player-name-button {
   border: 0;
   background: transparent;
@@ -942,6 +959,100 @@ select {
 }
 .history-dialog {
   width: min(700px, calc(100% - 32px));
+}
+.comparison-dialog {
+  width: min(760px, calc(100% - 32px));
+}
+.comparison-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 0 25px;
+  padding: 4px 4px 0;
+  border: 1px solid #dfe7e0;
+  border-radius: 8px 8px 0 0;
+  background: #f2f6f2;
+}
+.comparison-panel {
+  margin: 0 25px 25px;
+  padding-top: 0;
+  border: 1px solid #dfe7e0;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+.comparison-tab {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: #617068;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.comparison-tab:hover,
+.comparison-tab[aria-selected='true'] {
+  background: #fff;
+  border-color: #dfe7e0;
+  border-bottom-color: #fff;
+  color: #35412e;
+  margin-bottom: 0;
+}
+.comparison-panel .comparison-table-wrap {
+  margin-inline: 0;
+}
+.comparison-panel .direct-comparison {
+  margin-inline: 0;
+  margin-bottom: 0;
+}
+.comparison-table-wrap {
+  overflow-x: auto;
+  margin: 0 25px;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.comparison-table th,
+.comparison-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e4eae5;
+  text-align: right;
+  white-space: nowrap;
+}
+.comparison-table thead th {
+  color: #617068;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  text-align: left;
+}
+.comparison-table tbody th {
+  color: #617068;
+  font-weight: 600;
+}
+.comparison-table tbody td {
+  font-weight: 700;
+}
+.direct-comparison {
+  margin: 24px 25px 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e4eae5;
+}
+.direct-comparison h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+.direct-comparison .comparison-table-wrap {
+  margin-inline: 0;
+}
+.comparison-empty {
+  margin: 0 !important;
 }
 .history-table-wrap {
   overflow-x: auto;
@@ -1219,6 +1330,41 @@ html.header-overlay-active.fullscreen-header-visible header {
   .history-table-wrap tr.running {
     background: #2d2c21;
     box-shadow: inset 4px 0 #8fb54c;
+  }
+  .comparison-table th,
+  .comparison-table td,
+  .comparison-tabs,
+  .direct-comparison {
+    border-color: #35453a;
+  }
+  .comparison-table thead th,
+  .comparison-table tbody th {
+    color: #b4c5ab;
+  }
+  .comparison-tab {
+    color: #b4c5ab;
+  }
+  .comparison-tab:hover,
+  .comparison-tab[aria-selected='true'] {
+    background: #202c25;
+    border-color: #425443;
+    border-bottom-color: #202c25;
+    color: #d8f5b1;
+  }
+  .comparison-tabs {
+    border-color: #35453a;
+    background: #17201c;
+  }
+  .comparison-panel {
+    border-color: #35453a;
+    background: #202c25;
+  }
+  .compare-button {
+    color: #b4c5ab;
+  }
+  .compare-button:hover {
+    background: #30472a;
+    color: #d8f5b1;
   }
   .drag-hint.winner {
     background: #3d5a32;
@@ -1899,6 +2045,10 @@ aside {
     width: min(440px, calc(100% - 24px));
   }
 
+  .comparison-dialog {
+    width: min(760px, calc(100% - 24px));
+  }
+
   .dialog > * {
     margin-left: 18px;
     margin-right: 18px;
@@ -1919,6 +2069,22 @@ aside {
   }
 
   .history-table-wrap {
+    margin-inline: 18px;
+  }
+
+  .comparison-table-wrap {
+    margin-inline: 18px;
+  }
+
+  .comparison-tabs {
+    margin-inline: 18px;
+  }
+
+  .comparison-panel {
+    margin-inline: 18px;
+  }
+
+  .direct-comparison {
     margin-inline: 18px;
   }
 }
@@ -1975,11 +2141,11 @@ aside {
 
   .match {
     display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) 24px minmax(0, 1fr);
+    grid-template-columns: 24px 44px minmax(0, 1fr) 24px minmax(0, 1fr);
     grid-template-areas:
-      'court player-a versus player-b'
-      '. start start .'
-      '. scores scores scores';
+      'court compare player-a versus player-b'
+      '. start start start .'
+      '. scores scores scores scores';
     gap: 8px 7px;
     align-items: center;
     padding-block: 12px;
@@ -1992,6 +2158,11 @@ aside {
 
   .match-start {
     grid-area: start;
+    justify-self: center;
+  }
+
+  .compare-button {
+    grid-area: compare;
     justify-self: center;
   }
 
@@ -2049,7 +2220,7 @@ aside {
   }
 
   .match {
-    grid-template-columns: 20px minmax(0, 1fr) 20px minmax(0, 1fr);
+    grid-template-columns: 20px 44px minmax(0, 1fr) 20px minmax(0, 1fr);
   }
 
   .match-player {
@@ -3130,6 +3301,9 @@ dialog.settings-modal:not([open]) {
   min-height: 44px;
   touch-action: manipulation;
 }
+.compare-button {
+  touch-action: manipulation;
+}
 .readonly-focus-mode :where(.icon-btn, .drag-handle-button, .status-btn, .delete-btn) {
   min-width: calc(44px * var(--focus-ui-scale));
   min-height: calc(44px * var(--focus-ui-scale));
@@ -3137,6 +3311,10 @@ dialog.settings-modal:not([open]) {
 
 .readonly-focus-mode .history-dialog {
   width: min(1000px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+}
+.readonly-focus-mode .comparison-dialog {
+  width: min(1100px, calc(100vw - 32px));
   max-height: calc(100dvh - 24px);
 }
 .readonly-focus-mode .history-dialog > * {
@@ -3162,6 +3340,16 @@ dialog.settings-modal:not([open]) {
 .readonly-focus-mode .history-table-wrap th,
 .readonly-focus-mode .history-table-wrap td {
   padding: clamp(12px, 1vw, 20px) clamp(10px, 1vw, 20px);
+}
+.readonly-focus-mode .comparison-tabs {
+  margin-inline: clamp(18px, 2.5vw, 38px);
+}
+.readonly-focus-mode .comparison-panel {
+  margin-inline: clamp(18px, 2.5vw, 38px);
+}
+.readonly-focus-mode .comparison-tab {
+  font-size: clamp(18px, 1.2vw, 26px);
+  padding: clamp(10px, 0.8vw, 16px) clamp(12px, 1vw, 20px);
 }
 
 .readonly-focus-mode .current-round-group {
@@ -3245,6 +3433,7 @@ dialog.settings-modal:not([open]) {
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .round-actions,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .player-actions,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .drag-handle-button,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .compare-button,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .seed-grip,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) dialog,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .search-popover {

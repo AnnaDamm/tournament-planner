@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { CalendarClock, Clock, GripVertical } from 'lucide-react'
+import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
-import { getMatchResult, hasEnteredScore } from '../tournament'
+import { getMatchResult, hasEnteredScore, isUnknownParticipantId } from '../tournament'
 import { SetScores } from './SetScores'
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   name: (id: string) => string
   record: (id: string) => string
   onPlayerClick: (id: string) => void
+  onCompare: (firstId: string, secondId: string) => void
   onUpdate: (matches: Match[]) => void
   allMatches: Match[]
   onSwap?: (draggedId: string, targetId: string) => void
@@ -75,6 +76,7 @@ export function MatchRow({
   name,
   record,
   onPlayerClick,
+  onCompare,
   onUpdate,
   allMatches,
   onSwap,
@@ -178,6 +180,17 @@ export function MatchRow({
           )}{' '}
           {formatStartTime(match.startedAt ?? match.predictedStart!)}
         </time>
+      )}
+      {!isUnknownParticipantId(match.a) && !isUnknownParticipantId(match.b) && (
+        <button
+          className="compare-button"
+          type="button"
+          aria-label={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
+          title={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
+          onClick={() => onCompare(match.a, match.b)}
+        >
+          <GitCompareArrows size={16} aria-hidden="true" />
+        </button>
       )}
       <span
         className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}

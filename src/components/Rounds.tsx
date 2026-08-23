@@ -1,6 +1,7 @@
 import { Plus, Trophy } from 'lucide-react'
 import { useState } from 'react'
 import { PageTitle } from './PageTitle'
+import { PlayerComparisonDialog } from './PlayerComparisonDialog'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
@@ -43,6 +44,11 @@ const getFirstRunningMatchId = (
     )
     .at(0)?.id
 
+type ComparisonSelection = {
+  playerIds: [string, string]
+  roundIndex: number
+}
+
 export function Rounds({
   rounds,
   players,
@@ -64,6 +70,7 @@ export function Rounds({
   readOnly = false,
 }: Props) {
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
+  const [comparisonSelection, setComparisonSelection] = useState<ComparisonSelection | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
   const [keyboardMove, setKeyboardMove] = useState<{
     roundIndex: number
@@ -108,6 +115,9 @@ export function Rounds({
       onPlayerClick={(id) => {
         if (!isUnknownParticipantId(id)) setHistoryPlayerId(id)
       }}
+      onCompare={(firstId, secondId) =>
+        setComparisonSelection({ playerIds: [firstId, secondId], roundIndex })
+      }
       onUpdate={(matches) => onUpdate(roundIndex, matches)}
       onSettings={() => setSettingsRoundNumber(round.number)}
       onStart={() => onStart(round.number)}
@@ -163,6 +173,15 @@ export function Rounds({
         defaultSetPoints={defaultSetPoints}
         name={name}
         onClose={() => setHistoryPlayerId(null)}
+      />
+      <PlayerComparisonDialog
+        playerIds={comparisonSelection?.playerIds ?? null}
+        roundIndex={comparisonSelection?.roundIndex ?? null}
+        players={players}
+        rounds={rounds}
+        defaultSetPoints={defaultSetPoints}
+        name={name}
+        onClose={() => setComparisonSelection(null)}
       />
       {!readOnly && (
         <RoundSettingsDialog

@@ -16,6 +16,7 @@ type Props = {
   name: (id: string) => string
   record: (id: string) => string
   onPlayerClick: (id: string) => void
+  onCompare: (firstId: string, secondId: string) => void
   onUpdate: (matches: Match[]) => void
   onSettings: () => void
   onStart: () => void
@@ -40,6 +41,7 @@ export function RoundSection({
   name,
   record,
   onPlayerClick,
+  onCompare,
   onUpdate,
   onSettings,
   onStart,
@@ -165,6 +167,7 @@ export function RoundSection({
               name={name}
               record={record}
               onPlayerClick={onPlayerClick}
+              onCompare={onCompare}
               onUpdate={onUpdate}
               allMatches={round.matches}
               winningGames={round.winningGames ?? 1}
