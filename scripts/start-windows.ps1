@@ -55,6 +55,13 @@ if (-not $viewerUrl) {
   $viewerUrl = "http://${address}:$port/"
 }
 
+if (-not $env:VITE_APP_VERSION) {
+  $env:VITE_APP_VERSION = git describe --tags --exact-match --match 'v[0-9]*' HEAD 2>$null
+  if (-not $env:VITE_APP_VERSION) {
+    $env:VITE_APP_VERSION = git describe --tags --abbrev=0 --first-parent --match 'v[0-9]*' HEAD 2>$null
+  }
+}
+
 if ($PrintUrl) {
   Write-Output $viewerUrl
   exit 0

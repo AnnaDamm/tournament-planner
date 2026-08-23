@@ -587,6 +587,7 @@ export function AppLayout({
           <span className="app-footer-name">
             <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
             Tourny
+            <span className="app-footer-version">{import.meta.env.VITE_APP_VERSION}</span>
           </span>
           <nav className="app-footer-links" aria-label={t('footerLinks')}>
             <a

@@ -1,9 +1,39 @@
 import { defineConfig, transformWithOxc, type Plugin } from 'vite'
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+
+const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
+  version: string
+}
+
+const getGitVersion = (args: string[]) => {
+  try {
+    return execFileSync('git', args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+  } catch {
+    return ''
+  }
+}
+
+const getAppVersion = () =>
+  process.env.VITE_APP_VERSION?.trim() ||
+  getGitVersion(['describe', '--tags', '--exact-match', '--match', 'v[0-9]*', 'HEAD']) ||
+  getGitVersion([
+    'describe',
+    '--tags',
+    '--abbrev=0',
+    '--first-parent',
+    '--match',
+    'v[0-9]*',
+    'HEAD',
+  ]) ||
+  `v${packageJson.version}`
 
 function serviceWorker(): Plugin {
   let outputDir = resolve('dist')
@@ -15,15 +45,12 @@ function serviceWorker(): Plugin {
       base = config.base
     },
     async closeBundle() {
-      const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
-        version: string
-      }
       const indexContent = readFileSync(resolve(outputDir, 'index.html'))
       const buildId = createHash('sha256').update(indexContent).digest('hex').slice(0, 16)
       const source = readFileSync(resolve('src/service-worker.ts'), 'utf8')
         .replace(/^.*<reference lib="webworker".*$/m, '')
         .replace(/^export {}\n/m, '')
-        .replaceAll('__APP_VERSION__', `${packageJson.version}-${buildId}`)
+        .replaceAll('__APP_VERSION__', `${getAppVersion()}-${buildId}`)
         .replaceAll('__BASE_URL__', base)
       const result = await transformWithOxc(source, 'service-worker.ts', {})
       writeFileSync(resolve(outputDir, 'sw.js'), result.code)
@@ -92,15 +119,20 @@ function inlineAssets(): Plugin {
   }
 }
 
-export default defineConfig(({ mode }) => ({
-  root: 'src',
-  base: mode === 'production' ? (process.env.VITE_BASE_URL ?? '/tournament-planner/') : '/',
-  plugins: [react(), tailwindcss(), serviceWorker(), webManifest(), inlineAssets()],
-  build: {
-    outDir: '../dist',
-    emptyOutDir: true,
-    modulePreload: false,
-    cssCodeSplit: false,
-    rollupOptions: { output: { manualChunks: undefined } },
-  },
-}))
+export default defineConfig(({ mode }) => {
+  const appVersion = getAppVersion()
+
+  return {
+    root: 'src',
+    base: mode === 'production' ? (process.env.VITE_BASE_URL ?? '/tournament-planner/') : '/',
+    define: { 'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion) },
+    plugins: [react(), tailwindcss(), serviceWorker(), webManifest(), inlineAssets()],
+    build: {
+      outDir: '../dist',
+      emptyOutDir: true,
+      modulePreload: false,
+      cssCodeSplit: false,
+      rollupOptions: { output: { manualChunks: undefined } },
+    },
+  }
+})

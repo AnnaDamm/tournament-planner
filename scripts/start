@@ -144,6 +144,15 @@ if [ -z "$viewer_url" ]; then
   viewer_url="http://${address}:${port}/"
 fi
 
+if [ -z "${VITE_APP_VERSION:-}" ]; then
+  VITE_APP_VERSION="$({
+    git describe --tags --exact-match --match 'v[0-9]*' HEAD 2>/dev/null ||
+    git describe --tags --abbrev=0 --first-parent --match 'v[0-9]*' HEAD 2>/dev/null ||
+    true
+  })"
+  export VITE_APP_VERSION
+fi
+
 if [ "${1:-}" = "--print-url" ]; then
   printf '%s\n' "$viewer_url"
   exit 0

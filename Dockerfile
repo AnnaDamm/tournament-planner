@@ -17,6 +17,9 @@ CMD ["pnpm", "dev", "--host", "0.0.0.0"]
 
 FROM base AS build
 
+ARG VITE_APP_VERSION
+ENV VITE_APP_VERSION=$VITE_APP_VERSION
+
 COPY . .
 RUN pnpm build:host
 

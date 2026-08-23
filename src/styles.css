@@ -327,6 +327,10 @@ aside {
   height: 18px;
   border-radius: 4px;
 }
+.app-footer-version {
+  color: #87948c;
+  font-weight: 500;
+}
 .app-footer-link-icon {
   width: 14px;
   height: 14px;
