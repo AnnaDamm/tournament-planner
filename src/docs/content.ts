@@ -364,9 +364,38 @@ const en: DocPage[] = [
     summary: 'Released versions and the changes included in each release.',
     sections: [
       {
+        title: 'Unreleased — Features',
+        items: [
+          'Move tournament state to Redux.',
+          'Split styling into CSS modules and remove Tailwind.',
+          'Reduce Redux-driven rendering and enable the React Compiler.',
+          'Add print mode.',
+          'Add the player comparison overlay.',
+          'Show the release version in the footer.',
+          'Improve round score progression and bye handling.',
+        ],
+      },
+      {
+        title: 'Unreleased — Bugfixes',
+        items: [
+          'Refine drag-and-drop accessibility.',
+          'Skip non-droppable controls during keyboard drag-and-drop.',
+          'Restore top-menu focus behavior.',
+          'Stabilize the round layout.',
+          'Fix focus-mode idle scrolling.',
+          'Make tournament menus sticky.',
+          'Fix round-one pairing and lower-bracket pairing issues.',
+          'Fix bye selection and rerolling after a bye swap.',
+          'Make byes clickable in the player overlay.',
+          'Count byes as best-possible wins.',
+          'Improve dark-mode dialog contrast.',
+          'Fix player positions appearing before a match finishes.',
+          'Update container names and local start/build scripts.',
+        ],
+      },
+      {
         title: 'Releases',
         items: [
-          'Unreleased — accessibility, focus, layout, Redux, CSS module, performance, print, comparison, pairing, bye, and footer improvements.',
           'v2.1.2 — Fix time handling between rounds.',
           'v2.1.1 — Improve start-time handling and round-related UX.',
           'v2.1.0 — Enhance tournament views and round management.',
@@ -741,9 +770,38 @@ const de: DocPage[] = [
     summary: 'Veröffentlichte Versionen und die enthaltenen Änderungen.',
     sections: [
       {
+        title: 'Unveröffentlicht — Funktionen',
+        items: [
+          'Turnierstatus in Redux verschoben.',
+          'Styles in CSS-Module aufgeteilt und Tailwind entfernt.',
+          'Redux-gesteuerte Darstellung reduziert und den React Compiler aktiviert.',
+          'Druckansicht ergänzt.',
+          'Spielervergleichs-Overlay ergänzt.',
+          'Veröffentlichte Version im Footer angezeigt.',
+          'Rundenfortschritt und Freilosbehandlung verbessert.',
+        ],
+      },
+      {
+        title: 'Unveröffentlicht — Fehlerbehebungen',
+        items: [
+          'Barrierefreiheit beim Drag-and-drop verbessert.',
+          'Nicht ablegbare Bedienelemente beim Tastatur-Drag-and-drop übersprungen.',
+          'Fokusverhalten des oberen Menüs wiederhergestellt.',
+          'Rundenlayout stabilisiert.',
+          'Leerlauf-Scrolling im Fokusmodus korrigiert.',
+          'Turniermenüs fixiert.',
+          'Paarungsprobleme in Runde eins und unteren Gruppen korrigiert.',
+          'Freilosauswahl und erneutes Auslosen nach einem Freilos-Tausch korrigiert.',
+          'Freilose im Spieler-Overlay anklickbar gemacht.',
+          'Freilose als bestmögliche Siege gewertet.',
+          'Kontrast des Dialogs im dunklen Modus verbessert.',
+          'Spielerpositionen vor Abschluss einer Begegnung korrigiert.',
+          'Containernamen sowie lokale Start- und Build-Skripte aktualisiert.',
+        ],
+      },
+      {
         title: 'Veröffentlichungen',
         items: [
-          'Unveröffentlicht — Verbesserungen an Barrierefreiheit, Fokus, Layout, Redux, CSS-Modulen, Performance, Druckansicht, Vergleich, Paarungen, Freilosen und Versionsanzeige.',
           'v2.1.2 — Zeitbehandlung zwischen Runden korrigiert.',
           'v2.1.1 — Startzeitbehandlung und Runden-UX verbessert.',
           'v2.1.0 — Turnieransichten und Rundenverwaltung erweitert.',
