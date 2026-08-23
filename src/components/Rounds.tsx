@@ -6,9 +6,21 @@ import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
 import { t } from '../i18n'
-import type { Match, Participant, Round } from '../tournamentTypes'
+import type { Participant, Round } from '../tournamentTypes'
 import { getRunningMatchIdsByRound, isUnknownParticipantId } from '../tournament'
 import { useIdleRunningMatchScroll } from '../hooks/useIdleRunningMatchScroll'
+import {
+  createRound,
+  deleteRound,
+  fillUnknown,
+  reroll,
+  rerollByeCommand,
+  setRoundSettings,
+  startRound,
+  swapPlayers,
+  updateRoundMatches,
+} from '../tournamentCommands'
+import { useAppDispatch } from '../storeHooks'
 
 type Props = {
   rounds: Round[]
@@ -19,15 +31,6 @@ type Props = {
   defaultCourtCount: number
   defaultWinningGames: number
   defaultSetPoints: number
-  onCreate: () => void
-  onStart: (number: number) => void
-  onUpdate: (index: number, matches: Match[]) => void
-  onSetRoundSettings: (number: number, winningGames: number, courtCount: number) => void
-  onDelete: (number: number) => void
-  onFillUnknown: (number: number) => void
-  onReroll: (number: number) => void
-  onRerollBye: (number: number) => void
-  onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   readOnly?: boolean
 }
 
@@ -58,17 +61,9 @@ export function Rounds({
   defaultCourtCount,
   defaultWinningGames,
   defaultSetPoints,
-  onCreate,
-  onStart,
-  onUpdate,
-  onSetRoundSettings,
-  onDelete,
-  onFillUnknown,
-  onReroll,
-  onRerollBye,
-  onSwapPlayers,
   readOnly = false,
 }: Props) {
+  const dispatch = useAppDispatch()
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
   const [comparisonSelection, setComparisonSelection] = useState<ComparisonSelection | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
@@ -96,7 +91,7 @@ export function Rounds({
       return
     }
     if (keyboardMove.participantId !== participantId) {
-      onSwapPlayers(roundIndex, keyboardMove.participantId, participantId)
+      dispatch(swapPlayers(roundIndex, keyboardMove.participantId, participantId))
     }
     setKeyboardMove(null)
   }
@@ -118,14 +113,16 @@ export function Rounds({
       onCompare={(firstId, secondId) =>
         setComparisonSelection({ playerIds: [firstId, secondId], roundIndex })
       }
-      onUpdate={(matches) => onUpdate(roundIndex, matches)}
+      onUpdate={(matches) => dispatch(updateRoundMatches(roundIndex, matches))}
       onSettings={() => setSettingsRoundNumber(round.number)}
-      onStart={() => onStart(round.number)}
-      onFillUnknown={() => onFillUnknown(round.number)}
-      onReroll={() => onReroll(round.number)}
-      onRerollBye={() => onRerollBye(round.number)}
-      onDelete={() => onDelete(round.number)}
-      onSwapPlayers={(draggedId, targetId) => onSwapPlayers(roundIndex, draggedId, targetId)}
+      onStart={() => dispatch(startRound(round.number))}
+      onFillUnknown={() => dispatch(fillUnknown(round.number))}
+      onReroll={() => dispatch(reroll(round.number))}
+      onRerollBye={() => dispatch(rerollByeCommand(round.number))}
+      onDelete={() => dispatch(deleteRound(round.number))}
+      onSwapPlayers={(draggedId, targetId) =>
+        dispatch(swapPlayers(roundIndex, draggedId, targetId))
+      }
       keyboardMove={keyboardMove}
       onKeyboardSwap={(participantId) => handleKeyboardSwap(roundIndex, participantId)}
       readOnly={readOnly}
@@ -158,7 +155,11 @@ export function Rounds({
         </div>
       )}
       {!readOnly && (
-        <button className="button primary" onClick={onCreate} title={t('create')}>
+        <button
+          className="button primary"
+          onClick={() => dispatch(createRound())}
+          title={t('create')}
+        >
           <Plus size={16} aria-hidden="true" /> {t('create')}
         </button>
       )}
@@ -188,7 +189,9 @@ export function Rounds({
           round={settingsRound}
           defaultCourtCount={defaultCourtCount}
           defaultWinningGames={defaultWinningGames}
-          onSave={onSetRoundSettings}
+          onSave={(number, winningGames, courtCount) =>
+            dispatch(setRoundSettings(number, winningGames, courtCount))
+          }
           onClose={() => setSettingsRoundNumber(null)}
         />
       )}

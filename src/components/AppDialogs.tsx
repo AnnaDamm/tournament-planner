@@ -2,6 +2,8 @@ import type { RefObject } from 'react'
 import { UserPlus, X } from 'lucide-react'
 import { Dialog } from './Dialog'
 import { t } from '../i18n'
+import { addParticipants, deleteAllTournamentData } from '../tournamentCommands'
+import { useAppDispatch } from '../storeHooks'
 
 type Props = {
   participantType: 'players' | 'teams'
@@ -10,8 +12,6 @@ type Props = {
   confirmRef: RefObject<HTMLDialogElement | null>
   draft: string
   setDraft: (value: string) => void
-  onAdd: () => void
-  onDeleteAll: () => void
 }
 
 export function AppDialogs({
@@ -21,9 +21,21 @@ export function AppDialogs({
   confirmRef,
   draft,
   setDraft,
-  onAdd,
-  onDeleteAll,
 }: Props) {
+  const dispatch = useAppDispatch()
+  const onAdd = () => {
+    const names = draft
+      .split('\n')
+      .map((nameValue) => nameValue.trim())
+      .filter(Boolean)
+    dispatch(addParticipants(names))
+    setDraft('')
+    bulkRef.current?.close()
+  }
+  const onDeleteAll = () => {
+    dispatch(deleteAllTournamentData())
+    confirmRef.current?.close()
+  }
   return (
     <>
       <Dialog

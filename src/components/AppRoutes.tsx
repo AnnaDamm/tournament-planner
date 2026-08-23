@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { LocalMasterConfig } from '../liveSharing'
-import type { Match, Participant, Round, TournamentSettings } from '../tournamentTypes'
+import type { Participant, Round, TournamentSettings } from '../tournamentTypes'
 import { hasEnteredScore } from '../tournament'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
@@ -25,22 +25,7 @@ export type AppRoutesProps = {
   sort: string
   desc: boolean
   onAdd: () => void
-  onDeleteParticipant: (id: string) => void
-  onRename: (player: Participant, name: string) => void
-  onToggleWithdraw: (id: string) => void
-  onReorderParticipants: (draggedId: string, targetId: string) => void
-  onShuffleParticipants: () => void
   onToggleSort: (key: string) => void
-  onCreateRound: () => void
-  onStartRound: (number: number) => void
-  onUpdateRound: (index: number, matches: Match[]) => void
-  onSetRoundSettings: (number: number, winningGames: number, courtCount: number) => void
-  onDeleteRound: (number: number) => void
-  onFillUnknown: (number: number) => void
-  onReroll: (number: number) => void
-  onRerollBye: (number: number) => void
-  onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
-  onSaveSettings: (settings: TournamentSettings) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
@@ -62,22 +47,7 @@ export function AppRoutes({
   sort,
   desc,
   onAdd,
-  onDeleteParticipant,
-  onRename,
-  onToggleWithdraw,
-  onReorderParticipants,
-  onShuffleParticipants,
   onToggleSort,
-  onCreateRound,
-  onStartRound,
-  onUpdateRound,
-  onSetRoundSettings,
-  onDeleteRound,
-  onFillUnknown,
-  onReroll,
-  onRerollBye,
-  onSwapPlayers,
-  onSaveSettings,
   onExport,
   onImport,
   onDeleteAll,
@@ -101,11 +71,6 @@ export function AppRoutes({
             toggleSort={onToggleSort}
             desc={desc}
             onAdd={onAdd}
-            onDelete={onDeleteParticipant}
-            onRename={onRename}
-            onToggleWithdraw={onToggleWithdraw}
-            onReorder={onReorderParticipants}
-            onShuffle={onShuffleParticipants}
             canSeed={
               !readOnly &&
               !rounds.some((round) => round.matches.some((match) => hasEnteredScore(match)))
@@ -136,15 +101,6 @@ export function AppRoutes({
             defaultCourtCount={courtCount}
             defaultWinningGames={defaultWinningGames}
             defaultSetPoints={settings.defaultSetPoints}
-            onCreate={onCreateRound}
-            onStart={onStartRound}
-            onUpdate={onUpdateRound}
-            onSetRoundSettings={onSetRoundSettings}
-            onDelete={onDeleteRound}
-            onFillUnknown={onFillUnknown}
-            onReroll={onReroll}
-            onRerollBye={onRerollBye}
-            onSwapPlayers={onSwapPlayers}
             readOnly={readOnly}
           />
         }
@@ -155,13 +111,7 @@ export function AppRoutes({
           readOnly ? (
             <Navigate to="/table" replace />
           ) : (
-            <SettingsPage
-              settings={settings}
-              onSave={onSaveSettings}
-              onExport={onExport}
-              onImport={onImport}
-              onDeleteAll={onDeleteAll}
-            />
+            <SettingsPage onExport={onExport} onImport={onImport} onDeleteAll={onDeleteAll} />
           )
         }
       />

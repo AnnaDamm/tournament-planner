@@ -14,6 +14,14 @@ import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
 import { t } from '../i18n'
 import type { Participant, Round } from '../tournamentTypes'
+import {
+  deleteParticipant,
+  renameParticipant,
+  reorderParticipants,
+  shuffleParticipants,
+  toggleParticipantWithdrawal,
+} from '../tournamentCommands'
+import { useAppDispatch } from '../storeHooks'
 
 export type Stat = Participant & {
   diff: number
@@ -36,11 +44,6 @@ type Props = {
   desc: boolean
   toggleSort: (key: string) => void
   onAdd: () => void
-  onDelete: (id: string) => void
-  onRename: (player: Participant, name: string) => void
-  onToggleWithdraw: (id: string) => void
-  onReorder: (draggedId: string, targetId: string) => void
-  onShuffle: () => void
   canSeed: boolean
   readOnly?: boolean
 }
@@ -70,14 +73,10 @@ export function Table({
   desc,
   toggleSort,
   onAdd,
-  onDelete,
-  onRename,
-  onToggleWithdraw,
-  onReorder,
-  onShuffle,
   canSeed,
   readOnly = false,
 }: Props) {
+  const dispatch = useAppDispatch()
   const [editing, setEditing] = useState(false)
   const [historyPlayer, setHistoryPlayer] = useState<Participant | null>(null)
   const mostPlayed = Math.max(0, ...sorted.map((player) => player.played))
@@ -88,7 +87,11 @@ export function Table({
         {!readOnly && (
           <div className="page-actions">
             {canSeed && (
-              <button className="button ghost" onClick={onShuffle} title={t('shuffle')}>
+              <button
+                className="button ghost"
+                onClick={() => dispatch(shuffleParticipants())}
+                title={t('shuffle')}
+              >
                 <Shuffle size={16} aria-hidden="true" /> {t('shuffle')}
               </button>
             )}
@@ -182,7 +185,8 @@ export function Table({
                   onDrop={(event) => {
                     event.preventDefault()
                     const draggedId = event.dataTransfer.getData('text/plain')
-                    if (draggedId && draggedId !== player.id) onReorder(draggedId, player.id)
+                    if (draggedId && draggedId !== player.id)
+                      dispatch(reorderParticipants(draggedId, player.id))
                   }}
                 >
                   <td className="rank-cell" data-label={t('position')}>
@@ -198,7 +202,9 @@ export function Table({
                         type="text"
                         value={player.name}
                         aria-label={`${t('editName')}: ${player.name}`}
-                        onChange={(event) => onRename(player, event.target.value)}
+                        onChange={(event) =>
+                          dispatch(renameParticipant(player.id, event.target.value))
+                        }
                       />
                     ) : (
                       <button
@@ -246,7 +252,7 @@ export function Table({
                     <td className="player-actions" data-label={t('actions')}>
                       <button
                         className="status-btn"
-                        onClick={() => onToggleWithdraw(player.id)}
+                        onClick={() => dispatch(toggleParticipantWithdrawal(player.id))}
                         title={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
                         aria-label={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
                       >
@@ -258,7 +264,7 @@ export function Table({
                       </button>
                       <button
                         className="delete-btn"
-                        onClick={() => onDelete(player.id)}
+                        onClick={() => dispatch(deleteParticipant(player.id))}
                         title={t('delete')}
                         aria-label={`${t('delete')}: ${player.name}`}
                       >

@@ -19,10 +19,12 @@
     "postinstall": "if command -v git >/dev/null 2>&1; then git config core.hooksPath .githooks; fi"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "latest",
     "@vitejs/plugin-react": "latest",
     "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-redux": "latest",
     "react-router-dom": "latest",
     "tailwindcss": "latest",
     "@tailwindcss/vite": "latest",

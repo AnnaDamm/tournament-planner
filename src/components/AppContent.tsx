@@ -15,8 +15,6 @@ export function AppContent() {
           confirmRef={dialogs.confirmRef}
           draft={dialogs.draft}
           setDraft={dialogs.setDraft}
-          onAdd={dialogs.onAddParticipants}
-          onDeleteAll={dialogs.onDeleteAllConfirmed}
         />
       )}
     </>

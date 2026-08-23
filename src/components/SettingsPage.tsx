@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState, type SyntheticEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react'
 import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 import type { TournamentSettings } from '../tournamentTypes'
+import { saveTournamentSettings } from '../tournamentCommands'
+import { selectTournamentSnapshot } from '../tournamentSelectors'
+import { useAppDispatch, useAppSelector } from '../storeHooks'
 
 type SettingsDraft = {
   tournamentName: string
@@ -16,8 +19,6 @@ type SettingsDraft = {
 }
 
 type Props = {
-  settings: TournamentSettings
-  onSave: (settings: TournamentSettings) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
@@ -40,7 +41,31 @@ const createDraft = (settings: TournamentSettings): SettingsDraft => ({
 })
 
 // oxlint-disable-next-line eslint/max-lines-per-function
-export function SettingsPage({ settings, onSave, onExport, onImport, onDeleteAll }: Props) {
+export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
+  const dispatch = useAppDispatch()
+  const snapshot = useAppSelector(selectTournamentSnapshot)
+  const settings = useMemo<TournamentSettings>(
+    () => ({
+      tournamentName: snapshot.tournamentName,
+      participantType: snapshot.participantType,
+      courtCount: snapshot.courtCount,
+      defaultWinningGames: snapshot.defaultWinningGames,
+      defaultSetPoints: snapshot.defaultSetPoints,
+      expectedDurationMinutes: snapshot.expectedDurationMinutes,
+      breakBetweenMatchesMinutes: snapshot.breakBetweenMatchesMinutes,
+      scheduledStart: snapshot.scheduledStart,
+    }),
+    [
+      snapshot.breakBetweenMatchesMinutes,
+      snapshot.courtCount,
+      snapshot.defaultSetPoints,
+      snapshot.defaultWinningGames,
+      snapshot.expectedDurationMinutes,
+      snapshot.participantType,
+      snapshot.scheduledStart,
+      snapshot.tournamentName,
+    ],
+  )
   const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
@@ -74,16 +99,18 @@ export function SettingsPage({ settings, onSave, onExport, onImport, onDeleteAll
 
   const handleSave = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
-    onSave({
-      tournamentName: draft.tournamentName.trim() || 'Tourny',
-      participantType: draft.participantType,
-      courtCount: clampPositiveInteger(Number(draft.courtCount)),
-      defaultWinningGames: clampWinningGames(Number(draft.defaultWinningGames)),
-      defaultSetPoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
-      scheduledStart: draft.scheduledStart,
-      expectedDurationMinutes: clampDuration(Number(draft.expectedDurationMinutes)),
-      breakBetweenMatchesMinutes: clampBreak(Number(draft.breakBetweenMatchesMinutes)),
-    })
+    dispatch(
+      saveTournamentSettings({
+        tournamentName: draft.tournamentName.trim() || 'Tourny',
+        participantType: draft.participantType,
+        courtCount: clampPositiveInteger(Number(draft.courtCount)),
+        defaultWinningGames: clampWinningGames(Number(draft.defaultWinningGames)),
+        defaultSetPoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
+        scheduledStart: draft.scheduledStart,
+        expectedDurationMinutes: clampDuration(Number(draft.expectedDurationMinutes)),
+        breakBetweenMatchesMinutes: clampBreak(Number(draft.breakBetweenMatchesMinutes)),
+      }),
+    )
     navigate(-1)
   }
 

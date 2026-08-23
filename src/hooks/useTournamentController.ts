@@ -2,92 +2,26 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
 import type { Participant, Round, TournamentSettings } from '../tournamentTypes'
 import { parseTournamentSnapshot } from '../tournamentSnapshot'
-import {
-  createParticipant,
-  swapRoundPlayers as swapRoundPlayersInRounds,
-  toggleParticipantWithdrawal,
-  updateRoundsForCourtCount,
-} from '../tournamentActions'
 import { downloadTournament } from '../tournamentExport'
 import {
-  createRoundPlan,
-  fillUnknownRound,
   getCurrentRoundNumber,
-  getMatchResult,
-  hasEnteredScore,
   getRunningMatchIdsByRound,
+  getMatchResult,
   isUnknownParticipantId,
-  rerollRound,
-  rerollBye,
-  assignCourtsToMatches,
-  calculateExpectedMatchStarts,
-  startReadyRounds,
-  startRoundInRounds,
 } from '../tournament'
 import { t } from '../i18n'
 import type { TournamentContextValue } from '../context/TournamentContext'
+import { getLocalSession, isReadOnlyTab } from '../liveSharing'
+import { useAppDispatch, useAppSelector } from '../storeHooks'
+import { selectTournamentSnapshot } from '../tournamentSelectors'
+import {
+  getScheduledRounds,
+  importTournamentSnapshot,
+  startScheduledRound,
+  updatePredictedStarts,
+} from '../tournamentCommands'
 import { useTournamentDerivedState } from './useTournamentDerivedState'
-import { useTournamentLiveState } from './useTournamentLiveState'
-
-const buildRoundWithResult = (
-  rounds: Round[],
-  number: number,
-  winningGames: number,
-  courtCount: number,
-) =>
-  rounds.map((round) => (round.number === number ? { ...round, winningGames, courtCount } : round))
-
-const updateRoundSettings = (
-  rounds: Round[],
-  number: number,
-  winningGames: number,
-  roundCourtCount: number,
-  defaultCourtCount: number,
-) =>
-  startReadyRounds(
-    buildRoundWithResult(rounds, number, winningGames, roundCourtCount),
-    defaultCourtCount,
-  )
-
-const deleteRoundAndStartReadyRounds = (rounds: Round[], number: number, courtCount: number) =>
-  startReadyRounds(
-    rounds
-      .filter((round) => round.number !== number)
-      .map((round) => (round.number > number ? { ...round, number: round.number - 1 } : round)),
-    courtCount,
-  )
-
-const rerollRoundAndStartReadyRounds = (
-  players: Participant[],
-  rounds: Round[],
-  number: number,
-  courtCount: number,
-  defaultSetPoints: number,
-) => startReadyRounds(rerollRound(players, rounds, number, defaultSetPoints), courtCount)
-
-const rerollByeAndStartReadyRounds = (
-  players: Participant[],
-  rounds: Round[],
-  number: number,
-  courtCount: number,
-  defaultSetPoints: number,
-) => startReadyRounds(rerollBye(players, rounds, number, defaultSetPoints), courtCount)
-
-const fillRoundAndStartReadyRounds = (
-  rounds: Round[],
-  number: number,
-  players: Participant[],
-  courtCount: number,
-  defaultSetPoints: number,
-) => {
-  const index = rounds.findIndex((round) => round.number === number)
-  if (index < 0) return rounds
-  const filled = fillUnknownRound(rounds[index], players, rounds.slice(0, index), defaultSetPoints)
-  return startReadyRounds(
-    rounds.map((round, roundIndex) => (roundIndex === index ? filled : round)),
-    courtCount,
-  )
-}
+import { useLiveTournamentSync } from './useLiveTournamentSync'
 
 const openBulkDialog = (dialog: HTMLDialogElement | null, input: HTMLTextAreaElement | null) => {
   if (!dialog) return
@@ -122,88 +56,48 @@ const getNextMatchTargets = (players: Participant[], rounds: Round[], courtCount
 
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function useTournamentController(): TournamentContextValue {
-  const {
-    localMaster,
-    readOnly,
-    isLive,
-    players,
-    setPlayers,
-    tournamentName,
-    setTournamentName,
-    courtCount,
-    setCourtCount,
-    defaultWinningGames,
-    setDefaultWinningGames,
-    defaultSetPoints,
-    setDefaultSetPoints,
-    rounds,
-    setRounds,
-    participantType,
-    setParticipantType,
-    scheduledStart,
-    setScheduledStart,
-    expectedDurationMinutes,
-    setExpectedDurationMinutes,
-    breakBetweenMatchesMinutes,
-    setBreakBetweenMatchesMinutes,
-  } = useTournamentLiveState()
+  const dispatch = useAppDispatch()
+  const snapshot = useAppSelector(selectTournamentSnapshot)
+  const localSession = useMemo(() => getLocalSession(), [])
+  const readOnlyTab = isReadOnlyTab()
+  const localMaster = localSession?.role === 'master' ? localSession : null
+  const readOnly = localSession?.role === 'viewer' || readOnlyTab
+  const syncSession = readOnlyTab ? null : localSession
   const [sort, setSort] = useState('position')
   const [desc, setDesc] = useState(true)
   const [draft, setDraft] = useState('')
   const bulkRef = useRef<HTMLDialogElement>(null)
   const bulkInputRef = useRef<HTMLTextAreaElement>(null)
   const confirmRef = useRef<HTMLDialogElement>(null)
+  const {
+    players,
+    rounds,
+    tournamentName,
+    courtCount,
+    defaultWinningGames,
+    defaultSetPoints,
+    participantType,
+    scheduledStart,
+    expectedDurationMinutes,
+    breakBetweenMatchesMinutes,
+  } = snapshot
+
   useEffect(() => {
     document.title = `${tournamentName} — Tournament Manager`
   }, [tournamentName])
+
   useEffect(() => {
     if (readOnly || !scheduledStart) return
     const startAt = new Date(scheduledStart).getTime()
     if (!Number.isFinite(startAt)) return
-    const startScheduledRound = () => {
+    const checkScheduledRound = () => {
       if (Date.now() < startAt) return
-      if (players.filter((player) => !player.withdrawn).length < 2) return
-      setRounds((current) => {
-        if (current.some((round) => round.startedAt)) return current
-        const existing = current[0]
-        const plan = createRoundPlan(players, [], 1, undefined, defaultSetPoints)
-        const firstRound = existing
-          ? {
-              ...existing,
-              bye: plan.bye,
-              matches: existing.matches.length ? existing.matches : plan.matches,
-              standings: plan.standings,
-            }
-          : {
-              number: 1,
-              bye: plan.bye,
-              winningGames: defaultWinningGames,
-              courtCount,
-              matches: plan.matches,
-              standings: plan.standings,
-            }
-        const next = existing ? [firstRound, ...current.slice(1)] : [firstRound]
-        return assignCourtsToMatches(
-          startRoundInRounds(next, 1, new Date(startAt).toISOString()),
-          courtCount,
-          new Date(startAt).toISOString(),
-        )
-      })
-      setScheduledStart('')
+      dispatch(startScheduledRound(startAt))
     }
-    startScheduledRound()
-    const timer = window.setInterval(startScheduledRound, 1000)
+    checkScheduledRound()
+    const timer = window.setInterval(checkScheduledRound, 1000)
     return () => window.clearInterval(timer)
-  }, [
-    courtCount,
-    defaultWinningGames,
-    defaultSetPoints,
-    players,
-    readOnly,
-    scheduledStart,
-    setRounds,
-    setScheduledStart,
-  ])
+  }, [dispatch, readOnly, scheduledStart])
 
   const { standingsBeforeRounds, participantOrderByRound, sorted } = useTournamentDerivedState(
     players,
@@ -213,50 +107,19 @@ export function useTournamentController(): TournamentContextValue {
     desc,
   )
   const scheduledRounds = useMemo(
-    () =>
-      calculateExpectedMatchStarts(
-        rounds,
-        courtCount,
-        expectedDurationMinutes,
-        breakBetweenMatchesMinutes,
-        scheduledStart,
-        Math.floor(players.filter((player) => !player.withdrawn).length / 2),
-      ),
-    [
-      breakBetweenMatchesMinutes,
-      courtCount,
-      expectedDurationMinutes,
-      players,
-      rounds,
-      scheduledStart,
-    ],
+    () => getScheduledRounds(snapshot, scheduledStart),
+    [snapshot, scheduledStart],
   )
+
   useEffect(() => {
-    setRounds((current) => {
-      let changed = false
-      const next = current.map((round, index) => {
-        const scheduledRound = scheduledRounds[index]
-        if (!scheduledRound) return round
-        const matchesChanged = round.matches.some(
-          (match, matchIndex) =>
-            match.predictedStart !== scheduledRound.matches[matchIndex]?.predictedStart,
-        )
-        if (!matchesChanged && round.predictedStart === scheduledRound.predictedStart) {
-          return round
-        }
-        changed = true
-        return {
-          ...round,
-          predictedStart: scheduledRound.predictedStart,
-          matches: round.matches.map((match, matchIndex) => ({
-            ...match,
-            predictedStart: scheduledRound.matches[matchIndex]?.predictedStart,
-          })),
-        }
-      })
-      return changed ? next : current
-    })
-  }, [scheduledRounds, setRounds])
+    dispatch(updatePredictedStarts(scheduledRounds))
+  }, [dispatch, scheduledRounds])
+
+  const isLive = useLiveTournamentSync({
+    session: syncSession,
+    snapshot,
+    onSnapshot: (incoming) => dispatch(importTournamentSnapshot(incoming)),
+  })
   const nextMatchTargets = useMemo(
     () => getNextMatchTargets(players, rounds, courtCount),
     [courtCount, players, rounds],
@@ -279,134 +142,6 @@ export function useTournamentController(): TournamentContextValue {
   }
   const toggleSort = (key: string) =>
     sort === key ? setDesc((value) => !value) : (setSort(key), setDesc(key !== 'name'))
-  const updateRound = (index: number, matches: Round['matches']) =>
-    setRounds((current) => {
-      const previousMatches = current[index]?.matches ?? []
-      const completedMatch = matches.some((match) => {
-        const previousMatch = previousMatches.find((item) => item.id === match.id)
-        const winningGames = Math.max(1, current[index]?.winningGames || 1)
-        return (
-          getMatchResult(match, winningGames) &&
-          !getMatchResult(previousMatch ?? match, winningGames)
-        )
-      })
-      const nextStart = new Date(
-        Date.now() + (completedMatch ? breakBetweenMatchesMinutes * 60_000 : 0),
-      ).toISOString()
-      return startReadyRounds(
-        current.map((round, roundIndex) => (roundIndex === index ? { ...round, matches } : round)),
-        courtCount,
-        nextStart,
-      )
-    })
-  const startRound = (number: number) =>
-    setRounds((current) => assignCourtsToMatches(startRoundInRounds(current, number), courtCount))
-  const swapRoundPlayers = (roundIndex: number, draggedId: string, targetId: string) =>
-    setRounds((current) => swapRoundPlayersInRounds(current, roundIndex, draggedId, targetId))
-  const updateParticipantOrder = (ordered: Participant[]) => {
-    setPlayers(ordered)
-    setRounds((current) =>
-      current.some((round) => round.matches.some((match) => hasEnteredScore(match)))
-        ? current
-        : rerollRound(ordered, current, 1, defaultSetPoints),
-    )
-  }
-  const reorderParticipants = (draggedId: string, targetId: string) => {
-    const next = [...players]
-    const from = next.findIndex((player) => player.id === draggedId)
-    const to = next.findIndex((player) => player.id === targetId)
-    if (from < 0 || to < 0) return
-    const [dragged] = next.splice(from, 1)
-    next.splice(to, 0, dragged)
-    updateParticipantOrder(next)
-  }
-  const shuffleParticipants = () => {
-    const next = [...players]
-    for (let index = next.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1))
-      ;[next[index], next[swapIndex]] = [next[swapIndex], next[index]]
-    }
-    updateParticipantOrder(next)
-  }
-  const makeRound = () => {
-    if (players.filter((player) => !player.withdrawn).length < 2) return
-    setRounds((current) => {
-      const number = current.length + 1
-      const previousRound = current.at(-1)
-      return [
-        ...current,
-        {
-          number,
-          bye: null,
-          winningGames: previousRound?.winningGames ?? defaultWinningGames,
-          courtCount: previousRound?.courtCount ?? courtCount,
-          matches: [],
-        },
-      ]
-    })
-  }
-  const addBulk = () => {
-    const names = draft
-      .split('\n')
-      .map((nameValue) => nameValue.trim())
-      .filter(Boolean)
-    setPlayers((current) => [...current, ...names.map(createParticipant)])
-    setDraft('')
-    bulkRef.current?.close()
-  }
-  const rename = (player: Participant, value: string) =>
-    setPlayers((current) =>
-      current.map((item) => (item.id === player.id ? { ...item, name: value } : item)),
-    )
-  const deleteAll = () => {
-    setPlayers([])
-    setRounds([])
-    confirmRef.current?.close()
-  }
-  const exportTournament = () =>
-    downloadTournament({
-      version: 1,
-      tournamentName,
-      players,
-      rounds,
-      participantType,
-      courtCount,
-      defaultWinningGames,
-      defaultSetPoints,
-      expectedDurationMinutes,
-      breakBetweenMatchesMinutes,
-      scheduledStart,
-    })
-  const importTournament = async (file: File) => {
-    try {
-      const snapshot = parseTournamentSnapshot(JSON.parse(await file.text()))
-      if (!snapshot) return false
-      setTournamentName(snapshot.tournamentName)
-      setPlayers(snapshot.players)
-      setRounds(startReadyRounds(snapshot.rounds, snapshot.courtCount))
-      setParticipantType(snapshot.participantType)
-      setCourtCount(snapshot.courtCount)
-      setDefaultWinningGames(snapshot.defaultWinningGames)
-      setDefaultSetPoints(snapshot.defaultSetPoints)
-      setExpectedDurationMinutes(snapshot.expectedDurationMinutes ?? 25)
-      setBreakBetweenMatchesMinutes(snapshot.breakBetweenMatchesMinutes ?? 5)
-      setScheduledStart(snapshot.scheduledStart ?? '')
-      return true
-    } catch {
-      return false
-    }
-  }
-  const saveSettings = (nextSettings: TournamentSettings) => {
-    setTournamentName(nextSettings.tournamentName)
-    setParticipantType(nextSettings.participantType)
-    setCourtCount(nextSettings.courtCount)
-    setRounds((current) => updateRoundsForCourtCount(current, nextSettings.courtCount))
-    setDefaultWinningGames(nextSettings.defaultWinningGames)
-    setDefaultSetPoints(nextSettings.defaultSetPoints)
-    setScheduledStart(nextSettings.scheduledStart)
-    setExpectedDurationMinutes(nextSettings.expectedDurationMinutes)
-    setBreakBetweenMatchesMinutes(nextSettings.breakBetweenMatchesMinutes)
-  }
   const settings = useMemo<TournamentSettings>(
     () => ({
       tournamentName,
@@ -429,6 +164,18 @@ export function useTournamentController(): TournamentContextValue {
       tournamentName,
     ],
   )
+  const exportTournament = () => downloadTournament(snapshot)
+  const importTournament = async (file: File) => {
+    try {
+      const imported = parseTournamentSnapshot(JSON.parse(await file.text()))
+      if (!imported) return false
+      dispatch(importTournamentSnapshot(imported))
+      return true
+    } catch {
+      return false
+    }
+  }
+  const recordRoute = (roundIndex: number, id: string) => recordBeforeRound(roundIndex, id)
   const routes: AppRoutesProps = {
     localMaster,
     readOnly,
@@ -440,42 +187,13 @@ export function useTournamentController(): TournamentContextValue {
     defaultWinningGames,
     settings,
     name,
-    record: recordBeforeRound,
+    record: recordRoute,
     participantOrderByRound,
     sorted,
     sort,
     desc,
     onAdd: () => openBulkDialog(bulkRef.current, bulkInputRef.current),
-    onDeleteParticipant: (id) =>
-      setPlayers((current) => current.filter((player) => player.id !== id)),
-    onRename: rename,
-    onToggleWithdraw: (id) => setPlayers((current) => toggleParticipantWithdrawal(current, id)),
-    onReorderParticipants: reorderParticipants,
-    onShuffleParticipants: shuffleParticipants,
     onToggleSort: toggleSort,
-    onCreateRound: makeRound,
-    onStartRound: startRound,
-    onUpdateRound: updateRound,
-    onSetRoundSettings: (number, winningGames, roundCourtCount) =>
-      setRounds((current) =>
-        updateRoundSettings(current, number, winningGames, roundCourtCount, courtCount),
-      ),
-    onDeleteRound: (number) =>
-      setRounds((current) => deleteRoundAndStartReadyRounds(current, number, courtCount)),
-    onFillUnknown: (number) =>
-      setRounds((current) =>
-        fillRoundAndStartReadyRounds(current, number, players, courtCount, defaultSetPoints),
-      ),
-    onReroll: (number) =>
-      setRounds((current) =>
-        rerollRoundAndStartReadyRounds(players, current, number, courtCount, defaultSetPoints),
-      ),
-    onRerollBye: (number) =>
-      setRounds((current) =>
-        rerollByeAndStartReadyRounds(players, current, number, courtCount, defaultSetPoints),
-      ),
-    onSwapPlayers: swapRoundPlayers,
-    onSaveSettings: saveSettings,
     onExport: exportTournament,
     onImport: importTournament,
     onDeleteAll: () => confirmRef.current?.showModal(),
@@ -502,8 +220,6 @@ export function useTournamentController(): TournamentContextValue {
       confirmRef,
       draft,
       setDraft,
-      onAddParticipants: addBulk,
-      onDeleteAllConfirmed: deleteAll,
     },
   }
 }

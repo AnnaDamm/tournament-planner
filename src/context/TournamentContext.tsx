@@ -22,8 +22,6 @@ type DialogState = {
   confirmRef: RefObject<HTMLDialogElement | null>
   draft: string
   setDraft: (value: string) => void
-  onAddParticipants: () => void
-  onDeleteAllConfirmed: () => void
 }
 
 export type TournamentContextValue = {
@@ -40,7 +38,7 @@ export function useTournament() {
   return context
 }
 
-export function TournamentProvider({ children }: { children: ReactNode }) {
+export function TournamentContextBridge({ children }: { children: ReactNode }) {
   const value = useTournamentController()
   return <TournamentContext.Provider value={value}>{children}</TournamentContext.Provider>
 }
