@@ -295,9 +295,6 @@ export function AppLayout({
     <>
       {mobile && (
         <div className="mobile-nav-head">
-          <div className="side-label" aria-hidden="true">
-            {t('tournament')}
-          </div>
           <button
             className="icon-btn mobile-nav-close"
             id="mobile-nav-close"
@@ -311,11 +308,6 @@ export function AppLayout({
           >
             <X size={20} aria-hidden="true" />
           </button>
-        </div>
-      )}
-      {!mobile && (
-        <div className="side-label" aria-hidden="true">
-          {t('tournament')}
         </div>
       )}
       {navigation.map(({ label, target, icon: Icon }) => (

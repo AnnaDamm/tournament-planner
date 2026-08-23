@@ -84,7 +84,7 @@ export function Table({
   const hasDuplicateNames = hasDuplicateParticipantNames(sorted)
   return (
     <>
-      <PageTitle eyebrow={t('ranking')} title={t('table')}>
+      <PageTitle title={t('table')}>
         {!readOnly && (
           <div className="page-actions">
             {canSeed && (

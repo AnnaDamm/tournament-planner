@@ -103,7 +103,6 @@ export function SettingsPage({ settings, onSave, onExport, onImport, onDeleteAll
       <section className="settings-drawer">
         <div className="settings-drawer-head">
           <div>
-            <div className="eyebrow">{t('tournament')}</div>
             <h1 id="settings-title">{t('settings')}</h1>
           </div>
           <button

@@ -1,4 +1,4 @@
-import { BookOpen, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { Navigate, NavLink, useParams } from 'react-router-dom'
 import { getDocs } from '../docs/content'
 import { locale } from '../i18n'
@@ -14,10 +14,6 @@ export function DocumentationPage() {
   return (
     <div className="docs-layout">
       <nav className="docs-nav" aria-label={locale === 'de' ? 'Dokumentation' : 'Documentation'}>
-        <div className="docs-nav-title">
-          <BookOpen size={18} aria-hidden="true" />{' '}
-          {locale === 'de' ? 'Dokumentation' : 'Documentation'}
-        </div>
         {docs.map((item) => (
           <NavLink key={item.slug} to={`/docs/${item.slug}`}>
             {item.title} <ChevronRight size={14} aria-hidden="true" />
@@ -25,9 +21,6 @@ export function DocumentationPage() {
         ))}
       </nav>
       <article className="docs-article">
-        <div className="docs-eyebrow" aria-hidden="true">
-          TOURNY · {locale === 'de' ? 'DOKUMENTATION' : 'DOCUMENTATION'}
-        </div>
         <h1>{page.title}</h1>
         <p className="docs-summary">{page.summary}</p>
         {page.sections.map((section, index) => (

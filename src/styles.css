@@ -722,6 +722,7 @@ select {
   display: flex;
   gap: 8px;
   margin-left: auto;
+  padding-inline-end: clamp(12px, 1vw, 24px);
 }
 .set-label {
   color: #a0aaa5;
@@ -850,6 +851,7 @@ select {
 .match.running {
   background: #fffdf0;
   box-shadow: inset 4px 0 #b9ea5b;
+  padding-inline-start: clamp(12px, 1vw, 24px);
 }
 .match.search-target {
   animation: search-target-pulse 1.8s ease-out;
@@ -1163,7 +1165,7 @@ html.header-overlay-active.fullscreen-header-visible header {
 }
 .readonly-focus-mode .content {
   padding-block: clamp(8px, 0.8vw, 14px);
-  padding-inline: 0;
+  padding-inline: clamp(16px, 3vw, 48px);
 }
 .readonly-focus-mode .page-title h1 {
   font-size: clamp(75px, 6.3vw, 132px);
@@ -1175,16 +1177,30 @@ html.header-overlay-active.fullscreen-header-visible header {
 .readonly-focus-mode .round-head h2 {
   font-size: clamp(45px, 3.3vw, 69px);
 }
+.readonly-focus-mode .bye-pill {
+  gap: clamp(8px, 0.6vw, 12px);
+  padding: clamp(8px, 0.6vw, 14px) clamp(14px, 1vw, 22px);
+  font-size: clamp(36px, 2.4vw, 54px);
+  line-height: 1.2;
+}
 .readonly-focus-mode .round-card {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding: clamp(6px, 0.6vw, 12px);
+  background: #fff;
+  border: 1px solid #e4eae5;
+  border-radius: 10px;
+  padding-block: clamp(14px, 1.2vw, 24px);
+  padding-inline-start: clamp(18px, 1.6vw, 32px);
+  padding-inline-end: clamp(32px, 2.5vw, 52px);
 }
 .readonly-focus-mode .round-card.current-round {
   background: #eef3ec;
   border: 1px solid #cbd8c9;
   border-radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  .readonly-focus-mode .round-card:not(.current-round) {
+    background: #17201c;
+    border-color: #2c3931;
+  }
 }
 .readonly-focus-mode .match {
   gap: clamp(8px, 0.8vw, 16px);
@@ -1202,6 +1218,11 @@ html.header-overlay-active.fullscreen-header-visible header {
 .readonly-focus-mode .drag-hint {
   width: clamp(200px, 18vw, 400px);
 }
+.readonly-focus-mode .match-player {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+}
 .readonly-focus-mode .match-player-name {
   font-size: clamp(36px, 2.4vw, 54px);
 }
@@ -1216,6 +1237,12 @@ html.header-overlay-active.fullscreen-header-visible header {
 .readonly-focus-mode .score-readonly .score-value,
 .readonly-focus-mode .match-score {
   font-size: clamp(42px, 3vw, 66px);
+}
+.readonly-focus-mode .set-scores {
+  flex: 0 0 clamp(220px, 21vw, 360px);
+  width: clamp(220px, 21vw, 360px);
+  justify-content: flex-end;
+  gap: clamp(10px, 0.8vw, 16px);
 }
 .view-rotation-active svg {
   animation: view-rotation-spin 6s linear infinite;
@@ -3233,7 +3260,7 @@ dialog.settings-modal:not([open]) {
 }
 .readonly-focus-mode .page-title {
   margin-bottom: clamp(6px, 0.6vw, 12px);
-  margin-inline-start: clamp(12px, 1.5vw, 24px);
+  margin-inline-start: 0;
 }
 .readonly-focus-mode .page-title .eyebrow {
   display: none;
@@ -3573,6 +3600,26 @@ html.header-overlay-active.focus-mode-active .top-menu-slot:focus-within .top-me
   border-top: 1px solid #cbd8c9;
 }
 
+.readonly-focus-mode .current-round-group {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.5vw, 28px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.readonly-focus-mode .current-round-group .round-card {
+  padding-inline-start: clamp(18px, 1.6vw, 32px);
+  padding-inline-end: clamp(32px, 2.5vw, 52px);
+  border: 1px solid #cbd8c9;
+  border-radius: 10px;
+  background: #eef3ec;
+}
+.readonly-focus-mode .current-round-group .round-card + .round-card {
+  border-top: 1px solid #cbd8c9;
+}
+
 @media (prefers-color-scheme: dark) {
   .current-round-group {
     background: #243026;
@@ -3581,6 +3628,15 @@ html.header-overlay-active.focus-mode-active .top-menu-slot:focus-within .top-me
   .current-round-group .round-card + .round-card {
     border-color: #425443;
   }
+
+  .readonly-focus-mode .current-round-group .round-card {
+    border-color: #425443;
+    background: #243026;
+  }
+}
+
+.app-shell:not(.readonly-focus-mode) .match {
+  padding-block: clamp(7px, 0.6vw, 12px);
 }
 
 @media print {

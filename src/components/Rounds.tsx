@@ -135,7 +135,7 @@ export function Rounds({
   const currentGroupEnd = lastRunningRoundIndex ?? -1
   return (
     <>
-      <PageTitle eyebrow={t('schedule')} title={t('rounds')} />
+      <PageTitle title={t('rounds')} />
       {rounds.length === 0 ? (
         <div className="empty">
           <Trophy size={30} aria-hidden="true" />

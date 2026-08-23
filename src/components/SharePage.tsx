@@ -28,7 +28,7 @@ export function SharePage({ viewerUrl }: Props) {
 
   return (
     <>
-      <PageTitle eyebrow={t('liveView')} title={t('shareTournament')} />
+      <PageTitle title={t('shareTournament')} />
       <section className="share-card" aria-labelledby="share-title">
         <div className="share-copy">
           <div className="share-icon" aria-hidden="true">
