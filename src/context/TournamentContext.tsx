@@ -1,44 +1,64 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { RefObject } from 'react'
-import type { AppRoutesProps } from '../components/AppRoutes'
 import { useTournamentController } from '../hooks/useTournamentController'
 import type { LocalMasterConfig } from '../liveSharing'
 
-type LayoutState = {
-  tournamentName: string
+export type TournamentSession = {
   localMaster: LocalMasterConfig | null
   readOnly: boolean
   isLive: boolean
-  participantNames: string[]
-  participantTargets: { participantName: string; participantId: string }[]
-  nextMatchTargets: { participantName: string; matchId: string }[]
-  roundCount: number
-  currentRound: number
 }
 
-type DialogState = {
+export type TournamentDialogRefs = {
   bulkRef: RefObject<HTMLDialogElement | null>
   bulkInputRef: RefObject<HTMLTextAreaElement | null>
   confirmRef: RefObject<HTMLDialogElement | null>
+}
+
+export type TournamentDraft = {
   draft: string
   setDraft: (value: string) => void
 }
 
-export type TournamentContextValue = {
-  layout: LayoutState
-  routes: AppRoutesProps
-  dialogs: DialogState
+type TournamentContexts = {
+  session: TournamentSession
+  dialogRefs: TournamentDialogRefs
+  draft: TournamentDraft
 }
 
-const TournamentContext = createContext<TournamentContextValue | null>(null)
+const TournamentSessionContext = createContext<TournamentSession | null>(null)
+const TournamentDialogRefsContext = createContext<TournamentDialogRefs | null>(null)
+const TournamentDraftContext = createContext<TournamentDraft | null>(null)
 
 export function useTournament() {
-  const context = useContext(TournamentContext)
-  if (!context) throw new Error('useTournament must be used inside TournamentProvider')
-  return context
+  const session = useContext(TournamentSessionContext)
+  if (!session) throw new Error('useTournament must be used inside TournamentProvider')
+  return session
+}
+
+export function useTournamentDialogRefs() {
+  const dialogRefs = useContext(TournamentDialogRefsContext)
+  if (!dialogRefs) throw new Error('useTournamentDialogRefs must be used inside TournamentProvider')
+  return dialogRefs
+}
+
+export function useTournamentDraft() {
+  const draft = useContext(TournamentDraftContext)
+  if (!draft) throw new Error('useTournamentDraft must be used inside TournamentProvider')
+  return draft
 }
 
 export function TournamentContextBridge({ children }: { children: ReactNode }) {
-  const value = useTournamentController()
-  return <TournamentContext.Provider value={value}>{children}</TournamentContext.Provider>
+  const { session, dialogRefs, draft } = useTournamentController()
+  const contexts: TournamentContexts = { session, dialogRefs, draft }
+
+  return (
+    <TournamentSessionContext.Provider value={contexts.session}>
+      <TournamentDialogRefsContext.Provider value={contexts.dialogRefs}>
+        <TournamentDraftContext.Provider value={contexts.draft}>
+          {children}
+        </TournamentDraftContext.Provider>
+      </TournamentDialogRefsContext.Provider>
+    </TournamentSessionContext.Provider>
+  )
 }

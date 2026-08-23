@@ -1,57 +1,103 @@
+import { useCallback, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { LocalMasterConfig } from '../liveSharing'
-import type { Participant, Round, TournamentSettings } from '../tournamentTypes'
-import { hasEnteredScore } from '../tournament'
+import { t } from '../i18n'
+import { downloadTournament } from '../tournamentExport'
+import { parseTournamentSnapshot } from '../tournamentSnapshot'
+import { hasEnteredScore, getMatchResult, isUnknownParticipantId } from '../tournament'
+import {
+  selectCourtCount,
+  selectDefaultSetPoints,
+  selectDefaultWinningGames,
+  selectParticipantOrderByRound,
+  selectParticipantType,
+  selectPlayers,
+  selectRounds,
+  selectScheduledRounds,
+  selectSortedParticipants,
+  selectStandingsBeforeRounds,
+} from '../tournamentSelectors'
+import { importTournamentSnapshot } from '../tournamentCommands'
+import { useAppDispatch, useAppSelector, useAppStore } from '../storeHooks'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
 import { SharePage } from './SharePage'
-import { Table, type Stat } from './Table'
+import { Table } from './Table'
 import { DocumentationPage } from './DocumentationPage'
 
 export type AppRoutesProps = {
   localMaster: LocalMasterConfig | null
   readOnly: boolean
-  players: Participant[]
-  participantLabel: string
-  rounds: Round[]
-  participantType: 'players' | 'teams'
-  courtCount: number
-  defaultWinningGames: number
-  settings: TournamentSettings
-  name: (id: string) => string
-  record: (roundIndex: number, id: string) => string
-  participantOrderByRound: string[][]
-  sorted: Stat[]
-  sort: string
-  desc: boolean
   onAdd: () => void
-  onToggleSort: (key: string) => void
-  onExport: () => void
-  onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
 }
 
-export function AppRoutes({
-  localMaster,
-  readOnly,
-  players,
-  participantLabel,
-  rounds,
-  courtCount,
-  defaultWinningGames,
-  settings,
-  name,
-  record,
-  participantOrderByRound,
-  sorted,
-  sort,
-  desc,
-  onAdd,
-  onToggleSort,
-  onExport,
-  onImport,
-  onDeleteAll,
-}: AppRoutesProps) {
+export function AppRoutes({ localMaster, readOnly, onAdd, onDeleteAll }: AppRoutesProps) {
+  const dispatch = useAppDispatch()
+  const store = useAppStore()
+  const [sort, setSort] = useState('position')
+  const [desc, setDesc] = useState(true)
+  const players = useAppSelector(selectPlayers)
+  const rounds = useAppSelector(selectRounds)
+  const scheduledRounds = useAppSelector(selectScheduledRounds)
+  const participantOrderByRound = useAppSelector(selectParticipantOrderByRound)
+  const defaultSetPoints = useAppSelector(selectDefaultSetPoints)
+  const defaultWinningGames = useAppSelector(selectDefaultWinningGames)
+  const courtCount = useAppSelector(selectCourtCount)
+  const participantType = useAppSelector(selectParticipantType)
+  const standingsBeforeRounds = useAppSelector(selectStandingsBeforeRounds)
+  const sorted = useAppSelector((state) => selectSortedParticipants(state, sort, desc))
+  const participantLabel = participantType === 'teams' ? t('teams') : t('players')
+
+  const name = useCallback(
+    (id: string) =>
+      isUnknownParticipantId(id)
+        ? t('notYetKnown')
+        : players.find((player) => player.id === id)?.name || t('unknown'),
+    [players],
+  )
+  const record = useCallback(
+    (roundIndex: number, id: string) => {
+      const player = standingsBeforeRounds[roundIndex]?.find((item) => item.id === id)
+      if (!player) return '—'
+
+      const round = rounds[roundIndex]
+      const match = round?.matches.find((item) => item.a === id || item.b === id)
+      const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
+      const nextWins = result?.winner === id ? player.wins + 1 : player.wins
+
+      return result ? `${player.wins} → ${nextWins}` : String(player.wins)
+    },
+    [rounds, standingsBeforeRounds],
+  )
+  const toggleSort = useCallback(
+    (key: string) => {
+      if (sort === key) setDesc((value) => !value)
+      else {
+        setSort(key)
+        setDesc(key !== 'name')
+      }
+    },
+    [sort],
+  )
+  const exportTournament = useCallback(
+    () => downloadTournament(store.getState().tournament),
+    [store],
+  )
+  const importTournament = useCallback(
+    async (file: File) => {
+      try {
+        const imported = parseTournamentSnapshot(JSON.parse(await file.text()))
+        if (!imported) return false
+        dispatch(importTournamentSnapshot(imported))
+        return true
+      } catch {
+        return false
+      }
+    },
+    [dispatch],
+  )
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/table" replace />} />
@@ -63,12 +109,12 @@ export function AppRoutes({
             sorted={sorted}
             players={players}
             defaultCourtCount={courtCount}
-            defaultSetPoints={settings.defaultSetPoints}
+            defaultSetPoints={defaultSetPoints}
             participantLabel={participantLabel}
-            rounds={rounds}
+            rounds={scheduledRounds}
             name={name}
             sort={sort}
-            toggleSort={onToggleSort}
+            toggleSort={toggleSort}
             desc={desc}
             onAdd={onAdd}
             canSeed={
@@ -93,14 +139,14 @@ export function AppRoutes({
         path="/rounds"
         element={
           <Rounds
-            rounds={rounds}
+            rounds={scheduledRounds}
             players={players}
             participantOrderByRound={participantOrderByRound}
             name={name}
             record={record}
             defaultCourtCount={courtCount}
             defaultWinningGames={defaultWinningGames}
-            defaultSetPoints={settings.defaultSetPoints}
+            defaultSetPoints={defaultSetPoints}
             readOnly={readOnly}
           />
         }
@@ -111,7 +157,11 @@ export function AppRoutes({
           readOnly ? (
             <Navigate to="/table" replace />
           ) : (
-            <SettingsPage onExport={onExport} onImport={onImport} onDeleteAll={onDeleteAll} />
+            <SettingsPage
+              onExport={exportTournament}
+              onImport={importTournament}
+              onDeleteAll={onDeleteAll}
+            />
           )
         }
       />

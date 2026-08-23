@@ -32,6 +32,8 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
+    "@rolldown/plugin-babel": "latest",
+    "babel-plugin-react-compiler": "latest",
     "oxlint": "latest",
     "typescript": "latest",
     "prettier": "latest",

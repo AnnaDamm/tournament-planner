@@ -1,4 +1,5 @@
 import { CalendarClock, Clock, GripVertical } from 'lucide-react'
+import { memo, useCallback, useMemo } from 'react'
 import { MatchRow } from './MatchRow'
 import { RoundActions } from './RoundActions'
 import { t } from '../i18n'
@@ -14,23 +15,23 @@ type Props = {
   currentRoundNumber: number | undefined
   runningMatchIds: Set<string>
   name: (id: string) => string
-  record: (id: string) => string
+  record: (roundIndex: number, id: string) => string
   onPlayerClick: (id: string) => void
-  onCompare: (firstId: string, secondId: string) => void
-  onUpdate: (matches: Match[]) => void
-  onSettings: () => void
-  onStart: () => void
-  onFillUnknown: () => void
-  onReroll: () => void
-  onRerollBye: () => void
-  onDelete: () => void
-  onSwapPlayers: (draggedId: string, targetId: string) => void
+  onCompare: (firstId: string, secondId: string, roundIndex: number) => void
+  onUpdate: (roundIndex: number, match: Match) => void
+  onSettings: (roundNumber: number) => void
+  onStart: (roundNumber: number) => void
+  onFillUnknown: (roundNumber: number) => void
+  onReroll: (roundNumber: number) => void
+  onRerollBye: (roundNumber: number) => void
+  onDelete: (roundNumber: number) => void
+  onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   keyboardMove: { roundIndex: number; participantId: string } | null
-  onKeyboardSwap: (participantId: string) => void
+  onKeyboardSwap: (roundIndex: number, participantId: string) => void
   readOnly: boolean
 }
 
-export function RoundSection({
+export const RoundSection = memo(function RoundSection({
   round,
   roundIndex,
   nextRoundStarted,
@@ -56,7 +57,36 @@ export function RoundSection({
 }: Props) {
   const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(round)
   const isCurrentRound = runningMatchIds.size > 0
-  const orderedMatches = sortMatchesByParticipantOrder(round.matches, participantOrder)
+  const orderedMatches = useMemo(
+    () => sortMatchesByParticipantOrder(round.matches, participantOrder),
+    [participantOrder, round.matches],
+  )
+  const getRecord = useCallback((id: string) => record(roundIndex, id), [record, roundIndex])
+  const handleCompare = useCallback(
+    (firstId: string, secondId: string) => onCompare(firstId, secondId, roundIndex),
+    [onCompare, roundIndex],
+  )
+  const handleUpdate = useCallback(
+    (match: Match) => onUpdate(roundIndex, match),
+    [onUpdate, roundIndex],
+  )
+  const handleSettings = useCallback(() => onSettings(round.number), [onSettings, round.number])
+  const handleStart = useCallback(() => onStart(round.number), [onStart, round.number])
+  const handleFillUnknown = useCallback(
+    () => onFillUnknown(round.number),
+    [onFillUnknown, round.number],
+  )
+  const handleReroll = useCallback(() => onReroll(round.number), [onReroll, round.number])
+  const handleRerollBye = useCallback(() => onRerollBye(round.number), [onRerollBye, round.number])
+  const handleDelete = useCallback(() => onDelete(round.number), [onDelete, round.number])
+  const handleSwapPlayers = useCallback(
+    (draggedId: string, targetId: string) => onSwapPlayers(roundIndex, draggedId, targetId),
+    [onSwapPlayers, roundIndex],
+  )
+  const handleKeyboardSwap = useCallback(
+    (participantId: string) => onKeyboardSwap(roundIndex, participantId),
+    [onKeyboardSwap, roundIndex],
+  )
 
   return (
     <section
@@ -108,7 +138,7 @@ export function RoundSection({
                     canReorderBye &&
                     event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
                   ) {
-                    onSwapPlayers(event.dataTransfer.getData('text/plain'), round.bye ?? '')
+                    handleSwapPlayers(event.dataTransfer.getData('text/plain'), round.bye ?? '')
                   }
                 }}
               >
@@ -122,7 +152,7 @@ export function RoundSection({
                       keyboardMove?.roundIndex === roundIndex &&
                       keyboardMove.participantId === round.bye
                     }
-                    onClick={() => onKeyboardSwap(round.bye ?? '')}
+                    onClick={() => handleKeyboardSwap(round.bye ?? '')}
                   >
                     <GripVertical size={14} aria-hidden="true" />
                   </button>
@@ -143,12 +173,12 @@ export function RoundSection({
           <RoundActions
             round={round}
             canCalculatePairings={canCalculatePairings}
-            onSettings={onSettings}
-            onStart={onStart}
-            onFillUnknown={onFillUnknown}
-            onReroll={onReroll}
-            onRerollBye={onRerollBye}
-            onDelete={onDelete}
+            onSettings={handleSettings}
+            onStart={handleStart}
+            onFillUnknown={handleFillUnknown}
+            onReroll={handleReroll}
+            onRerollBye={handleRerollBye}
+            onDelete={handleDelete}
           />
         )}
       </div>
@@ -165,18 +195,18 @@ export function RoundSection({
               matchIndex={matchIndex}
               roundIndex={roundIndex}
               name={name}
-              record={record}
+              recordA={getRecord(match.a)}
+              recordB={getRecord(match.b)}
               onPlayerClick={onPlayerClick}
-              onCompare={onCompare}
-              onUpdate={onUpdate}
-              allMatches={round.matches}
+              onCompare={handleCompare}
+              onUpdate={handleUpdate}
               winningGames={round.winningGames ?? 1}
               isRunning={runningMatchIds.has(match.id)}
-              onSwap={onSwapPlayers}
+              onSwap={handleSwapPlayers}
               selectedParticipantId={
                 keyboardMove?.roundIndex === roundIndex ? keyboardMove.participantId : null
               }
-              onKeyboardSwap={onKeyboardSwap}
+              onKeyboardSwap={handleKeyboardSwap}
               readOnly={readOnly}
             />
           ))}
@@ -184,7 +214,7 @@ export function RoundSection({
       )}
     </section>
   )
-}
+})
 
 const formatStartTime = (startedAt: string) => {
   const date = new Date(startedAt)

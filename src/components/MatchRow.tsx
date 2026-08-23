@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
@@ -10,14 +10,14 @@ type Props = {
   matchIndex: number
   roundIndex: number
   name: (id: string) => string
-  record: (id: string) => string
+  recordA: string
+  recordB: string
   onPlayerClick: (id: string) => void
   onCompare: (firstId: string, secondId: string) => void
-  onUpdate: (matches: Match[]) => void
-  allMatches: Match[]
-  onSwap?: (draggedId: string, targetId: string) => void
+  onUpdate: (match: Match) => void
+  onSwap: (draggedId: string, targetId: string) => void
   selectedParticipantId?: string | null
-  onKeyboardSwap?: (participantId: string) => void
+  onKeyboardSwap: (participantId: string) => void
   winningGames: number
   isRunning?: boolean
   readOnly?: boolean
@@ -69,16 +69,16 @@ const formatStartTime = (value: string) => {
 }
 
 // oxlint-disable-next-line eslint/max-lines-per-function
-export function MatchRow({
+export const MatchRow = memo(function MatchRow({
   match,
   matchIndex,
   roundIndex,
   name,
-  record,
+  recordA,
+  recordB,
   onPlayerClick,
   onCompare,
   onUpdate,
-  allMatches,
   onSwap,
   selectedParticipantId = null,
   onKeyboardSwap,
@@ -86,16 +86,6 @@ export function MatchRow({
   isRunning = false,
   readOnly = false,
 }: Props) {
-  const swapPlayers = (draggedId: string, targetId: string) => {
-    if (!draggedId || draggedId === targetId) return
-    onUpdate(
-      allMatches.map((item) => ({
-        ...item,
-        a: item.a === draggedId ? targetId : item.a === targetId ? draggedId : item.a,
-        b: item.b === draggedId ? targetId : item.b === targetId ? draggedId : item.b,
-      })),
-    )
-  }
   const initialSets = useMemo<SetScore[]>(
     () => (match.sets?.length ? match.sets : [{ a: match.scoreA ?? '', b: match.scoreB ?? '' }]),
     [match.sets, match.scoreA, match.scoreB],
@@ -148,13 +138,7 @@ export function MatchRow({
     commitTimer.current = setTimeout(() => {
       const nextSets = trimSetsAfterWinner(draftSetsRef.current, targetWins)
       const firstSet = nextSets[0] ?? { a: '', b: '' }
-      onUpdate(
-        allMatches.map((item) =>
-          item.id === match.id
-            ? { ...item, sets: nextSets, scoreA: firstSet.a, scoreB: firstSet.b }
-            : item,
-        ),
-      )
+      onUpdate({ ...match, sets: nextSets, scoreA: firstSet.a, scoreB: firstSet.b })
     }, 200)
   }
   return (
@@ -207,7 +191,7 @@ export function MatchRow({
             canReorder &&
             event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
           ) {
-            ;(onSwap ?? swapPlayers)(event.dataTransfer.getData('text/plain'), match.a)
+            onSwap(event.dataTransfer.getData('text/plain'), match.a)
           }
         }}
       >
@@ -218,7 +202,7 @@ export function MatchRow({
             aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
             title={`${t('moveParticipant')}: ${name(match.a)}`}
             aria-pressed={selectedParticipantId === match.a}
-            onClick={() => onKeyboardSwap?.(match.a)}
+            onClick={() => onKeyboardSwap(match.a)}
           >
             <GripVertical size={16} aria-hidden="true" />
           </button>
@@ -231,7 +215,7 @@ export function MatchRow({
         >
           {name(match.a)}
         </button>
-        <small className="player-record">{record(match.a)}</small>
+        <small className="player-record">{recordA}</small>
       </span>
       {finalScore ? (
         <span className="match-score" aria-label={`${finalScore.a}:${finalScore.b}`}>
@@ -257,7 +241,7 @@ export function MatchRow({
             canReorder &&
             event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
           ) {
-            ;(onSwap ?? swapPlayers)(event.dataTransfer.getData('text/plain'), match.b)
+            onSwap(event.dataTransfer.getData('text/plain'), match.b)
           }
         }}
       >
@@ -268,7 +252,7 @@ export function MatchRow({
             aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
             title={`${t('moveParticipant')}: ${name(match.b)}`}
             aria-pressed={selectedParticipantId === match.b}
-            onClick={() => onKeyboardSwap?.(match.b)}
+            onClick={() => onKeyboardSwap(match.b)}
           >
             <GripVertical size={16} aria-hidden="true" />
           </button>
@@ -281,7 +265,7 @@ export function MatchRow({
         >
           {name(match.b)}
         </button>
-        <small className="player-record">{record(match.b)}</small>
+        <small className="player-record">{recordB}</small>
       </span>
       <SetScores
         draftSets={draftSets}
@@ -294,4 +278,4 @@ export function MatchRow({
       />
     </fieldset>
   )
-}
+})

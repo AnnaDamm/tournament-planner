@@ -3,7 +3,8 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { resolve } from 'node:path'
-import react from '@vitejs/plugin-react'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
@@ -126,7 +127,14 @@ export default defineConfig(({ mode }) => {
     root: 'src',
     base: mode === 'production' ? (process.env.VITE_BASE_URL ?? '/tournament-planner/') : '/',
     define: { 'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion) },
-    plugins: [react(), tailwindcss(), serviceWorker(), webManifest(), inlineAssets()],
+    plugins: [
+      react(),
+      babel({ presets: [reactCompilerPreset()] }),
+      tailwindcss(),
+      serviceWorker(),
+      webManifest(),
+      inlineAssets(),
+    ],
     build: {
       outDir: '../dist',
       emptyOutDir: true,

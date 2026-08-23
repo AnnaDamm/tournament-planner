@@ -127,6 +127,17 @@ export const updateRoundMatches =
     dispatch(roundMatchesUpdated(rounds))
   }
 
+export const updateRoundMatch =
+  (index: number, match: Match): TournamentCommand =>
+  (dispatch, getState) => {
+    const state = getState().tournament
+    const currentMatches = state.rounds[index]?.matches ?? []
+    const matches = currentMatches.map((currentMatch) =>
+      currentMatch.id === match.id ? match : currentMatch,
+    )
+    dispatch(updateRoundMatches(index, matches))
+  }
+
 export const setRoundSettings =
   (number: number, winningGames: number, courtCount: number): TournamentCommand =>
   (dispatch, getState) => {

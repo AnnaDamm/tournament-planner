@@ -1,28 +1,16 @@
-import type { RefObject } from 'react'
 import { UserPlus, X } from 'lucide-react'
 import { Dialog } from './Dialog'
 import { t } from '../i18n'
 import { addParticipants, deleteAllTournamentData } from '../tournamentCommands'
-import { useAppDispatch } from '../storeHooks'
+import { useAppDispatch, useAppSelector } from '../storeHooks'
+import { useTournamentDialogRefs, useTournamentDraft } from '../context/TournamentContext'
+import { selectParticipantType } from '../tournamentSelectors'
 
-type Props = {
-  participantType: 'players' | 'teams'
-  bulkRef: RefObject<HTMLDialogElement | null>
-  bulkInputRef: RefObject<HTMLTextAreaElement | null>
-  confirmRef: RefObject<HTMLDialogElement | null>
-  draft: string
-  setDraft: (value: string) => void
-}
-
-export function AppDialogs({
-  participantType,
-  bulkRef,
-  bulkInputRef,
-  confirmRef,
-  draft,
-  setDraft,
-}: Props) {
+export function AppDialogs() {
   const dispatch = useAppDispatch()
+  const participantType = useAppSelector(selectParticipantType)
+  const { bulkRef, bulkInputRef, confirmRef } = useTournamentDialogRefs()
+  const { draft, setDraft } = useTournamentDraft()
   const onAdd = () => {
     const names = draft
       .split('\n')

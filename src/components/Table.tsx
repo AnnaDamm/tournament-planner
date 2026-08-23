@@ -12,11 +12,11 @@ import {
 import { useState } from 'react'
 import { PageTitle } from './PageTitle'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
+import { PlayerNameEditor } from './PlayerNameEditor'
 import { t } from '../i18n'
 import type { Participant, Round } from '../tournamentTypes'
 import {
   deleteParticipant,
-  renameParticipant,
   reorderParticipants,
   shuffleParticipants,
   toggleParticipantWithdrawal,
@@ -197,15 +197,7 @@ export function Table({
                   <td className="name-cell" data-label={participantLabel}>
                     {canSeed && <GripVertical className="seed-grip" size={16} aria-hidden="true" />}
                     {editing ? (
-                      <input
-                        className="player-name-input"
-                        type="text"
-                        value={player.name}
-                        aria-label={`${t('editName')}: ${player.name}`}
-                        onChange={(event) =>
-                          dispatch(renameParticipant(player.id, event.target.value))
-                        }
-                      />
+                      <PlayerNameEditor player={player} />
                     ) : (
                       <button
                         className={

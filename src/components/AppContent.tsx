@@ -1,22 +1,30 @@
+import { useCallback } from 'react'
 import { AppDialogs } from './AppDialogs'
 import { AppRoutes } from './AppRoutes'
-import { useTournament } from '../context/TournamentContext'
+import { useTournament, useTournamentDialogRefs } from '../context/TournamentContext'
 
 export function AppContent() {
-  const { layout, routes, dialogs } = useTournament()
+  const { localMaster, readOnly } = useTournament()
+  const { bulkRef, bulkInputRef, confirmRef } = useTournamentDialogRefs()
+  const onAdd = useCallback(() => {
+    const dialog = bulkRef.current
+    if (!dialog) return
+    dialog.showModal()
+    window.setTimeout(() => {
+      if (dialog.open) bulkInputRef.current?.focus()
+    }, 0)
+  }, [bulkInputRef, bulkRef])
+  const onDeleteAll = useCallback(() => confirmRef.current?.showModal(), [confirmRef])
+
   return (
     <>
-      <AppRoutes {...routes} />
-      {!layout.readOnly && (
-        <AppDialogs
-          participantType={routes.participantType}
-          bulkRef={dialogs.bulkRef}
-          bulkInputRef={dialogs.bulkInputRef}
-          confirmRef={dialogs.confirmRef}
-          draft={dialogs.draft}
-          setDraft={dialogs.setDraft}
-        />
-      )}
+      <AppRoutes
+        localMaster={localMaster}
+        readOnly={readOnly}
+        onAdd={onAdd}
+        onDeleteAll={onDeleteAll}
+      />
+      {!readOnly && <AppDialogs />}
     </>
   )
 }

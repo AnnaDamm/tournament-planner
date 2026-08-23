@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react'
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react'
 import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
 import type { TournamentSettings } from '../tournamentTypes'
 import { saveTournamentSettings } from '../tournamentCommands'
-import { selectTournamentSnapshot } from '../tournamentSelectors'
+import { selectTournamentSettings } from '../tournamentSelectors'
 import { useAppDispatch, useAppSelector } from '../storeHooks'
 
 type SettingsDraft = {
@@ -43,29 +43,7 @@ const createDraft = (settings: TournamentSettings): SettingsDraft => ({
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
   const dispatch = useAppDispatch()
-  const snapshot = useAppSelector(selectTournamentSnapshot)
-  const settings = useMemo<TournamentSettings>(
-    () => ({
-      tournamentName: snapshot.tournamentName,
-      participantType: snapshot.participantType,
-      courtCount: snapshot.courtCount,
-      defaultWinningGames: snapshot.defaultWinningGames,
-      defaultSetPoints: snapshot.defaultSetPoints,
-      expectedDurationMinutes: snapshot.expectedDurationMinutes,
-      breakBetweenMatchesMinutes: snapshot.breakBetweenMatchesMinutes,
-      scheduledStart: snapshot.scheduledStart,
-    }),
-    [
-      snapshot.breakBetweenMatchesMinutes,
-      snapshot.courtCount,
-      snapshot.defaultSetPoints,
-      snapshot.defaultWinningGames,
-      snapshot.expectedDurationMinutes,
-      snapshot.participantType,
-      snapshot.scheduledStart,
-      snapshot.tournamentName,
-    ],
-  )
+  const settings = useAppSelector(selectTournamentSettings)
   const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
