@@ -619,6 +619,23 @@
     transition: transform 180ms ease;
   }
 
+  html:global(.header-overlay-active) .top-menu-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    transform: translateY(-100%);
+    box-shadow: 0 8px 24px rgb(23 32 29 / 18%);
+    transition: none;
+  }
+
+  html:global(.header-overlay-active):global(.fullscreen-header-visible) .top-menu-header {
+    transform: translateY(0);
+  }
+
+  :global(.readonly-focus-mode .app-footer) {
+    display: none;
+  }
+
   .top-menu-header :global(.icon-btn) {
     min-width: 44px;
     min-height: 44px;
@@ -629,22 +646,7 @@
     display: none;
   }
 
-  @supports (animation-timeline: scroll(root block)) {
-    .top-menu-header {
-      animation: top-menu-collapse linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 24px 128px;
-    }
-  }
-
-  @supports (animation-timeline: scroll(root block)) {
-    html:global(.header-overlay-active) .top-menu-header {
-      animation: none;
-    }
-  }
-
   html:global(.header-overlay-active):global(.focus-mode-active) .top-menu-header {
-    animation: none;
     transform: translateY(-100%);
   }
 
@@ -660,27 +662,22 @@
   html:global(.header-overlay-active):global(.focus-mode-active)
     :global(.top-menu-slot):focus-within
     .top-menu-header {
-    animation: none;
     transform: translateY(0);
   }
 
-  @supports not (animation-timeline: scroll(root block)) {
-    html:global(.top-menu-scrolled):not(:global(.header-overlay-active)) .top-menu-header {
-      transform: translateY(-100%);
-    }
+  html:global(.top-menu-scrolled):not(:global(.header-overlay-active)) .top-menu-header {
+    transform: translateY(-100%);
   }
 
-  @supports not (animation-timeline: scroll(root block)) {
-    html:global(.top-menu-scrolled):not(:global(.header-overlay-active)):has(
-        :global(.top-menu-slot):hover
-      )
-      .top-menu-header,
-    html:global(.top-menu-scrolled):not(:global(.header-overlay-active)):has(
-        :global(.top-menu-slot):focus-within
-      )
-      .top-menu-header {
-      transform: translateY(0);
-    }
+  html:global(.top-menu-scrolled):not(:global(.header-overlay-active)):has(
+      :global(.top-menu-slot):hover
+    )
+    .top-menu-header,
+  html:global(.top-menu-scrolled):not(:global(.header-overlay-active)):has(
+      :global(.top-menu-slot):focus-within
+    )
+    .top-menu-header {
+    transform: translateY(0);
   }
 
   @media screen and (min-width: 901px) {
@@ -731,7 +728,6 @@
         :global(.desktop-side-nav):focus-within
       )
       .top-menu-header {
-      animation: none;
       transform: translateY(0);
     }
   }

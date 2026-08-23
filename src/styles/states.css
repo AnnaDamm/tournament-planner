@@ -37,19 +37,6 @@
     cursor: none !important;
   }
 
-  html.header-overlay-active header {
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 100;
-    transform: translateY(-100%);
-    box-shadow: 0 8px 24px rgb(23 32 29 / 18%);
-    transition: none;
-  }
-
-  html.header-overlay-active.fullscreen-header-visible header {
-    transform: translateY(0);
-  }
-
   @keyframes view-rotation-spin {
     to {
       transform: rotate(360deg);
@@ -85,15 +72,6 @@
   .readonly-focus-mode {
     --focus-ui-scale: 1.5;
     font-size: calc(1rem * var(--focus-ui-scale));
-  }
-
-  @keyframes top-menu-collapse {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(-100%);
-    }
   }
 
   @media print {
