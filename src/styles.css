@@ -298,6 +298,8 @@ aside {
   padding: 53px 5vw;
   width: 100%;
   max-width: 1120px;
+  container-name: content;
+  container-type: inline-size;
 }
 .app-footer {
   border-top: 1px solid #e5eae6;
@@ -348,7 +350,7 @@ aside {
   color: #4f7c2e;
   text-decoration: underline;
 }
-@media (max-width: 600px) {
+@media screen and (max-width: 600px) {
   .app-footer-inner {
     align-items: flex-start;
     flex-direction: column;
@@ -1109,7 +1111,7 @@ html.header-overlay-active.fullscreen-header-visible header {
 .score b {
   color: #a0aaa5;
 }
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   header {
     padding: 0 20px;
   }
@@ -1142,14 +1144,6 @@ html.header-overlay-active.fullscreen-header-visible header {
   }
   .page-title h1 {
     font-size: 30px;
-  }
-  .match {
-    gap: 7px;
-  }
-  .drag-hint {
-    width: auto;
-    flex: 1;
-    font-size: 12px;
   }
   .hero-card {
     align-items: start;
@@ -1769,7 +1763,7 @@ aside {
   overflow-y: auto;
 }
 
-@media (min-width: 1600px) {
+@media screen and (min-width: 1600px) {
   .content {
     padding-inline: clamp(64px, 5vw, 150px);
   }
@@ -1779,17 +1773,13 @@ aside {
   }
 }
 
-@media (max-width: 1100px) {
+@media screen and (max-width: 1100px) {
   .content {
     padding-inline: clamp(24px, 4vw, 56px);
   }
-
-  .drag-hint {
-    width: clamp(130px, 16vw, 190px);
-  }
 }
 
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   header {
     padding-inline: 16px;
   }
@@ -1892,95 +1882,6 @@ aside {
     min-width: 570px;
   }
 
-  .round-head {
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 16px;
-  }
-
-  .round-title-line {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .round-actions {
-    justify-content: flex-start;
-    margin-left: 0;
-  }
-
-  .match {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) 24px minmax(0, 1fr);
-    grid-template-areas:
-      'court player-a versus player-b'
-      '. start start .'
-      '. scores scores scores';
-    gap: 12px 7px;
-    align-items: center;
-    padding-block: 16px;
-  }
-
-  .match-court {
-    grid-area: court;
-    width: auto;
-  }
-
-  .match-start {
-    grid-area: start;
-    justify-self: center;
-  }
-
-  .match-player {
-    width: auto;
-    min-width: 0;
-  }
-
-  .match-player-a {
-    grid-area: player-a;
-  }
-
-  .match-player-b {
-    grid-area: player-b;
-  }
-
-  .versus {
-    grid-area: versus;
-    text-align: center;
-  }
-
-  .match-score {
-    grid-area: versus;
-    text-align: center;
-  }
-
-  .match-player-name,
-  .player-record {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .set-scores {
-    grid-area: scores;
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
-    gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .score {
-    margin-left: 0;
-    flex: 0 0 auto;
-  }
-
-  .score input {
-    width: 38px;
-    height: 34px;
-  }
-
   .settings-field {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -2022,7 +1923,7 @@ aside {
   }
 }
 
-@media (max-width: 430px) {
+@media screen and (max-width: 430px) {
   .brand-title {
     max-width: calc(100vw - 92px);
   }
@@ -2039,7 +1940,110 @@ aside {
   .content {
     padding-inline: 12px;
   }
+}
 
+@container content (max-width: 680px) {
+  .drag-hint {
+    width: auto;
+    flex: 1;
+    font-size: 12px;
+  }
+
+  .round-list {
+    gap: 12px;
+  }
+
+  .round-card {
+    padding: 14px;
+  }
+
+  .round-head {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 12px;
+  }
+
+  .round-title-line {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .round-actions {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
+  .match {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 24px minmax(0, 1fr);
+    grid-template-areas:
+      'court player-a versus player-b'
+      '. start start .'
+      '. scores scores scores';
+    gap: 8px 7px;
+    align-items: center;
+    padding-block: 12px;
+  }
+
+  .match-court {
+    grid-area: court;
+    width: auto;
+  }
+
+  .match-start {
+    grid-area: start;
+    justify-self: center;
+  }
+
+  .match-player {
+    width: auto;
+    min-width: 0;
+  }
+
+  .match-player-a {
+    grid-area: player-a;
+  }
+
+  .match-player-b {
+    grid-area: player-b;
+  }
+
+  .versus,
+  .match-score {
+    grid-area: versus;
+    text-align: center;
+  }
+
+  .match-player-name,
+  .player-record {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .set-scores {
+    grid-area: scores;
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .score {
+    margin-left: 0;
+    flex: 0 0 auto;
+  }
+
+  .score input {
+    width: 38px;
+    height: 34px;
+  }
+}
+
+@container content (max-width: 430px) {
   .round-card {
     padding-inline: 14px;
   }
@@ -2058,7 +2062,7 @@ aside {
   }
 }
 
-@media (max-width: 900px) {
+@container content (max-width: 680px) {
   /* On narrow screens, expose every table value in a readable card instead of
      hiding important columns behind an invisible horizontal scroll area. */
   .table-wrap table.ranking-table,
@@ -2175,7 +2179,7 @@ aside {
   }
 }
 
-@media (min-width: 901px) {
+@media screen and (min-width: 901px) {
   .readonly-focus-mode main {
     display: block;
   }
@@ -2258,7 +2262,7 @@ aside {
   }
 }
 
-@media (min-width: 901px) {
+@media screen and (min-width: 901px) {
   /* Keep the table context available while long rankings are scrolled. */
   .table-wrap {
     overflow: visible;
@@ -2322,7 +2326,7 @@ aside {
   }
 }
 
-@media (max-width: 900px) {
+@container content (max-width: 680px) {
   .ranking-table tbody tr,
   .participants-table tbody tr {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2411,7 +2415,7 @@ aside {
   }
 }
 
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   .content {
     padding-top: 24px;
     padding-bottom: 32px;
@@ -2424,32 +2428,15 @@ aside {
   .hero-card {
     margin-bottom: 24px;
   }
-
-  .round-list {
-    gap: 12px;
-  }
-
-  .round-card {
-    padding: 14px;
-  }
-
-  .round-head {
-    margin-bottom: 12px;
-  }
-
-  .match {
-    gap: 8px 7px;
-    padding-block: 12px;
-  }
 }
 
-@media (max-width: 430px) {
+@media screen and (max-width: 430px) {
   .nav-item {
     font-size: 12px;
   }
 }
 
-@media (max-width: 900px) {
+@container content (max-width: 680px) {
   /* Pivot table columns into label/value rows on narrow screens. */
   .ranking-table tbody tr,
   .participants-table tbody tr {
@@ -2520,7 +2507,7 @@ aside {
   display: none;
 }
 
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
   .content {
     padding-inline: 0;
   }
@@ -2627,7 +2614,7 @@ aside {
   }
 }
 
-@media (max-width: 340px) {
+@media screen and (max-width: 340px) {
   header {
     min-height: 68px;
     height: 68px;
@@ -2784,14 +2771,14 @@ dialog.settings-modal:not([open]) {
   white-space: nowrap;
 }
 
-@media (min-width: 901px) {
+@media screen and (min-width: 901px) {
   .ranking-table th:last-child,
   .ranking-table td:last-child {
     min-width: 112px;
   }
 }
 
-@media (max-width: 900px) {
+@container content (max-width: 680px) {
   .ranking-table tbody .player-actions {
     display: flex;
     flex-direction: row;
@@ -2912,7 +2899,7 @@ dialog.settings-modal:not([open]) {
   color: #40513d;
   line-height: 1.55;
 }
-@media (max-width: 780px) {
+@media screen and (max-width: 780px) {
   .docs-layout {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -3038,7 +3025,7 @@ dialog.settings-modal:not([open]) {
   max-width: 100%;
   height: auto;
 }
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   .share-card {
     align-items: start;
     flex-direction: column;
@@ -3220,5 +3207,59 @@ dialog.settings-modal:not([open]) {
   }
   .current-round-group .round-card + .round-card {
     border-color: #425443;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body:has(.app-shell .round-list),
+  body:has(.app-shell .ranking-table) {
+    background: #fff;
+  }
+
+  html:has(.app-shell .round-list),
+  html:has(.app-shell .ranking-table) {
+    background: #fff;
+  }
+
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) {
+    display: block;
+    min-height: 0;
+    background: #fff;
+    color: #17201d;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .skip-link,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .top-menu-slot,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .top-header-reveal,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .desktop-side-nav,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .mobile-side-nav,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .app-footer,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .page-actions,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .round-actions,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .player-actions,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .drag-handle-button,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .seed-grip,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) dialog,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .search-popover {
+    display: none !important;
+  }
+
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .content {
+    width: auto;
+    max-width: none;
+    padding: 0;
+  }
+
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .match,
+  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .table-wrap tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
