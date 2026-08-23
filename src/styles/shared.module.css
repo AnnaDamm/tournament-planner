@@ -2000,6 +2000,20 @@
   }
 
   @media print {
+    :global(.app-shell):has(:global(.ranking-table))
+      :global(.ranking-table)
+      :global(.actions-heading) {
+      display: none !important;
+    }
+  }
+
+  @media print {
+    :global(.app-shell):has(:global(.round-list)) :global(.round-list) + :global(.button) {
+      display: none !important;
+    }
+  }
+
+  @media print {
     :is(
         :global(.app-shell):has(:global(.round-list)),
         :global(.app-shell):has(:global(.ranking-table))

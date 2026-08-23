@@ -376,6 +376,10 @@ const en: DocPage[] = [
             title: 'Features',
             items: ['Link the footer version to the version history documentation.'],
           },
+          {
+            title: 'Bugfixes',
+            items: ['Hide table and round action controls from print views.'],
+          },
         ],
       },
       {
@@ -923,6 +927,12 @@ const de: DocPage[] = [
           {
             title: 'Funktionen',
             items: ['Footer-Version mit der Versionshistorie verknüpft.'],
+          },
+          {
+            title: 'Fehlerbehebungen',
+            items: [
+              'Aktionsschaltflächen der Tabellen- und Rundenansicht in Druckansichten ausgeblendet.',
+            ],
           },
         ],
       },

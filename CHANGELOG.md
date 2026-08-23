@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Hide table and round action controls from print views.
+
 ## v3.0.0
 
 ### Features

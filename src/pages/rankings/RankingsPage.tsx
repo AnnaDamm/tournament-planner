@@ -193,7 +193,11 @@ export function RankingsPage({
                   </button>
                 </th>
               ))}
-              {!readOnly && <th scope="col">{t('actions')}</th>}
+              {!readOnly && (
+                <th className={classNames(sharedStyles, styles, 'actions-heading')} scope="col">
+                  {t('actions')}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
