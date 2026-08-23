@@ -16,6 +16,7 @@
 }
 :root {
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --top-menu-height: clamp(60px, 3.8vw, 84px);
   font-family: var(--font-family);
   color: #17201d;
   background: #f5f7f5;
@@ -95,6 +96,7 @@ header {
   border-radius: 10px;
   width: 37px;
   height: 37px;
+  overflow: hidden;
   display: grid;
   place-items: center;
 }
@@ -1154,7 +1156,7 @@ html.header-overlay-active header {
   z-index: 100;
   transform: translateY(-100%);
   box-shadow: 0 8px 24px rgb(23 32 29 / 18%);
-  transition: transform 180ms ease;
+  transition: none;
 }
 html.header-overlay-active.fullscreen-header-visible header {
   transform: translateY(0);
@@ -1678,8 +1680,8 @@ body:has(.settings-modal[open]) {
 }
 
 header {
-  min-height: 78px;
-  height: clamp(78px, 5vw, 108px);
+  min-height: var(--top-menu-height);
+  height: var(--top-menu-height);
   padding-inline: clamp(16px, 5vw, 112px);
 }
 
@@ -1694,9 +1696,11 @@ header {
   flex: 0 0 auto;
 }
 
-.brand-mark svg {
-  width: clamp(20px, 1.3vw, 28px);
-  height: clamp(20px, 1.3vw, 28px);
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
 }
 
 .brand-title {
@@ -1723,7 +1727,7 @@ main {
 aside {
   width: clamp(190px, 14vw, 340px);
   padding: clamp(28px, 3vw, 72px) clamp(14px, 1.8vw, 40px);
-  min-height: calc(100vh - clamp(78px, 5vw, 108px));
+  min-height: calc(100vh - var(--top-menu-height));
   flex: 0 0 auto;
 }
 
@@ -2814,9 +2818,9 @@ aside {
     border-radius: 8px;
   }
 
-  .brand-mark svg {
-    width: 18px;
-    height: 18px;
+  .brand-mark img {
+    width: 100%;
+    height: 100%;
   }
 
   .brand-title {
@@ -3361,6 +3365,183 @@ dialog.settings-modal:not([open]) {
   padding-inline: clamp(8px, 0.75vw, 16px);
 }
 
+.top-menu-slot {
+  flex: 0 0 var(--top-menu-height);
+  height: var(--top-menu-height);
+}
+
+.readonly-focus-mode .top-menu-slot {
+  flex-basis: 0;
+  height: 0;
+}
+
+.top-menu-slot::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 99;
+  height: var(--top-menu-height);
+  background: transparent;
+}
+
+.top-menu-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  min-height: var(--top-menu-height);
+  height: var(--top-menu-height);
+  transition: transform 180ms ease;
+}
+
+.top-menu-header .icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px;
+}
+
+.focus-left-reveal-zone {
+  display: none;
+}
+
+@keyframes top-menu-collapse {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@supports (animation-timeline: scroll(root block)) {
+  .top-menu-header {
+    animation: top-menu-collapse linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 24px 128px;
+  }
+
+  html.header-overlay-active .top-menu-header {
+    animation: none;
+  }
+}
+
+html.header-overlay-active.focus-mode-active .top-menu-header {
+  animation: none;
+  transform: translateY(-100%);
+}
+
+html.header-overlay-active .top-menu-header {
+  transition: transform 180ms ease;
+}
+
+.top-menu-slot:hover .top-menu-header,
+.top-menu-slot:focus-within .top-menu-header,
+html.header-overlay-active.focus-mode-active .top-menu-slot:hover .top-menu-header,
+html.header-overlay-active.focus-mode-active .top-menu-slot:focus-within .top-menu-header {
+  animation: none;
+  transform: translateY(0);
+}
+
+@supports not (animation-timeline: scroll(root block)) {
+  html.top-menu-scrolled:not(.header-overlay-active) .top-menu-header {
+    transform: translateY(-100%);
+  }
+
+  html.top-menu-scrolled:not(.header-overlay-active):has(.top-menu-slot:hover) .top-menu-header,
+  html.top-menu-scrolled:not(.header-overlay-active):has(.top-menu-slot:focus-within)
+    .top-menu-header {
+    transform: translateY(0);
+  }
+}
+
+@media screen and (min-width: 901px) {
+  .desktop-side-nav {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    flex: 0 0 clamp(220px, 14vw, 340px);
+    width: clamp(220px, 14vw, 340px);
+    min-height: 100vh;
+    padding: clamp(28px, 3vw, 72px) clamp(14px, 1.8vw, 40px);
+    border-right: 1px solid #e2e8e3;
+    background: #fff;
+    color: #17201d;
+    z-index: 2;
+    transition: padding-top 160ms ease;
+  }
+
+  html.top-menu-scrolled:has(.top-menu-slot:hover) .desktop-side-nav,
+  html.top-menu-scrolled:has(.top-menu-slot:focus-within) .desktop-side-nav {
+    padding-top: calc(clamp(28px, 3vw, 72px) + var(--top-menu-height));
+  }
+
+  .readonly-focus-mode .focus-left-reveal-zone {
+    display: block;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 24px;
+    z-index: 102;
+  }
+
+  .readonly-focus-mode .desktop-side-nav {
+    display: block;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: clamp(280px, 20vw, 420px);
+    min-height: 100vh;
+    padding-top: calc(clamp(28px, 3vw, 72px) + var(--top-menu-height));
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+    z-index: 98;
+  }
+
+  html.header-overlay-active.focus-mode-active:has(.top-menu-slot:hover) .desktop-side-nav,
+  html.header-overlay-active.focus-mode-active:has(.top-menu-slot:focus-within) .desktop-side-nav,
+  html.header-overlay-active.focus-mode-active:has(.focus-left-reveal-zone:hover) .desktop-side-nav,
+  html.header-overlay-active.focus-mode-active:has(.desktop-side-nav:hover) .desktop-side-nav,
+  html.header-overlay-active.focus-mode-active:has(.desktop-side-nav:focus-within)
+    .desktop-side-nav {
+    transform: translateX(0);
+  }
+
+  html.header-overlay-active.focus-mode-active:has(.focus-left-reveal-zone:hover) .top-menu-header,
+  html.header-overlay-active.focus-mode-active:has(.desktop-side-nav:hover) .top-menu-header,
+  html.header-overlay-active.focus-mode-active:has(.desktop-side-nav:focus-within)
+    .top-menu-header {
+    animation: none;
+    transform: translateY(0);
+  }
+
+  .readonly-focus-mode .mobile-nav-trigger {
+    display: none;
+  }
+
+  .desktop-side-nav .nav-item {
+    min-height: 44px;
+    margin-bottom: 4px;
+    padding: 11px 13px;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  :root {
+    --top-menu-height: 60px;
+  }
+
+  .top-menu-slot {
+    flex-basis: var(--top-menu-height);
+    height: var(--top-menu-height);
+  }
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 901px) {
+  .desktop-side-nav {
+    border-right-color: #2c3931;
+    background: #17201c;
+    color: #edf4ef;
+  }
+}
+
 .round-card.current-round,
 .readonly-focus-mode .round-card.current-round {
   background: #eef3ec;
@@ -3429,7 +3610,6 @@ dialog.settings-modal:not([open]) {
 
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .skip-link,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .top-menu-slot,
-  :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .top-header-reveal,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .desktop-side-nav,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .mobile-side-nav,
   :is(.app-shell:has(.round-list), .app-shell:has(.ranking-table)) .app-footer,

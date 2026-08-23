@@ -95,7 +95,6 @@ export function AppLayout({
   const findingCursorRef = useRef({ key: '', index: -1 })
   const matchCursorRef = useRef({ key: '', index: -1 })
   const fullscreenIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const fullscreenHeaderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.hash.slice(1)).get('search') ?? '',
@@ -180,6 +179,8 @@ export function AppLayout({
   useEffect(() => {
     const cursorHiddenClass = 'fullscreen-cursor-hidden'
     const headerOverlayActiveClass = 'header-overlay-active'
+    const focusModeActiveClass = 'focus-mode-active'
+    const topMenuScrolledClass = 'top-menu-scrolled'
     const fullscreenHeaderVisibleClass = 'fullscreen-header-visible'
     const fullscreenHeader = document.querySelector<HTMLElement>('header')
     const isFullscreenMode = () => {
@@ -199,16 +200,8 @@ export function AppLayout({
     }
     const setCursorHidden = (hidden: boolean) =>
       document.documentElement.classList.toggle(cursorHiddenClass, hidden)
-    const clearHeaderTimer = () => {
-      if (fullscreenHeaderTimerRef.current) clearTimeout(fullscreenHeaderTimerRef.current)
-      fullscreenHeaderTimerRef.current = null
-    }
     const setHeaderVisible = (visible: boolean) =>
       document.documentElement.classList.toggle(fullscreenHeaderVisibleClass, visible)
-    const scheduleHeaderHide = () => {
-      clearHeaderTimer()
-      fullscreenHeaderTimerRef.current = setTimeout(() => setHeaderVisible(false), 500)
-    }
     const scheduleCursorHide = () => {
       clearIdleTimer()
       if (!isFullscreenMode()) return
@@ -216,10 +209,10 @@ export function AppLayout({
     }
     const handleDisplayModeChange = () => {
       clearIdleTimer()
-      clearHeaderTimer()
       const isFullscreen = isFullscreenMode()
       const isHeaderOverlayActive = readonlyFocusMode || isFullscreen
       document.documentElement.classList.toggle(headerOverlayActiveClass, isHeaderOverlayActive)
+      document.documentElement.classList.toggle(focusModeActiveClass, readonlyFocusMode)
       setHeaderVisible(false)
       setCursorHidden(false)
       if (isFullscreen) scheduleCursorHide()
@@ -230,32 +223,35 @@ export function AppLayout({
         setCursorHidden(false)
         scheduleCursorHide()
       }
-      if (!readonlyFocusMode && !isFullscreen) return
-      const headerHeight = fullscreenHeader?.offsetHeight ?? 108
+      if (!isFullscreen) return
+      const headerHeight = fullscreenHeader?.offsetHeight ?? 92
       if (event.clientY <= 100) {
-        clearHeaderTimer()
         setHeaderVisible(true)
       } else if (event.clientY > headerHeight) {
-        scheduleHeaderHide()
+        setHeaderVisible(false)
       }
     }
+    const syncTopMenuScrollState = () =>
+      document.documentElement.classList.toggle(topMenuScrolledClass, window.scrollY > 0)
 
     document.addEventListener('fullscreenchange', handleDisplayModeChange)
     window.addEventListener('resize', handleDisplayModeChange)
     window.addEventListener('pointermove', handlePointerActivity)
-    fullscreenHeader?.addEventListener('pointerleave', scheduleHeaderHide)
+    window.addEventListener('scroll', syncTopMenuScrollState, { passive: true })
     handleDisplayModeChange()
+    syncTopMenuScrollState()
 
     return () => {
       clearIdleTimer()
-      clearHeaderTimer()
       document.documentElement.classList.remove(headerOverlayActiveClass)
+      document.documentElement.classList.remove(focusModeActiveClass)
+      document.documentElement.classList.remove(topMenuScrolledClass)
       setHeaderVisible(false)
       setCursorHidden(false)
       document.removeEventListener('fullscreenchange', handleDisplayModeChange)
       window.removeEventListener('resize', handleDisplayModeChange)
       window.removeEventListener('pointermove', handlePointerActivity)
-      fullscreenHeader?.removeEventListener('pointerleave', scheduleHeaderHide)
+      window.removeEventListener('scroll', syncTopMenuScrollState)
     }
   }, [readonlyFocusMode])
 
@@ -346,226 +342,231 @@ export function AppLayout({
       <a className="skip-link" href="#main-content">
         {t('skipToContent')}
       </a>
-      <header>
-        <button
-          className="icon-btn mobile-nav-trigger"
-          ref={mobileNavTriggerRef}
-          type="button"
-          aria-label={t('menu')}
-          title={t('menu')}
-          aria-controls="mobile-nav"
-          popoverTarget="mobile-nav"
-          popoverTargetAction="toggle"
-        >
-          <Menu size={21} aria-hidden="true" />
-        </button>
-        <div className="brand">
-          <div className="brand-mark">
-            <Trophy size={20} aria-hidden="true" />
+      <div className="top-menu-slot">
+        <header id="top-menu-header" className="top-menu-header">
+          <button
+            className="icon-btn mobile-nav-trigger"
+            ref={mobileNavTriggerRef}
+            type="button"
+            aria-label={t('menu')}
+            title={t('menu')}
+            aria-controls="mobile-nav"
+            popoverTarget="mobile-nav"
+            popoverTargetAction="toggle"
+          >
+            <Menu size={21} aria-hidden="true" />
+          </button>
+          <div className="brand">
+            <div className="brand-mark">
+              <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
+            </div>
+            <div className="brand-title" title={tournamentName}>
+              <Link to={pathWithSearch('/table')}>{tournamentName}</Link>
+            </div>
           </div>
-          <div className="brand-title" title={tournamentName}>
-            <Link to={pathWithSearch('/table')}>{tournamentName}</Link>
-          </div>
-        </div>
-        <div className="header-actions">
-          <div className="search-control">
-            <button
-              className={`icon-btn search-trigger ${searchTerm ? 'active' : ''}`}
-              ref={searchTriggerRef}
-              type="button"
-              aria-label={t('playerSearch')}
-              title={t('playerSearch')}
-              aria-expanded={searchOpen}
-              aria-controls="player-search-popover"
-              popoverTarget="player-search-popover"
-              popoverTargetAction="toggle"
-            >
-              <Search size={18} aria-hidden="true" />
-            </button>
-            <section
-              className="search-popover"
-              ref={searchPopoverRef}
-              id="player-search-popover"
-              aria-label={t('playerSearch')}
-              onToggle={handleSearchToggle}
-              popover="auto"
-            >
-              <div className="search-input-wrap">
-                <Search size={16} aria-hidden="true" />
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  list="participant-search-options"
-                  value={searchTerm}
-                  placeholder={t('playerSearch')}
-                  aria-label={t('playerSearch')}
-                  onChange={(event) => updateSearch(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') navigateFinding(1)
-                  }}
-                />
-                {searchTerm && (
-                  <button
-                    type="button"
-                    aria-label={t('clearSearch')}
-                    title={t('clearSearch')}
-                    onClick={() => updateSearch('')}
-                  >
-                    <X size={15} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-              <datalist id="participant-search-options">
-                {participantNames.map((name, index) => (
-                  <option value={name} key={`${name}-${index}`}>
-                    {name}
-                  </option>
-                ))}
-              </datalist>
-              {findingCount > 1 && (
-                <div className="finding-navigation">
-                  <button
-                    type="button"
-                    aria-label={t('previousFinding')}
-                    title={t('previousFinding')}
-                    onClick={() => navigateFinding(-1)}
-                  >
-                    <ChevronLeft size={16} aria-hidden="true" />
-                  </button>
-                  <span aria-live="polite">
-                    {findingCount} {t('searchResults')}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={t('nextFinding')}
-                    title={t('nextFinding')}
-                    onClick={() => navigateFinding(1)}
-                  >
-                    <ChevronRight size={16} aria-hidden="true" />
-                  </button>
+          <div className="header-actions">
+            <div className="search-control">
+              <button
+                className={`icon-btn search-trigger ${searchTerm ? 'active' : ''}`}
+                ref={searchTriggerRef}
+                type="button"
+                aria-label={t('playerSearch')}
+                title={t('playerSearch')}
+                aria-expanded={searchOpen}
+                aria-controls="player-search-popover"
+                popoverTarget="player-search-popover"
+                popoverTargetAction="toggle"
+              >
+                <Search size={18} aria-hidden="true" />
+              </button>
+              <section
+                className="search-popover"
+                ref={searchPopoverRef}
+                id="player-search-popover"
+                aria-label={t('playerSearch')}
+                onToggle={handleSearchToggle}
+                popover="auto"
+              >
+                <div className="search-input-wrap">
+                  <Search size={16} aria-hidden="true" />
+                  <input
+                    ref={searchInputRef}
+                    type="search"
+                    list="participant-search-options"
+                    value={searchTerm}
+                    placeholder={t('playerSearch')}
+                    aria-label={t('playerSearch')}
+                    onChange={(event) => updateSearch(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') navigateFinding(1)
+                    }}
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      aria-label={t('clearSearch')}
+                      title={t('clearSearch')}
+                      onClick={() => updateSearch('')}
+                    >
+                      <X size={15} aria-hidden="true" />
+                    </button>
+                  )}
                 </div>
-              )}
+                <datalist id="participant-search-options">
+                  {participantNames.map((name, index) => (
+                    <option value={name} key={`${name}-${index}`}>
+                      {name}
+                    </option>
+                  ))}
+                </datalist>
+                {findingCount > 1 && (
+                  <div className="finding-navigation">
+                    <button
+                      type="button"
+                      aria-label={t('previousFinding')}
+                      title={t('previousFinding')}
+                      onClick={() => navigateFinding(-1)}
+                    >
+                      <ChevronLeft size={16} aria-hidden="true" />
+                    </button>
+                    <span aria-live="polite">
+                      {findingCount} {t('searchResults')}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t('nextFinding')}
+                      title={t('nextFinding')}
+                      onClick={() => navigateFinding(1)}
+                    >
+                      <ChevronRight size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
+                <button
+                  className="next-match-button"
+                  type="button"
+                  disabled={matchingMatchIds.length === 0}
+                  title={matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}
+                  onClick={() => {
+                    if (matchingMatchIds.length === 0) return
+                    const cursor = matchCursorRef.current
+                    const nextIndex =
+                      cursor.key === normalizedSearch
+                        ? (cursor.index + 1) % matchingMatchIds.length
+                        : 0
+                    matchCursorRef.current = { key: normalizedSearch, index: nextIndex }
+                    if (location.pathname !== '/rounds') {
+                      navigate(pathWithSearch('/rounds'))
+                    }
+                    scrollToTarget(`match-${matchingMatchIds[nextIndex]}`)
+                  }}
+                >
+                  {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
+                  <ChevronDown size={15} aria-hidden="true" />
+                </button>
+              </section>
+            </div>
+            {!readOnly && (
               <button
-                className="next-match-button"
-                type="button"
-                disabled={matchingMatchIds.length === 0}
-                title={matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}
-                onClick={() => {
-                  if (matchingMatchIds.length === 0) return
-                  const cursor = matchCursorRef.current
-                  const nextIndex =
-                    cursor.key === normalizedSearch
-                      ? (cursor.index + 1) % matchingMatchIds.length
-                      : 0
-                  matchCursorRef.current = { key: normalizedSearch, index: nextIndex }
-                  if (location.pathname !== '/rounds') {
-                    navigate(pathWithSearch('/rounds'))
+                className="icon-btn"
+                aria-label={t('documentation')}
+                title={t('documentation')}
+                onClick={() => navigate(pathWithSearch('/docs'))}
+              >
+                <BookOpen size={18} aria-hidden="true" />
+              </button>
+            )}
+            {localMaster && (
+              <>
+                <output
+                  className={`live-indicator ${isLive ? 'is-live' : 'is-offline'}`}
+                  aria-label={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
+                  title={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
+                >
+                  <span aria-hidden="true" />
+                </output>
+              </>
+            )}
+            {readOnly && (
+              <div className="header-tooltip">
+                <button
+                  className={`icon-btn ${readonlyFocusMode ? 'active' : ''}`}
+                  type="button"
+                  aria-label={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+                  title={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+                  aria-pressed={readonlyFocusMode}
+                  onClick={() => toggleViewParam('focus', !readonlyFocusMode)}
+                >
+                  {readonlyFocusMode ? (
+                    <ZoomOut size={18} aria-hidden="true" />
+                  ) : (
+                    <ZoomIn size={18} aria-hidden="true" />
+                  )}
+                </button>
+                <div className="tooltip-popover" aria-hidden="true">
+                  {t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
+                </div>
+              </div>
+            )}
+            {readOnly && (
+              <div className="header-tooltip">
+                <button
+                  className={`icon-btn ${readonlyRotationMode ? 'active view-rotation-active' : ''}`}
+                  type="button"
+                  aria-label={t(
+                    readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode',
+                  )}
+                  title={t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
+                  aria-pressed={readonlyRotationMode}
+                  onClick={() => toggleViewParam('rotate', !readonlyRotationMode)}
+                >
+                  <RefreshCw size={18} aria-hidden="true" />
+                </button>
+                <div className="tooltip-popover" aria-hidden="true">
+                  {t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
+                </div>
+              </div>
+            )}
+            {!readOnly && (
+              <div className="header-tooltip">
+                <a
+                  className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
+                  href={readOnlyUrl.toString()}
+                  aria-label={t('enableReadOnly')}
+                  title={t('enableReadOnly')}
+                >
+                  <LockOpen size={18} aria-hidden="true" />
+                </a>
+                <div className="tooltip-popover" aria-hidden="true">
+                  {t('enableReadOnly')}
+                </div>
+              </div>
+            )}
+            {!readOnly && (
+              <div className="header-tooltip">
+                <button
+                  className="icon-btn settings-trigger"
+                  aria-label={isSettingsPage ? t('back') : t('settings')}
+                  title={isSettingsPage ? t('back') : t('settings')}
+                  onClick={() =>
+                    isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings'))
                   }
-                  scrollToTarget(`match-${matchingMatchIds[nextIndex]}`)
-                }}
-              >
-                {matchingMatchIds.length ? t('nextMatch') : t('noNextMatch')}{' '}
-                <ChevronDown size={15} aria-hidden="true" />
-              </button>
-            </section>
+                >
+                  {isSettingsPage ? (
+                    <ArrowLeft size={18} aria-hidden="true" />
+                  ) : (
+                    <Settings2 size={18} aria-hidden="true" />
+                  )}
+                </button>
+                <div className="tooltip-popover" aria-hidden="true">
+                  {isSettingsPage ? t('back') : t('settings')}
+                </div>
+              </div>
+            )}
           </div>
-          {!readOnly && (
-            <button
-              className="icon-btn"
-              aria-label={t('documentation')}
-              title={t('documentation')}
-              onClick={() => navigate(pathWithSearch('/docs'))}
-            >
-              <BookOpen size={18} aria-hidden="true" />
-            </button>
-          )}
-          {localMaster && (
-            <>
-              <output
-                className={`live-indicator ${isLive ? 'is-live' : 'is-offline'}`}
-                aria-label={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
-                title={isLive ? t('liveConnectionOnline') : t('liveConnectionOffline')}
-              >
-                <span aria-hidden="true" />
-              </output>
-            </>
-          )}
-          {readOnly && (
-            <div className="header-tooltip">
-              <button
-                className={`icon-btn ${readonlyFocusMode ? 'active' : ''}`}
-                type="button"
-                aria-label={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
-                title={t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
-                aria-pressed={readonlyFocusMode}
-                onClick={() => toggleViewParam('focus', !readonlyFocusMode)}
-              >
-                {readonlyFocusMode ? (
-                  <ZoomOut size={18} aria-hidden="true" />
-                ) : (
-                  <ZoomIn size={18} aria-hidden="true" />
-                )}
-              </button>
-              <div className="tooltip-popover" aria-hidden="true">
-                {t(readonlyFocusMode ? 'disableFocusMode' : 'enableFocusMode')}
-              </div>
-            </div>
-          )}
-          {readOnly && (
-            <div className="header-tooltip">
-              <button
-                className={`icon-btn ${readonlyRotationMode ? 'active view-rotation-active' : ''}`}
-                type="button"
-                aria-label={t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
-                title={t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
-                aria-pressed={readonlyRotationMode}
-                onClick={() => toggleViewParam('rotate', !readonlyRotationMode)}
-              >
-                <RefreshCw size={18} aria-hidden="true" />
-              </button>
-              <div className="tooltip-popover" aria-hidden="true">
-                {t(readonlyRotationMode ? 'disableRotationMode' : 'enableRotationMode')}
-              </div>
-            </div>
-          )}
-          {!readOnly && (
-            <div className="header-tooltip">
-              <a
-                className={`icon-btn ${isReadOnlyTab ? 'active' : ''}`}
-                href={readOnlyUrl.toString()}
-                aria-label={t('enableReadOnly')}
-                title={t('enableReadOnly')}
-              >
-                <LockOpen size={18} aria-hidden="true" />
-              </a>
-              <div className="tooltip-popover" aria-hidden="true">
-                {t('enableReadOnly')}
-              </div>
-            </div>
-          )}
-          {!readOnly && (
-            <div className="header-tooltip">
-              <button
-                className="icon-btn settings-trigger"
-                aria-label={isSettingsPage ? t('back') : t('settings')}
-                title={isSettingsPage ? t('back') : t('settings')}
-                onClick={() =>
-                  isSettingsPage ? navigate(-1) : navigate(pathWithSearch('/settings'))
-                }
-              >
-                {isSettingsPage ? (
-                  <ArrowLeft size={18} aria-hidden="true" />
-                ) : (
-                  <Settings2 size={18} aria-hidden="true" />
-                )}
-              </button>
-              <div className="tooltip-popover" aria-hidden="true">
-                {isSettingsPage ? t('back') : t('settings')}
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
+        </header>
+      </div>
+      <div className="focus-left-reveal-zone" aria-hidden="true" />
       <main id="main-content" tabIndex={-1}>
         <nav className="desktop-side-nav" aria-label={t('tournamentNavigation')}>
           {renderNavigation()}
