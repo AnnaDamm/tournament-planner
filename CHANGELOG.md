@@ -4,29 +4,29 @@
 
 ### Features
 
-- Move tournament state to Redux.
-- Split styling into CSS modules and remove Tailwind.
-- Reduce Redux-driven rendering and enable the React Compiler.
+- Improve round score progression and bye handling.
 - Add print mode.
 - Add the player comparison overlay.
-- Show the release version in the footer.
-- Improve round score progression and bye handling.
 - Keep documentation headings visible while scrolling.
+- Show the release version in the footer.
+- Reduce Redux-driven rendering and enable the React Compiler.
+- Move tournament state to Redux.
+- Split styling into CSS modules and remove Tailwind.
 
 ### Bugfixes
 
+- Fix round-one pairing and lower-bracket pairing issues.
+- Fix bye selection and rerolling after a bye swap.
+- Count byes as best-possible wins.
+- Fix player positions appearing before a match finishes.
+- Stabilize the round layout.
 - Refine drag-and-drop accessibility.
 - Skip non-droppable controls during keyboard drag-and-drop.
 - Restore top-menu focus behavior.
-- Stabilize the round layout.
+- Improve dark-mode dialog contrast.
+- Make byes clickable in the player overlay.
 - Fix focus-mode idle scrolling.
 - Make tournament menus sticky.
-- Fix round-one pairing and lower-bracket pairing issues.
-- Fix bye selection and rerolling after a bye swap.
-- Make byes clickable in the player overlay.
-- Count byes as best-possible wins.
-- Improve dark-mode dialog contrast.
-- Fix player positions appearing before a match finishes.
 - Update container names and local start/build scripts.
 
 ## v2.1.2
