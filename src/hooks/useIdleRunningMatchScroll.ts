@@ -10,14 +10,14 @@ export function useIdleRunningMatchScroll(readOnly: boolean, matchId: string | u
       if (!target) return
       const targetCenter = target.getBoundingClientRect().top + target.offsetHeight / 2
       window.scrollBy({
-        top: targetCenter - window.innerHeight / 2,
+        top: targetCenter - window.innerHeight * 0.3,
         behavior: 'smooth',
       })
     }
-    let idleTimer = window.setTimeout(scrollToRunningMatch, 10_000)
+    let idleTimer = window.setTimeout(scrollToRunningMatch, 5_000)
     const resetIdleTimer = () => {
       window.clearTimeout(idleTimer)
-      idleTimer = window.setTimeout(scrollToRunningMatch, 10_000)
+      idleTimer = window.setTimeout(scrollToRunningMatch, 5_000)
     }
     window.addEventListener('pointerdown', resetIdleTimer)
     window.addEventListener('pointermove', resetIdleTimer)
