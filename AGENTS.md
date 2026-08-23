@@ -45,6 +45,14 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
 - Always run the repository's pre-commit hooks at the end of the task as the
   final quality checks.
 
+## Release consistency
+
+- Every new version tag must update `package.json`, the version history on the documentation page, and `CHANGELOG.md` together.
+- A tag `vX.Y.Z` must point to a commit whose `package.json` version is exactly `X.Y.Z`.
+- Every `CHANGELOG.md` version entry, including `Unreleased`, must categorize changes under `Features` and/or `Bugfixes`; omit a subsection when it has no entries.
+- Whenever a feature or bug fix is made, update the current `Unreleased` block unless the change is already covered by an existing entry.
+- Do not create standalone release or version-bump commits; put the version change into the tagged feature or merge commit.
+
 ## Accessibility
 
 - Always provide an accessible name for every interactive control.

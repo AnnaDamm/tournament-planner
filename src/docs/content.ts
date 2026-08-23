@@ -358,6 +358,35 @@ const en: DocPage[] = [
       },
     ],
   },
+  {
+    slug: 'version-history',
+    title: 'Version history',
+    summary: 'Released versions and the changes included in each release.',
+    sections: [
+      {
+        title: 'Releases',
+        items: [
+          'Unreleased — accessibility, focus, layout, Redux, CSS module, performance, print, comparison, pairing, bye, and footer improvements.',
+          'v2.1.2 — Fix time handling between rounds.',
+          'v2.1.1 — Improve start-time handling and round-related UX.',
+          'v2.1.0 — Enhance tournament views and round management.',
+          'v2.0.4 — Update dependency automation and formatting configuration.',
+          'v2.0.3 — Increase the maximum winning-games setting to 99.',
+          'v2.0.2 — Improve match scoring, read-only links, service-worker caching, and layouts.',
+          'v2.0.1 — Improve interactive control semantics.',
+          'v2.0.0 — Add the responsive interface, accessibility improvements, sharing, bilingual documentation, search, and storage architecture updates.',
+          'v1.2.2 — Improve rerolling existing match scores.',
+          'v1.2.1 — Enable matches across active rounds.',
+          'v1.2.0 — Fix 404 handling, bye logic, and release workflow warnings.',
+          'v1.1.1 — Maintenance release.',
+          'v1.1.0 — Add PWA installation and offline support.',
+          'v1.0.2 — Fix the build configuration.',
+          'v1.0.1 — Maintenance release.',
+          'v1.0.0 — Initial release.',
+        ],
+      },
+    ],
+  },
 ]
 
 const de: DocPage[] = [
@@ -702,6 +731,35 @@ const de: DocPage[] = [
         text: [
           'Eine Begegnung bleibt bei fehlenden oder gleichen Werten oder unerreichter Zielzahl offen. Ohne Start, Kapazität, bei früherem offenem Spiel oder unbekanntem Platz läuft sie nicht.',
           'Fehlende Daten bedeuten meist eine andere URL, Browser oder Profil oder gelöschte Websitedaten. Nutze den letzten Export.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'version-history',
+    title: 'Versionshistorie',
+    summary: 'Veröffentlichte Versionen und die enthaltenen Änderungen.',
+    sections: [
+      {
+        title: 'Veröffentlichungen',
+        items: [
+          'Unveröffentlicht — Verbesserungen an Barrierefreiheit, Fokus, Layout, Redux, CSS-Modulen, Performance, Druckansicht, Vergleich, Paarungen, Freilosen und Versionsanzeige.',
+          'v2.1.2 — Zeitbehandlung zwischen Runden korrigiert.',
+          'v2.1.1 — Startzeitbehandlung und Runden-UX verbessert.',
+          'v2.1.0 — Turnieransichten und Rundenverwaltung erweitert.',
+          'v2.0.4 — Abhängigkeitsautomatisierung und Formatierungskonfiguration aktualisiert.',
+          'v2.0.3 — Maximale Einstellung für Gewinnsätze auf 99 erhöht.',
+          'v2.0.2 — Begegnungserfassung, Read-only-Links, Service-Worker-Cache und Layouts verbessert.',
+          'v2.0.1 — Semantik interaktiver Bedienelemente verbessert.',
+          'v2.0.0 — Responsive Oberfläche, Barrierefreiheit, Teilen, zweisprachige Dokumentation, Suche und Speicherarchitektur erweitert.',
+          'v1.2.2 — Erneutes Auslosen bestehender Ergebnisse verbessert.',
+          'v1.2.1 — Begegnungen über aktive Runden hinweg ermöglicht.',
+          'v1.2.0 — 404-Behandlung, Freiloslogik und Warnungen im Release-Workflow korrigiert.',
+          'v1.1.1 — Wartungsrelease.',
+          'v1.1.0 — PWA-Installation und Offline-Unterstützung ergänzt.',
+          'v1.0.2 — Build-Konfiguration korrigiert.',
+          'v1.0.1 — Wartungsrelease.',
+          'v1.0.0 — Erste Veröffentlichung.',
         ],
       },
     ],
