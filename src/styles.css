@@ -150,7 +150,9 @@ header {
   border: 1px solid #dfe7e0;
   border-radius: 10px;
   background: #fff;
-  box-shadow: 0 12px 35px #17201d2b;
+  box-shadow:
+    0 18px 42px rgb(23 32 29 / 20%),
+    0 4px 12px rgb(23 32 29 / 10%);
 }
 .search-input-wrap {
   display: flex;
@@ -584,7 +586,9 @@ td b {
   border-radius: 12px;
   padding: 0;
   width: min(440px, calc(100% - 32px));
-  box-shadow: 0 20px 80px #17201d33;
+  box-shadow:
+    0 24px 70px rgb(23 32 29 / 24%),
+    0 6px 18px rgb(23 32 29 / 12%);
   color: #17201d;
 }
 .dialog::backdrop {
@@ -1227,8 +1231,23 @@ html.header-overlay-active.fullscreen-header-visible header {
     color: #e5f5d5;
   }
   .dialog {
-    background: #17201c;
+    background: #202c25;
+    border: 1px solid #425443;
     color: #edf4ef;
+    box-shadow:
+      0 24px 80px rgb(0 0 0 / 58%),
+      0 6px 18px rgb(0 0 0 / 34%);
+  }
+  .search-popover {
+    box-shadow:
+      0 18px 42px rgb(0 0 0 / 48%),
+      0 4px 12px rgb(0 0 0 / 30%);
+  }
+  .dialog p {
+    color: #b4c5ab;
+  }
+  .dialog .icon-btn {
+    color: #b4c5ab;
   }
   .dialog textarea,
   .search-popover,
@@ -1354,6 +1373,27 @@ html.header-overlay-active.fullscreen-header-visible header {
     border-color: #3d4b42;
     color: #edf4ef;
   }
+  .settings-field input[type='datetime-local'] {
+    background: #202c25;
+    border-color: #3d4b42;
+    color: #edf4ef;
+  }
+  .settings-field label,
+  .round-settings-fields label {
+    color: #edf4ef;
+  }
+  .settings-card label small {
+    color: #b4c5ab;
+  }
+  .settings-actions {
+    border-top-color: #3d4b42;
+  }
+  .setting-status {
+    color: #b4c5ab;
+  }
+  .setting-status.error {
+    color: #f08a82;
+  }
 }
 .setting-status {
   font-size: 12px;
@@ -1383,7 +1423,7 @@ html.header-overlay-active.fullscreen-header-visible header {
   font-size: 11px;
   font-weight: 600;
   line-height: 1.25;
-  box-shadow: 0 6px 18px rgb(23 32 29 / 24%);
+  box-shadow: 0 8px 22px rgb(23 32 29 / 28%);
   white-space: nowrap;
   pointer-events: none;
   transition:
@@ -1432,7 +1472,7 @@ button[title]::after {
   font-size: 11px;
   font-weight: 600;
   line-height: 1.25;
-  box-shadow: 0 6px 18px rgb(23 32 29 / 24%);
+  box-shadow: 0 8px 22px rgb(23 32 29 / 28%);
   white-space: nowrap;
   pointer-events: none;
   transition:
@@ -1448,6 +1488,13 @@ button[title]:focus-visible::after {
 }
 .header-tooltip > button[title]::after {
   display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tooltip-popover,
+  button[title]::after {
+    box-shadow: 0 8px 22px rgb(0 0 0 / 48%);
+  }
 }
 
 .app-shell:has(.settings-modal[open]) .header-actions {
@@ -2663,10 +2710,12 @@ dialog.settings-modal:not([open]) {
   min-height: 0;
   overflow-y: auto;
   padding: clamp(24px, 3vw, 48px) clamp(18px, 3vw, 44px) 40px;
-  border-left: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: -18px 0 42px rgb(21 31 26 / 18%);
+  border-left: 1px solid var(--line, #e2e8e3);
+  background: var(--surface, #fff);
+  color: var(--ink, #17201d);
+  box-shadow:
+    -20px 0 48px rgb(21 31 26 / 22%),
+    -4px 0 12px rgb(21 31 26 / 10%);
 }
 
 .settings-drawer-head {
@@ -2702,9 +2751,17 @@ dialog.settings-modal:not([open]) {
   }
 
   .settings-drawer {
+    background: #202c25;
+    border-left-color: #425443;
+    color: #edf4ef;
+    box-shadow:
+      -20px 0 48px rgb(0 0 0 / 48%),
+      -4px 0 12px rgb(0 0 0 / 32%);
+  }
+
+  .settings-drawer .settings-card {
     background: #17201c;
-    border-left-color: #2c3931;
-    box-shadow: -18px 0 42px rgb(0 0 0 / 38%);
+    border-color: #3d4b42;
   }
 }
 
