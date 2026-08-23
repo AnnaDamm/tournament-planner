@@ -11,6 +11,7 @@
 - Add the player comparison overlay.
 - Show the release version in the footer.
 - Improve round score progression and bye handling.
+- Keep documentation headings visible while scrolling.
 
 ### Bugfixes
 

@@ -50,6 +50,7 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
 - Every new version tag must update `package.json`, the version history on the documentation page, and `CHANGELOG.md` together.
 - A tag `vX.Y.Z` must point to a commit whose `package.json` version is exactly `X.Y.Z`.
 - Every `CHANGELOG.md` version entry, including `Unreleased`, must categorize changes under `Features` and/or `Bugfixes`; omit a subsection when it has no entries.
+- Every documentation version-history entry must mirror its corresponding `CHANGELOG.md` entry with the same `Features` and/or `Bugfixes` subsections; omit a subsection when it has no entries.
 - Whenever a feature or bug fix is made, update the current `Unreleased` blocks in both `CHANGELOG.md` and the documentation page unless the change is already covered by an existing entry.
 - Do not create standalone release or version-bump commits; put the version change into the tagged feature or merge commit.
 
