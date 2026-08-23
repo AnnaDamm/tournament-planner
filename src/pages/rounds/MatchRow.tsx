@@ -7,7 +7,7 @@ import type { Match, SetScore } from '../../tournamentTypes'
 import { t } from '../../i18n'
 import {
   getMatchResult,
-  getMaxSetCount,
+  getVisibleSetCount,
   hasEnteredScore,
   isUnknownParticipantId,
 } from '../../tournament'
@@ -28,6 +28,7 @@ type Props = {
   onKeyboardSwap: (participantId: string) => void
   keyboardMoveActive?: boolean
   winningGames: number
+  setCount: number
   isRunning?: boolean
   readOnly?: boolean
 }
@@ -44,12 +45,10 @@ const isCompleteSet = (set: SetScore) =>
 const getSetStats = (sets: SetScore[], winningGames: number) => {
   let winsA = 0
   let winsB = 0
-  let completedSets = 0
   let winnerAt = -1
 
   sets.forEach((set, index) => {
     if (!isCompleteSet(set)) return
-    completedSets += 1
     if (Number(set.a) > Number(set.b)) winsA += 1
     if (Number(set.b) > Number(set.a)) winsB += 1
     if (winnerAt === -1 && (winsA >= winningGames || winsB >= winningGames)) {
@@ -57,7 +56,7 @@ const getSetStats = (sets: SetScore[], winningGames: number) => {
     }
   })
 
-  return { completedSets, winnerAt }
+  return { winnerAt }
 }
 
 const trimSetsAfterWinner = (sets: SetScore[], winningGames: number) => {
@@ -93,6 +92,7 @@ export const MatchRow = memo(function MatchRow({
   onKeyboardSwap,
   keyboardMoveActive = false,
   winningGames,
+  setCount,
   isRunning = false,
   readOnly = false,
 }: Props) {
@@ -115,11 +115,7 @@ export const MatchRow = memo(function MatchRow({
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.a
   const canKeyboardDropB =
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.b
-  const { completedSets, winnerAt } = useMemo(
-    () => getSetStats(draftSets, targetWins),
-    [draftSets, targetWins],
-  )
-  const maxSetCount = getMaxSetCount(targetWins)
+  const { winnerAt } = useMemo(() => getSetStats(draftSets, targetWins), [draftSets, targetWins])
   const finalScore = useMemo(() => {
     if (winnerAt < 0) return null
     return draftSets.slice(0, winnerAt + 1).reduce(
@@ -131,13 +127,7 @@ export const MatchRow = memo(function MatchRow({
       { a: 0, b: 0 },
     )
   }, [draftSets, winnerAt])
-  const visibleSetCount = Math.max(
-    targetWins,
-    Math.min(
-      maxSetCount,
-      winnerAt >= 0 ? winnerAt + 1 : completedSets >= targetWins ? completedSets + 1 : targetWins,
-    ),
-  )
+  const visibleSetCount = getVisibleSetCount(match, targetWins)
   const updateSet = (setIndex: number, side: 'a' | 'b', value: string) => {
     const safeValue =
       value === '' ? '' : String(Math.max(0, Number.isFinite(Number(value)) ? Number(value) : 0))
@@ -365,7 +355,7 @@ export const MatchRow = memo(function MatchRow({
       <SetScores
         draftSets={draftSets}
         visibleSetCount={visibleSetCount}
-        maxSetCount={maxSetCount}
+        setCount={setCount}
         readOnly={readOnly}
         playerA={name(match.a)}
         playerB={name(match.b)}

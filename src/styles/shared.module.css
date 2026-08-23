@@ -355,7 +355,7 @@
 
   :global(.match-heading-player-a) {
     grid-area: player-a;
-    padding-inline-start: 27px;
+    padding-inline-start: 30px;
   }
 
   :global(.match-heading-versus) {
@@ -365,7 +365,7 @@
 
   :global(.match-heading-player-b) {
     grid-area: player-b;
-    padding-inline-start: 27px;
+    padding-inline-start: 30px;
   }
 
   :global(.set-headers) {
@@ -618,43 +618,79 @@
   :global(.readonly-focus-mode) :global(.match),
   :global(.readonly-focus-mode) :global(.matches-header) {
     grid-template-columns:
-      [court] clamp(42px, 3vw, 63px)
-      [start] minmax(80px, max-content)
-      [compare] clamp(44px, 3vw, 64px)
+      [court] clamp(42px, 3cqw, 63px)
+      [start] minmax(clamp(80px, 7cqw, 120px), max-content)
+      [compare] clamp(44px, 3cqw, 64px)
       [player-a] minmax(0, 1fr)
-      [versus] clamp(72px, 5vw, 110px)
+      [versus] clamp(72px, 5cqw, 110px)
       [player-b] minmax(0, 1fr)
-      [scores] clamp(220px, 21vw, 360px);
+      [scores] clamp(220px, 24cqw, 360px);
     grid-template-areas: 'court start compare player-a versus player-b scores';
-    gap: clamp(8px, 0.8vw, 16px);
-    padding-block: clamp(5px, 0.5vw, 10px);
-    font-size: clamp(32px, 2.2vw, 48px);
+    gap: clamp(8px, 0.8cqw, 16px);
+    padding-block: clamp(5px, 0.5cqw, 10px);
+    font-size: clamp(24px, 2.2cqw, 48px);
   }
 
   :global(.readonly-focus-mode) :global(.matches-header) {
     --set-column-min-width: clamp(104px, 8vw, 150px);
-    gap: clamp(10px, 0.8vw, 16px);
-    padding-block: clamp(5px, 0.5vw, 10px);
-    font-size: clamp(24px, 1.4vw, 35px);
+    gap: clamp(10px, 0.8cqw, 16px);
+    padding-block: clamp(5px, 0.5cqw, 10px);
+    font-size: clamp(18px, 1.4cqw, 35px);
+  }
+
+  :global(.readonly-focus-mode) :global(.set-headers) {
+    --set-column-min-width: 0px;
+    gap: clamp(8px, 0.8cqw, 16px);
   }
 
   :global(.readonly-focus-mode) :global(.match-player-name) {
-    font-size: clamp(36px, 2.4vw, 54px);
+    font-size: clamp(28px, 2.8cqw, 54px);
   }
 
   :global(.readonly-focus-mode) :global(.player-record),
   :global(.readonly-focus-mode) :global(.round-started) {
-    font-size: clamp(27px, 1.6vw, 38px);
+    font-size: clamp(20px, 1.8cqw, 38px);
   }
 
-  :global(.readonly-focus-mode) :global(.set-label),
+  :global(.readonly-focus-mode) :global(.set-label) {
+    font-size: clamp(12px, calc(6cqw / var(--set-count)), 35px);
+  }
+
   :global(.readonly-focus-mode) :global(.versus) {
-    font-size: clamp(24px, 1.4vw, 35px);
+    font-size: clamp(18px, 1.6cqw, 35px);
   }
 
   :global(.readonly-focus-mode) :global(.score-readonly) :global(.score-value),
   :global(.readonly-focus-mode) :global(.match-score) {
-    font-size: clamp(42px, 3vw, 66px);
+    font-size: clamp(12px, calc(11cqw / var(--set-count)), 66px);
+  }
+
+  :global(.readonly-focus-mode) :global(.score) b {
+    font-size: clamp(12px, calc(11cqw / var(--set-count)), 66px);
+  }
+
+  @container content (max-width: 900px) {
+    :global(.readonly-focus-mode) :global(.match),
+    :global(.readonly-focus-mode) :global(.matches-header) {
+      grid-template-columns: 28px 48px minmax(0, 1fr) 44px minmax(0, 1fr);
+      grid-template-areas:
+        'court compare player-a versus player-b'
+        '. start start start .'
+        '. scores scores scores scores';
+      gap: 10px 9px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.readonly-focus-mode) :global(.match),
+    :global(.readonly-focus-mode) :global(.matches-header) {
+      grid-template-columns: 24px 44px minmax(0, 1fr) 24px minmax(0, 1fr);
+      grid-template-areas:
+        'court compare player-a versus player-b'
+        '. start start start .'
+        '. scores scores scores scores';
+      gap: 8px 7px;
+    }
   }
 
   :global(.score) b {

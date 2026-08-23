@@ -8,7 +8,7 @@ import { t } from '../../i18n'
 type Props = {
   draftSets: SetScore[]
   visibleSetCount: number
-  maxSetCount: number
+  setCount: number
   readOnly: boolean
   playerA: string
   playerB: string
@@ -20,7 +20,7 @@ type Props = {
 export function SetScores({
   draftSets,
   visibleSetCount,
-  maxSetCount,
+  setCount,
   readOnly,
   playerA,
   playerB,
@@ -28,7 +28,7 @@ export function SetScores({
   scheduleCommit,
   keyboardMoveActive = false,
 }: Props) {
-  const setScoresStyle = { '--set-count': maxSetCount } as CSSProperties
+  const setScoresStyle = { '--set-count': setCount } as CSSProperties
 
   return (
     <div

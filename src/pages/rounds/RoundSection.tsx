@@ -8,7 +8,12 @@ import { RoundBye } from './RoundBye'
 import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
 import { t } from '../../i18n'
-import { getMaxSetCount, isRoundComplete, sortMatchesByParticipantOrder } from '../../tournament'
+import {
+  getMaxSetCount,
+  getVisibleSetCount,
+  isRoundComplete,
+  sortMatchesByParticipantOrder,
+} from '../../tournament'
 import type { Match, Round } from '../../tournamentTypes'
 
 type Props = {
@@ -70,6 +75,9 @@ export const RoundSection = memo(function RoundSection({
     [participantOrder, round.matches],
   )
   const maxSetCount = getMaxSetCount(round.winningGames)
+  const setCount = readOnly
+    ? Math.max(1, ...orderedMatches.map((match) => getVisibleSetCount(match, round.winningGames)))
+    : maxSetCount
   const getRecord = useCallback((id: string) => record(roundIndex, id), [record, roundIndex])
   const handleCompare = useCallback(
     (firstId: string, secondId: string) => onCompare(firstId, secondId, roundIndex),
@@ -178,7 +186,7 @@ export const RoundSection = memo(function RoundSection({
         </div>
       ) : (
         <div className={classNames(sharedStyles, styles, 'matches')}>
-          <RoundMatchesHeader maxSetCount={maxSetCount} />
+          <RoundMatchesHeader setCount={setCount} />
           {orderedMatches.map((match, matchIndex) => (
             <MatchRow
               key={match.id}
@@ -192,6 +200,7 @@ export const RoundSection = memo(function RoundSection({
               onCompare={handleCompare}
               onUpdate={handleUpdate}
               winningGames={round.winningGames ?? 1}
+              setCount={setCount}
               isRunning={runningMatchIds.has(match.id)}
               onSwap={handleSwapPlayers}
               selectedParticipantId={selectedParticipantId}

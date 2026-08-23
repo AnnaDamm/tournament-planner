@@ -65,6 +65,28 @@ export const getMaxSetCount = (winningGames: number) => {
   return targetWins * 2 - 1
 }
 
+export const getVisibleSetCount = (match: Match, winningGames: number) => {
+  const targetWins = Math.max(1, Math.min(99, Number(winningGames) || 1))
+  const sets = getMatchSets(match)
+  let winsA = 0
+  let winsB = 0
+  let completedSets = 0
+  let winnerAt = -1
+
+  sets.forEach((set, index) => {
+    if (!completeSet(set)) return
+    completedSets += 1
+    if (Number(set.a) > Number(set.b)) winsA += 1
+    if (Number(set.b) > Number(set.a)) winsB += 1
+    if (winnerAt === -1 && (winsA >= targetWins || winsB >= targetWins)) winnerAt = index
+  })
+
+  return Math.max(
+    targetWins,
+    winnerAt >= 0 ? winnerAt + 1 : completedSets >= targetWins ? completedSets + 1 : targetWins,
+  )
+}
+
 const hasPlayed = (firstId: string, secondId: string, rounds: Round[]) =>
   rounds.some((round) =>
     round.matches.some(
