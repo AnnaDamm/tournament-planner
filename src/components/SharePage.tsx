@@ -1,3 +1,6 @@
+import styles from './SharePage.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
@@ -29,19 +32,22 @@ export function SharePage({ viewerUrl }: Props) {
   return (
     <>
       <PageTitle title={t('shareTournament')} />
-      <section className="share-card" aria-labelledby="share-title">
-        <div className="share-copy">
-          <div className="share-icon" aria-hidden="true">
+      <section
+        className={classNames(sharedStyles, styles, 'share-card')}
+        aria-labelledby="share-title"
+      >
+        <div className={classNames(sharedStyles, styles, 'share-copy')}>
+          <div className={classNames(sharedStyles, styles, 'share-icon')} aria-hidden="true">
             <QrCode size={24} />
           </div>
           <h2 id="share-title">{t('scanToView')}</h2>
           <p>{t('shareHelp')}</p>
-          <div className="share-address">
+          <div className={classNames(sharedStyles, styles, 'share-address')}>
             <span>{t('viewerAddress')}</span>
             <code>{viewerUrl}</code>
           </div>
         </div>
-        <div className="share-qr">
+        <div className={classNames(sharedStyles, styles, 'share-qr')}>
           {currentQrCode?.failed ? (
             <p role="alert">{t('qrError')}</p>
           ) : currentQrCode?.dataUrl ? (

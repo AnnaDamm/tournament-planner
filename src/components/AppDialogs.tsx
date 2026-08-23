@@ -1,3 +1,6 @@
+import styles from './AppDialogs.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { UserPlus, X } from 'lucide-react'
 import { Dialog } from './Dialog'
 import { t } from '../i18n'
@@ -31,7 +34,7 @@ export function AppDialogs() {
         labelledBy="add-participants-title"
         describedBy="add-participants-help"
       >
-        <div className="dialog-head">
+        <div className={classNames(sharedStyles, styles, 'dialog-head')}>
           <div>
             <h2 id="add-participants-title">
               {participantType === 'teams' ? t('addTeam') : t('add')}
@@ -39,7 +42,7 @@ export function AppDialogs() {
             <p id="add-participants-help">{t('onePerLine')}</p>
           </div>
           <button
-            className="icon-btn"
+            className={classNames(sharedStyles, styles, 'icon-btn')}
             type="button"
             aria-label={t('close')}
             title={t('close')}
@@ -61,16 +64,20 @@ export function AppDialogs() {
           }}
           placeholder={'North Stars\nRiver Club\n...'}
         />
-        <div className="dialog-actions">
+        <div className={classNames(sharedStyles, styles, 'dialog-actions')}>
           <button
-            className="button ghost"
+            className={classNames(sharedStyles, styles, 'button ghost')}
             type="button"
             title={t('cancel')}
             onClick={() => bulkRef.current?.close()}
           >
             {t('cancel')}
           </button>
-          <button className="button primary" onClick={onAdd} title={t('addButton')}>
+          <button
+            className={classNames(sharedStyles, styles, 'button primary')}
+            onClick={onAdd}
+            title={t('addButton')}
+          >
             <UserPlus size={16} aria-hidden="true" /> {t('addButton')}
           </button>
         </div>
@@ -80,13 +87,13 @@ export function AppDialogs() {
         labelledBy="delete-all-title"
         describedBy="delete-all-description"
       >
-        <div className="dialog-head">
+        <div className={classNames(sharedStyles, styles, 'dialog-head')}>
           <div>
             <h2 id="delete-all-title">{t('deleteEverything')}</h2>
             <p id="delete-all-description">{t('deleteDescription')}</p>
           </div>
           <button
-            className="icon-btn"
+            className={classNames(sharedStyles, styles, 'icon-btn')}
             type="button"
             aria-label={t('close')}
             title={t('close')}
@@ -95,15 +102,19 @@ export function AppDialogs() {
             <X size={18} aria-hidden="true" />
           </button>
         </div>
-        <div className="dialog-actions">
+        <div className={classNames(sharedStyles, styles, 'dialog-actions')}>
           <button
-            className="button ghost"
+            className={classNames(sharedStyles, styles, 'button ghost')}
             title={t('cancel')}
             onClick={() => confirmRef.current?.close()}
           >
             {t('cancel')}
           </button>
-          <button className="button danger" onClick={onDeleteAll} title={t('deleteAll')}>
+          <button
+            className={classNames(sharedStyles, styles, 'button danger')}
+            onClick={onDeleteAll}
+            title={t('deleteAll')}
+          >
             {t('deleteAll')}
           </button>
         </div>

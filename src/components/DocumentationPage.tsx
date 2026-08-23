@@ -1,3 +1,6 @@
+import styles from './DocumentationPage.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { ChevronRight } from 'lucide-react'
 import { Navigate, NavLink, useParams } from 'react-router-dom'
 import { getDocs } from '../docs/content'
@@ -12,17 +15,20 @@ export function DocumentationPage() {
   if (!page) return <Navigate to="/docs" replace />
 
   return (
-    <div className="docs-layout">
-      <nav className="docs-nav" aria-label={locale === 'de' ? 'Dokumentation' : 'Documentation'}>
+    <div className={classNames(sharedStyles, styles, 'docs-layout')}>
+      <nav
+        className={classNames(sharedStyles, styles, 'docs-nav')}
+        aria-label={locale === 'de' ? 'Dokumentation' : 'Documentation'}
+      >
         {docs.map((item) => (
           <NavLink key={item.slug} to={`/docs/${item.slug}`}>
             {item.title} <ChevronRight size={14} aria-hidden="true" />
           </NavLink>
         ))}
       </nav>
-      <article className="docs-article">
+      <article className={classNames(sharedStyles, styles, 'docs-article')}>
         <h1>{page.title}</h1>
-        <p className="docs-summary">{page.summary}</p>
+        <p className={classNames(sharedStyles, styles, 'docs-summary')}>{page.summary}</p>
         {page.sections.map((section, index) => (
           <section key={section.title} aria-labelledby={`docs-section-${index}`}>
             <h2 id={`docs-section-${index}`}>{section.title}</h2>
@@ -36,9 +42,11 @@ export function DocumentationPage() {
                 ))}
               </ul>
             )}
-            {section.note && <div className="docs-note">{section.note}</div>}
+            {section.note && (
+              <div className={classNames(sharedStyles, styles, 'docs-note')}>{section.note}</div>
+            )}
             {section.links && (
-              <p className="docs-links">
+              <p className={classNames(sharedStyles, styles, 'docs-links')}>
                 {section.links.map((link) => (
                   <NavLink key={link.to} to={link.to}>
                     {link.label}

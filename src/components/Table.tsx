@@ -1,3 +1,6 @@
+import styles from './Table.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import {
   Check,
   ChevronDown,
@@ -85,10 +88,10 @@ export function Table({
     <>
       <PageTitle title={t('table')}>
         {!readOnly && (
-          <div className="page-actions">
+          <div className={classNames(sharedStyles, styles, 'page-actions')}>
             {canSeed && (
               <button
-                className="button ghost"
+                className={classNames(sharedStyles, styles, 'button ghost')}
                 onClick={() => dispatch(shuffleParticipants())}
                 title={t('shuffle')}
               >
@@ -96,7 +99,7 @@ export function Table({
               </button>
             )}
             <button
-              className="button primary"
+              className={classNames(sharedStyles, styles, 'button primary')}
               onClick={onAdd}
               title={participantLabel === t('teams') ? t('addTeam') : t('add')}
             >
@@ -104,31 +107,41 @@ export function Table({
               {participantLabel === t('teams') ? t('addTeam') : t('add')}
             </button>
             {!editing ? (
-              <button className="button ghost" onClick={() => setEditing(true)} title={t('edit')}>
+              <button
+                className={classNames(sharedStyles, styles, 'button ghost')}
+                onClick={() => setEditing(true)}
+                title={t('edit')}
+              >
                 <Pencil size={16} aria-hidden="true" /> {t('edit')}
               </button>
             ) : (
-              <button className="button ghost" onClick={() => setEditing(false)} title={t('done')}>
+              <button
+                className={classNames(sharedStyles, styles, 'button ghost')}
+                onClick={() => setEditing(false)}
+                title={t('done')}
+              >
                 <Check size={16} aria-hidden="true" /> {t('done')}
               </button>
             )}
           </div>
         )}
       </PageTitle>
-      <div className="section-head ranking-participants-head">
+      <div className={classNames(sharedStyles, styles, 'section-head ranking-participants-head')}>
         <h2>{participantLabel === t('teams') ? t('allTeams') : t('all')}</h2>
         <span>
           {sorted.length} {t('registered')}
         </span>
       </div>
       {hasDuplicateNames && (
-        <p className="duplicate-warning" role="alert">
+        <p className={classNames(sharedStyles, styles, 'duplicate-warning')} role="alert">
           {t('duplicateWarning')}
         </p>
       )}
-      <div className="table-wrap">
-        <table className="ranking-table">
-          <caption className="sr-only">{t('rankingTable')}</caption>
+      <div className={classNames(sharedStyles, styles, 'table-wrap')}>
+        <table className={classNames(sharedStyles, styles, 'ranking-table')}>
+          <caption className={classNames(sharedStyles, styles, 'sr-only')}>
+            {t('rankingTable')}
+          </caption>
           <thead>
             <tr>
               <th
@@ -136,7 +149,11 @@ export function Table({
                 aria-sort={sort === 'position' ? (desc ? 'descending' : 'ascending') : 'none'}
               >
                 <button
-                  className={sort === 'position' ? 'sort-active' : ''}
+                  className={classNames(
+                    sharedStyles,
+                    styles,
+                    sort === 'position' ? 'sort-active' : '',
+                  )}
                   title={t('position')}
                   onClick={() => toggleSort('position')}
                 >
@@ -144,7 +161,11 @@ export function Table({
                   <ChevronDown
                     size={14}
                     aria-hidden="true"
-                    className={sort === 'position' && desc ? 'sort-down' : ''}
+                    className={classNames(
+                      sharedStyles,
+                      styles,
+                      sort === 'position' && desc ? 'sort-down' : '',
+                    )}
                   />
                 </button>
               </th>
@@ -155,7 +176,7 @@ export function Table({
                   aria-sort={sort === key ? (desc ? 'descending' : 'ascending') : 'none'}
                 >
                   <button
-                    className={sort === key ? 'sort-active' : ''}
+                    className={classNames(sharedStyles, styles, sort === key ? 'sort-active' : '')}
                     title={label}
                     onClick={() => toggleSort(key)}
                   >
@@ -163,7 +184,11 @@ export function Table({
                     <ChevronDown
                       size={14}
                       aria-hidden="true"
-                      className={sort === key && desc ? 'sort-down' : ''}
+                      className={classNames(
+                        sharedStyles,
+                        styles,
+                        sort === key && desc ? 'sort-down' : '',
+                      )}
                     />
                   </button>
                 </th>
@@ -178,7 +203,11 @@ export function Table({
                 <tr
                   id={`player-${player.id}`}
                   key={player.id}
-                  className={player.withdrawn ? 'withdrawn-row' : ''}
+                  className={classNames(
+                    sharedStyles,
+                    styles,
+                    player.withdrawn ? 'withdrawn-row' : '',
+                  )}
                   draggable={canSeed}
                   onDragStart={(event) => event.dataTransfer.setData('text/plain', player.id)}
                   onDragOver={(event) => canSeed && event.preventDefault()}
@@ -189,22 +218,41 @@ export function Table({
                       dispatch(reorderParticipants(draggedId, player.id))
                   }}
                 >
-                  <td className="rank-cell" data-label={t('position')}>
-                    <span className={`rank rank-${player.position} cell-value`}>
+                  <td
+                    className={classNames(sharedStyles, styles, 'rank-cell')}
+                    data-label={t('position')}
+                  >
+                    <span
+                      className={classNames(
+                        sharedStyles,
+                        styles,
+                        `rank rank-${player.position} cell-value`,
+                      )}
+                    >
                       {player.position}
                     </span>
                   </td>
-                  <td className="name-cell" data-label={participantLabel}>
-                    {canSeed && <GripVertical className="seed-grip" size={16} aria-hidden="true" />}
+                  <td
+                    className={classNames(sharedStyles, styles, 'name-cell')}
+                    data-label={participantLabel}
+                  >
+                    {canSeed && (
+                      <GripVertical
+                        className={classNames(sharedStyles, styles, 'seed-grip')}
+                        size={16}
+                        aria-hidden="true"
+                      />
+                    )}
                     {editing ? (
                       <PlayerNameEditor player={player} />
                     ) : (
                       <button
-                        className={
+                        className={classNames(
+                          styles,
                           player.withdrawn
                             ? 'player-name-button table-player-name withdrawn-name'
-                            : 'player-name-button table-player-name'
-                        }
+                            : 'player-name-button table-player-name',
+                        )}
                         title={`${t('history')}: ${player.name}`}
                         onClick={() => setHistoryPlayer(player)}
                       >
@@ -212,38 +260,48 @@ export function Table({
                       </button>
                     )}
                     {player.withdrawn && (
-                      <small className="withdrawn-label">{t('withdrawn')}</small>
+                      <small className={classNames(sharedStyles, styles, 'withdrawn-label')}>
+                        {t('withdrawn')}
+                      </small>
                     )}
                   </td>
                   <td data-label={t('wins')}>
-                    <span className="cell-value">{player.wins}</span>
+                    <span className={classNames(sharedStyles, styles, 'cell-value')}>
+                      {player.wins}
+                    </span>
                   </td>
                   <td data-label={t('games')}>
-                    <span className="cell-value">
+                    <span className={classNames(sharedStyles, styles, 'cell-value')}>
                       {player.played}
                       {gamesBehind > 0 && (
-                        <small className="games-behind" title={t('fewerGames')}>
+                        <small
+                          className={classNames(sharedStyles, styles, 'games-behind')}
+                          title={t('fewerGames')}
+                        >
                           (-{gamesBehind})
                         </small>
                       )}
                     </span>
                   </td>
                   <td data-label={t('sets')}>
-                    <span className="cell-value">
+                    <span className={classNames(sharedStyles, styles, 'cell-value')}>
                       {player.setsWon}:{player.setsLost} (
                       {formatDifference(player.setsWon - player.setsLost)})
                     </span>
                   </td>
                   <td data-label={t('points')}>
-                    <strong className="cell-value">
+                    <strong className={classNames(sharedStyles, styles, 'cell-value')}>
                       {player.scored}:{player.conceded} (
                       {formatDifference(player.scored - player.conceded)})
                     </strong>
                   </td>
                   {!readOnly && (
-                    <td className="player-actions" data-label={t('actions')}>
+                    <td
+                      className={classNames(sharedStyles, styles, 'player-actions')}
+                      data-label={t('actions')}
+                    >
                       <button
-                        className="status-btn"
+                        className={classNames(sharedStyles, styles, 'status-btn')}
                         onClick={() => dispatch(toggleParticipantWithdrawal(player.id))}
                         title={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
                         aria-label={player.withdrawn ? t('undoWithdrawal') : t('withdraw')}
@@ -255,7 +313,7 @@ export function Table({
                         )}
                       </button>
                       <button
-                        className="delete-btn"
+                        className={classNames(sharedStyles, styles, 'delete-btn')}
                         onClick={() => dispatch(deleteParticipant(player.id))}
                         title={t('delete')}
                         aria-label={`${t('delete')}: ${player.name}`}

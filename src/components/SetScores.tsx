@@ -1,3 +1,6 @@
+import styles from './SetScores.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import type { SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
 
@@ -21,17 +24,20 @@ export function SetScores({
   scheduleCommit,
 }: Props) {
   return (
-    <div className="set-scores">
+    <div className={classNames(sharedStyles, styles, 'set-scores')}>
       {Array.from(
         { length: visibleSetCount },
         (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },
       ).map((set, setIndex) => (
-        <div className={`score${readOnly ? ' score-readonly' : ''}`} key={setIndex}>
-          <span className="set-label" aria-hidden="true">
+        <div
+          className={classNames(sharedStyles, styles, `score${readOnly ? ' score-readonly' : ''}`)}
+          key={setIndex}
+        >
+          <span className={classNames(sharedStyles, styles, 'set-label')} aria-hidden="true">
             {setIndex + 1}
           </span>
           {readOnly ? (
-            <span className="score-value">{set.a || '–'}</span>
+            <span className={classNames(sharedStyles, styles, 'score-value')}>{set.a || '–'}</span>
           ) : (
             <input
               type="number"
@@ -46,7 +52,7 @@ export function SetScores({
           )}
           <b aria-hidden="true">:</b>
           {readOnly ? (
-            <span className="score-value">{set.b || '–'}</span>
+            <span className={classNames(sharedStyles, styles, 'score-value')}>{set.b || '–'}</span>
           ) : (
             <input
               type="number"

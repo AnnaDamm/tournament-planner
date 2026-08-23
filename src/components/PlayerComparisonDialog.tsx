@@ -1,3 +1,6 @@
+import styles from './PlayerComparisonDialog.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
@@ -141,6 +144,8 @@ export function PlayerComparisonDialog({
   onClose,
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const cn = (...values: Array<string | false | null | undefined>) =>
+    classNames(sharedStyles, styles, ...values)
   const [view, setView] = useState<ComparisonView>('current')
   const roundsBeforeSelected = useMemo(
     () => (roundIndex === null ? rounds : rounds.slice(0, roundIndex)),
@@ -195,26 +200,31 @@ export function PlayerComparisonDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="dialog comparison-dialog"
+      className={cn('dialog comparison-dialog')}
       aria-labelledby="player-comparison-title"
       aria-describedby="player-comparison-description"
       onCancel={onClose}
       onClose={onClose}
     >
-      <div className="dialog-head">
+      <div className={cn('dialog-head')}>
         <div>
           <h2 id="player-comparison-title">{t('comparison')}</h2>
           <p id="player-comparison-description">{t('comparisonDescription')}</p>
         </div>
-        <button className="icon-btn" onClick={onClose} aria-label={t('close')} title={t('close')}>
+        <button
+          className={cn('icon-btn')}
+          onClick={onClose}
+          aria-label={t('close')}
+          title={t('close')}
+        >
           <X size={18} aria-hidden="true" />
         </button>
       </div>
       {comparison && (
         <>
-          <div className="comparison-tabs" role="tablist" aria-label={t('comparisonViews')}>
+          <div className={cn('comparison-tabs')} role="tablist" aria-label={t('comparisonViews')}>
             <button
-              className="comparison-tab"
+              className={cn('comparison-tab')}
               type="button"
               role="tab"
               id="comparison-tab-current"
@@ -225,7 +235,7 @@ export function PlayerComparisonDialog({
               {t('currentStats')}
             </button>
             <button
-              className="comparison-tab"
+              className={cn('comparison-tab')}
               type="button"
               role="tab"
               id="comparison-tab-before-round"
@@ -237,7 +247,7 @@ export function PlayerComparisonDialog({
             </button>
           </div>
           <section
-            className="comparison-panel"
+            className={cn('comparison-panel')}
             id="comparison-panel"
             role="tabpanel"
             aria-labelledby={
@@ -245,9 +255,9 @@ export function PlayerComparisonDialog({
             }
             tabIndex={0}
           >
-            <div className="comparison-table-wrap">
-              <table className="comparison-table">
-                <caption className="sr-only">{t('comparison')}</caption>
+            <div className={cn('comparison-table-wrap')}>
+              <table className={cn('comparison-table')}>
+                <caption className={cn('sr-only')}>{t('comparison')}</caption>
                 <thead>
                   <tr>
                     <th scope="col">{t('statistics')}</th>
@@ -266,14 +276,20 @@ export function PlayerComparisonDialog({
                 </tbody>
               </table>
             </div>
-            <section className="direct-comparison" aria-labelledby="head-to-head-title">
+            <section className={cn('direct-comparison')} aria-labelledby="head-to-head-title">
               <h3 id="head-to-head-title">{t('headToHead')}</h3>
               {comparison.direct[0].played === 0 ? (
-                <p className="comparison-empty">{t('noHeadToHead')}</p>
+                <p className={cn('comparison-empty')}>{t('noHeadToHead')}</p>
               ) : (
-                <div className="comparison-table-wrap">
-                  <table className="comparison-table direct-comparison-table">
-                    <caption className="sr-only">{t('headToHead')}</caption>
+                <div className={cn('comparison-table-wrap')}>
+                  <table
+                    className={classNames(
+                      sharedStyles,
+                      styles,
+                      'comparison-table direct-comparison-table',
+                    )}
+                  >
+                    <caption className={cn('sr-only')}>{t('headToHead')}</caption>
                     <thead>
                       <tr>
                         <th scope="col">{t('statistics')}</th>

@@ -1,3 +1,6 @@
+import styles from './PlayerHistoryDialog.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, useMemo, useRef } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
@@ -164,27 +167,32 @@ export function PlayerHistoryDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="dialog history-dialog"
+      className={classNames(sharedStyles, styles, 'dialog history-dialog')}
       aria-labelledby="player-history-title"
       aria-describedby="player-history-description"
       onCancel={onClose}
       onClose={onClose}
     >
-      <div className="dialog-head">
+      <div className={classNames(sharedStyles, styles, 'dialog-head')}>
         <div>
           <h2 id="player-history-title">{player?.name}</h2>
           <p id="player-history-description">{t('history')}</p>
         </div>
-        <button className="icon-btn" onClick={onClose} aria-label={t('close')} title={t('close')}>
+        <button
+          className={classNames(sharedStyles, styles, 'icon-btn')}
+          onClick={onClose}
+          aria-label={t('close')}
+          title={t('close')}
+        >
           <X size={18} aria-hidden="true" />
         </button>
       </div>
-      <div className="history-table-wrap">
+      <div className={classNames(sharedStyles, styles, 'history-table-wrap')}>
         {entries.length === 0 ? (
-          <p className="history-empty">{t('historyEmpty')}</p>
+          <p className={classNames(sharedStyles, styles, 'history-empty')}>{t('historyEmpty')}</p>
         ) : (
           <table>
-            <caption className="sr-only">
+            <caption className={classNames(sharedStyles, styles, 'sr-only')}>
               {t('history')}: {player?.name}
             </caption>
             <thead>
@@ -199,7 +207,7 @@ export function PlayerHistoryDialog({
             </thead>
             <tbody>
               {entries.map((entry) => (
-                <tr key={entry.key} className={entry.rowClass}>
+                <tr key={entry.key} className={classNames(sharedStyles, styles, entry.rowClass)}>
                   <td>{entry.round}</td>
                   <td>{entry.positionAfter}</td>
                   <td>{entry.opponent}</td>
@@ -222,7 +230,9 @@ export function PlayerHistoryDialog({
                         ))
                       : '—'}
                   </td>
-                  <td className={entry.outcomeClass}>{entry.outcome}</td>
+                  <td className={classNames(sharedStyles, styles, entry.outcomeClass)}>
+                    {entry.outcome}
+                  </td>
                 </tr>
               ))}
             </tbody>

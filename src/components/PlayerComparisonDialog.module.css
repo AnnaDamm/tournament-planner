@@ -1,0 +1,207 @@
+@layer components {
+  .comparison-dialog {
+    width: min(760px, calc(100% - 32px));
+  }
+
+  .comparison-tabs {
+    display: flex;
+    gap: 2px;
+    margin: 0 25px;
+    padding: 4px 4px 0;
+    border: 1px solid #dfe7e0;
+    border-radius: 8px 8px 0 0;
+    background: #f2f6f2;
+  }
+
+  .comparison-panel {
+    margin: 0 25px 25px;
+    padding-top: 0;
+    border: 1px solid #dfe7e0;
+    border-top: 0;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+  }
+
+  .comparison-tab {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: #617068;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .comparison-tab:hover,
+  .comparison-tab[aria-selected='true'] {
+    background: #fff;
+    border-color: #dfe7e0;
+    border-bottom-color: #fff;
+    color: #35412e;
+    margin-bottom: 0;
+  }
+
+  .comparison-panel .comparison-table-wrap {
+    margin-inline: 0;
+  }
+
+  .comparison-panel .direct-comparison {
+    margin-inline: 0;
+    margin-bottom: 0;
+  }
+
+  .comparison-table-wrap {
+    overflow-x: auto;
+    margin: 0 25px;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e4eae5;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .comparison-table thead th {
+    color: #617068;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .comparison-table th:first-child,
+  .comparison-table td:first-child {
+    text-align: left;
+  }
+
+  .comparison-table tbody th {
+    color: #617068;
+    font-weight: 600;
+  }
+
+  .comparison-table tbody td {
+    font-weight: 700;
+  }
+
+  .direct-comparison {
+    margin: 24px 25px 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e4eae5;
+  }
+
+  .direct-comparison h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+  }
+
+  .direct-comparison .comparison-table-wrap {
+    margin-inline: 0;
+  }
+
+  .comparison-empty {
+    margin: 0 !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-table th,
+    .comparison-table td,
+    .comparison-tabs,
+    .direct-comparison {
+      border-color: #35453a;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-table thead th,
+    .comparison-table tbody th {
+      color: #b4c5ab;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-tab {
+      color: #b4c5ab;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-tab:hover,
+    .comparison-tab[aria-selected='true'] {
+      background: #202c25;
+      border-color: #425443;
+      border-bottom-color: #202c25;
+      color: #d8f5b1;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-tabs {
+      border-color: #35453a;
+      background: #17201c;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparison-panel {
+      border-color: #35453a;
+      background: #202c25;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .comparison-dialog {
+      width: min(760px, calc(100% - 24px));
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .comparison-table-wrap {
+      margin-inline: 18px;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .comparison-tabs {
+      margin-inline: 18px;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .comparison-panel {
+      margin-inline: 18px;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .direct-comparison {
+      margin-inline: 18px;
+    }
+  }
+
+  :global(.readonly-focus-mode) .comparison-dialog {
+    width: min(1100px, calc(100vw - 32px));
+    max-height: calc(100dvh - 24px);
+  }
+
+  :global(.readonly-focus-mode) .comparison-tabs {
+    margin-inline: clamp(18px, 2.5vw, 38px);
+  }
+
+  :global(.readonly-focus-mode) .comparison-panel {
+    margin-inline: clamp(18px, 2.5vw, 38px);
+  }
+
+  :global(.readonly-focus-mode) .comparison-tab {
+    font-size: clamp(18px, 1.2vw, 26px);
+    padding: clamp(10px, 0.8vw, 16px) clamp(12px, 1vw, 20px);
+  }
+}

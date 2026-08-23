@@ -1,3 +1,6 @@
+import styles from './SettingsPage.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react'
 import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -101,17 +104,17 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
   return (
     <dialog
       ref={dialogRef}
-      className="settings-modal"
+      className={classNames(sharedStyles, styles, 'settings-modal')}
       aria-labelledby="settings-title"
       onCancel={handleCancel}
     >
-      <section className="settings-drawer">
-        <div className="settings-drawer-head">
+      <section className={classNames(sharedStyles, styles, 'settings-drawer')}>
+        <div className={classNames(sharedStyles, styles, 'settings-drawer-head')}>
           <div>
             <h1 id="settings-title">{t('settings')}</h1>
           </div>
           <button
-            className="icon-btn settings-drawer-close"
+            className={classNames(sharedStyles, styles, 'icon-btn settings-drawer-close')}
             type="button"
             aria-label={t('back')}
             title={t('back')}
@@ -120,8 +123,11 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
             <ArrowLeft size={20} aria-hidden="true" />
           </button>
         </div>
-        <form className="round-card settings-card" onSubmit={handleSave}>
-          <div className="settings-field">
+        <form
+          className={classNames(sharedStyles, styles, 'round-card settings-card')}
+          onSubmit={handleSave}
+        >
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="expected-duration">
               <b>{t('expectedDuration')}</b>
               <small>{t('expectedDurationHelp')}</small>
@@ -139,7 +145,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="break-between-matches">
               <b>{t('breakBetweenMatches')}</b>
               <small>{t('breakBetweenMatchesHelp')}</small>
@@ -157,7 +163,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="scheduled-start">
               <b>{t('scheduledStart')}</b>
               <small>{t('scheduledStartHelp')}</small>
@@ -171,7 +177,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="tournament-name">
               <b>{t('tournamentName')}</b>
               <small>{t('tournamentNameHelp')}</small>
@@ -186,7 +192,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               maxLength={80}
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="participant-type">
               <b>{t('type')}</b>
               <small>{t('typeHelp')}</small>
@@ -205,7 +211,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               <option value="teams">{t('teams')}</option>
             </select>
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="court-count">
               <b>{t('courts')}</b>
               <small>{t('courtsHelp')}</small>
@@ -220,7 +226,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="default-winning-games">
               <b>{t('defaultWinningGames')}</b>
               <small>{t('defaultWinningGamesHelp')}</small>
@@ -239,7 +245,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="settings-field">
+          <div className={classNames(sharedStyles, styles, 'settings-field')}>
             <label htmlFor="default-set-points">
               <b>{t('defaultSetPoints')}</b>
               <small>{t('defaultSetPointsHelp')}</small>
@@ -258,22 +264,26 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               }
             />
           </div>
-          <div className="dialog-actions settings-form-actions">
+          <div className={classNames(sharedStyles, styles, 'dialog-actions settings-form-actions')}>
             <button
-              className="button ghost"
+              className={classNames(sharedStyles, styles, 'button ghost')}
               type="button"
               onClick={() => navigate(-1)}
               title={t('cancel')}
             >
               {t('cancel')}
             </button>
-            <button className="button primary" type="submit" title={t('save')}>
+            <button
+              className={classNames(sharedStyles, styles, 'button primary')}
+              type="submit"
+              title={t('save')}
+            >
               {t('save')}
             </button>
           </div>
-          <div className="settings-actions">
+          <div className={classNames(sharedStyles, styles, 'settings-actions')}>
             <button
-              className="button ghost"
+              className={classNames(sharedStyles, styles, 'button ghost')}
               type="button"
               onClick={onExport}
               title={t('exportData')}
@@ -281,7 +291,7 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
               <Download size={16} aria-hidden="true" /> {t('exportData')}
             </button>
             <button
-              className="button ghost"
+              className={classNames(sharedStyles, styles, 'button ghost')}
               type="button"
               title={t('importData')}
               onClick={() => importInputRef.current?.click()}
@@ -301,13 +311,13 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
             />
           </div>
           {importError && (
-            <p className="setting-status error" role="alert">
+            <p className={classNames(sharedStyles, styles, 'setting-status error')} role="alert">
               {t('importError')}
             </p>
           )}
         </form>
         <button
-          className="button danger delete-all-button"
+          className={classNames(sharedStyles, styles, 'button danger delete-all-button')}
           type="button"
           onClick={onDeleteAll}
           title={t('deleteAll')}

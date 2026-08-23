@@ -1,3 +1,6 @@
+import styles from './Rounds.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { Plus, Trophy } from 'lucide-react'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { PageTitle } from './PageTitle'
@@ -194,17 +197,17 @@ export const Rounds = memo(function Rounds({
     <>
       <PageTitle title={t('rounds')} />
       {rounds.length === 0 ? (
-        <div className="empty">
+        <div className={classNames(sharedStyles, styles, 'empty')}>
           <Trophy size={30} aria-hidden="true" />
           <h2>{t('noRounds')}</h2>
           <p>{t('firstRound')}</p>
         </div>
       ) : (
-        <div className="round-list">
+        <div className={classNames(sharedStyles, styles, 'round-list')}>
           {groupRunningRounds ? (
             <>
               {renderedRounds.slice(0, currentGroupStart)}
-              <div className="current-round-group">
+              <div className={classNames(sharedStyles, styles, 'current-round-group')}>
                 {renderedRounds.slice(currentGroupStart, currentGroupEnd + 1)}
               </div>
               {renderedRounds.slice(currentGroupEnd + 1)}
@@ -216,14 +219,14 @@ export const Rounds = memo(function Rounds({
       )}
       {!readOnly && (
         <button
-          className="button primary"
+          className={classNames(sharedStyles, styles, 'button primary')}
           onClick={() => dispatch(createRound())}
           title={t('create')}
         >
           <Plus size={16} aria-hidden="true" /> {t('create')}
         </button>
       )}
-      <p className="sr-only" aria-live="polite">
+      <p className={classNames(sharedStyles, styles, 'sr-only')} aria-live="polite">
         {keyboardMove ? t('moveInstructions') : ''}
       </p>
       <PlayerHistoryDialog

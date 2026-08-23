@@ -1,3 +1,6 @@
+import styles from './RoundActions.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { ArrowDown, Calculator, ListPlus, Play, RefreshCw, Settings2, X } from 'lucide-react'
 import { t } from '../i18n'
 import { hasEnteredScore, isUnknownParticipantId } from '../tournament'
@@ -27,9 +30,9 @@ export function RoundActions({
   const needsPairing = round.matches.length === 0
   const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
   return (
-    <div className="round-actions">
+    <div className={classNames(sharedStyles, styles, 'round-actions')}>
       <button
-        className="button ghost"
+        className={classNames(sharedStyles, styles, 'button ghost')}
         type="button"
         aria-label={t('roundSettings')}
         title={t('roundSettings')}
@@ -39,7 +42,7 @@ export function RoundActions({
       </button>
       {!round.startedAt && !needsPairing && (
         <button
-          className="button ghost"
+          className={classNames(sharedStyles, styles, 'button ghost')}
           type="button"
           aria-label={t('startRound')}
           title={t('startRound')}
@@ -52,7 +55,7 @@ export function RoundActions({
         (match) => isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
       ) && (
         <button
-          className="button ghost"
+          className={classNames(sharedStyles, styles, 'button ghost')}
           type="button"
           aria-label={t('fillMore')}
           title={t('fillMore')}
@@ -62,48 +65,60 @@ export function RoundActions({
         </button>
       )}
       {needsPairing && canCalculatePairings ? (
-        <div className="header-tooltip">
+        <div className={classNames(sharedStyles, styles, 'header-tooltip')}>
           <button
-            className="button ghost"
+            className={classNames(sharedStyles, styles, 'button ghost')}
             type="button"
             aria-label={t('calculatePairings')}
             title={t('calculatePairings')}
             onClick={onReroll}
           >
-            <span className="pairing-calculate-icon" aria-hidden="true">
+            <span
+              className={classNames(sharedStyles, styles, 'pairing-calculate-icon')}
+              aria-hidden="true"
+            >
               <Calculator size={16} />
-              <ArrowDown className="pairing-calculate-arrow" size={9} />
+              <ArrowDown
+                className={classNames(sharedStyles, styles, 'pairing-calculate-arrow')}
+                size={9}
+              />
             </span>
           </button>
-          <div className="tooltip-popover" aria-hidden="true">
+          <div className={classNames(sharedStyles, styles, 'tooltip-popover')} aria-hidden="true">
             {t('calculatePairings')}
           </div>
         </div>
       ) : (
         isUnstarted && (
-          <div className="header-tooltip">
+          <div className={classNames(sharedStyles, styles, 'header-tooltip')}>
             <button
-              className="button ghost"
+              className={classNames(sharedStyles, styles, 'button ghost')}
               type="button"
               aria-label={t('reroll')}
               title={t('reroll')}
               onClick={onReroll}
             >
-              <span className="pairing-calculate-icon" aria-hidden="true">
+              <span
+                className={classNames(sharedStyles, styles, 'pairing-calculate-icon')}
+                aria-hidden="true"
+              >
                 <Calculator size={16} />
-                <ArrowDown className="pairing-calculate-arrow" size={9} />
+                <ArrowDown
+                  className={classNames(sharedStyles, styles, 'pairing-calculate-arrow')}
+                  size={9}
+                />
               </span>
             </button>
-            <div className="tooltip-popover" aria-hidden="true">
+            <div className={classNames(sharedStyles, styles, 'tooltip-popover')} aria-hidden="true">
               {t('reroll')}
             </div>
           </div>
         )
       )}
       {round.bye && isUnstarted && (
-        <div className="header-tooltip">
+        <div className={classNames(sharedStyles, styles, 'header-tooltip')}>
           <button
-            className="button ghost"
+            className={classNames(sharedStyles, styles, 'button ghost')}
             type="button"
             aria-label={t('rerollBye')}
             title={t('rerollBye')}
@@ -111,14 +126,14 @@ export function RoundActions({
           >
             <RefreshCw size={16} aria-hidden="true" />
           </button>
-          <div className="tooltip-popover" aria-hidden="true">
+          <div className={classNames(sharedStyles, styles, 'tooltip-popover')} aria-hidden="true">
             {t('rerollBye')}
           </div>
         </div>
       )}
       {!round.matches.some((match) => match.scoreA || match.scoreB) && (
         <button
-          className="button danger"
+          className={classNames(sharedStyles, styles, 'button danger')}
           type="button"
           aria-label={t('deleteRound')}
           title={t('deleteRound')}

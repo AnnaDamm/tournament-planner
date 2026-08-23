@@ -1,0 +1,137 @@
+@layer components {
+  .match-court {
+    color: #aab3ae;
+    font-size: 14px;
+    width: 20px;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .match-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #7d8981;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .drag-hint {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 190px;
+    cursor: grab;
+  }
+
+  .drag-hint:global(.winner) {
+    background: #cfe8ad;
+    border-radius: 6px;
+    color: #2d4a25;
+    padding: 5px 7px;
+    margin: -5px -7px;
+  }
+
+  .drag-hint:global(.winner) :global(.match-player-name) {
+    font-weight: 900;
+  }
+
+  .drag-hint:global(.locked) {
+    cursor: default;
+    padding-inline-start: 27px;
+  }
+
+  .drag-hint:global(.winner):global(.locked) {
+    padding-inline-start: 34px;
+  }
+
+  .drag-hint svg {
+    color: #c2cbc5;
+  }
+
+  :global(.readonly-focus-mode) .match-court {
+    width: clamp(42px, 3vw, 63px);
+    font-size: clamp(29px, 1.7vw, 42px);
+  }
+
+  :global(.readonly-focus-mode) .drag-hint {
+    width: clamp(200px, 18vw, 400px);
+  }
+
+  :global(.readonly-focus-mode) .match-player {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .drag-hint:global(.winner) {
+      background: #3d5a32;
+      color: #e5f5d5;
+    }
+  }
+
+  .match-court {
+    width: clamp(20px, 1.5vw, 30px);
+    font-size: clamp(14px, 0.8vw, 20px);
+  }
+
+  .drag-hint {
+    width: clamp(150px, 13vw, 270px);
+    min-width: 0;
+  }
+
+  @container content (max-width: 680px) {
+    .drag-hint {
+      width: auto;
+      flex: 1;
+      font-size: 12px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .match-court {
+      grid-area: court;
+      width: auto;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .match-start {
+      grid-area: start;
+      justify-self: center;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .match-player {
+      width: auto;
+      min-width: 0;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .match-player-a {
+      grid-area: player-a;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .match-player-b {
+      grid-area: player-b;
+    }
+  }
+
+  @container content (max-width: 430px) {
+    .match-player {
+      gap: 3px;
+    }
+  }
+
+  @container content (max-width: 430px) {
+    .drag-hint:global(.winner) {
+      padding-inline: 5px;
+      margin-inline: -5px;
+    }
+  }
+}

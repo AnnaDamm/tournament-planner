@@ -1,0 +1,105 @@
+@layer states {
+  th button.sort-active {
+    color: #557238;
+    font-weight: 700;
+  }
+
+  .positive {
+    color: #5d9e45;
+  }
+
+  .negative {
+    color: #cf6b61;
+  }
+
+  .sort-down {
+    transform: rotate(180deg);
+  }
+
+  @keyframes search-target-pulse {
+    0%,
+    35% {
+      background: #e7f5d5;
+      box-shadow: 0 0 0 4px #b9ea5b66;
+    }
+    100% {
+      background: transparent;
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+
+  .withdrawn-row {
+    opacity: 0.6;
+  }
+
+  html.fullscreen-cursor-hidden,
+  html.fullscreen-cursor-hidden * {
+    cursor: none !important;
+  }
+
+  html.header-overlay-active header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    transform: translateY(-100%);
+    box-shadow: 0 8px 24px rgb(23 32 29 / 18%);
+    transition: none;
+  }
+
+  html.header-overlay-active.fullscreen-header-visible header {
+    transform: translateY(0);
+  }
+
+  @keyframes view-rotation-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    @keyframes search-target-pulse-dark {
+      0%,
+      35% {
+        background: #314726;
+        box-shadow: 0 0 0 4px #5e8f2e66;
+      }
+      100% {
+        background: transparent;
+        box-shadow: 0 0 0 0 transparent;
+      }
+    }
+  }
+
+  @media screen and (min-width: 901px) {
+    .readonly-focus-mode main {
+      display: block;
+    }
+  }
+
+  @media screen and (min-width: 901px) {
+    .readonly-focus-mode header {
+      padding-inline: 16px;
+    }
+  }
+
+  .readonly-focus-mode {
+    --focus-ui-scale: 1.5;
+    font-size: calc(1rem * var(--focus-ui-scale));
+  }
+
+  @keyframes top-menu-collapse {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+  }
+}

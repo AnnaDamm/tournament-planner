@@ -1,0 +1,27 @@
+@layer components {
+  .set-scores {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    padding-inline-end: clamp(12px, 1vw, 24px);
+  }
+
+  :global(.readonly-focus-mode) .set-scores {
+    flex: 0 0 clamp(220px, 21vw, 360px);
+    width: clamp(220px, 21vw, 360px);
+    justify-content: flex-end;
+    gap: clamp(10px, 0.8vw, 16px);
+  }
+
+  @container content (max-width: 680px) {
+    .set-scores {
+      grid-area: scores;
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+  }
+}

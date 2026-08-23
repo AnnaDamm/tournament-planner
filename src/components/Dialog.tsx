@@ -1,3 +1,6 @@
+import styles from './Dialog.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, type ReactNode, type RefObject } from 'react'
 
 type Props = {
@@ -21,7 +24,7 @@ export function Dialog({ dialogRef, children, labelledBy, describedBy }: Props) 
   return (
     <dialog
       ref={dialogRef}
-      className="dialog"
+      className={classNames(sharedStyles, styles, 'dialog')}
       aria-labelledby={labelledBy}
       aria-describedby={describedBy}
     >

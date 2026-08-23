@@ -1,0 +1,300 @@
+@layer components {
+  .duplicate-warning {
+    margin: 0 0 12px;
+    color: #b45309;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #edf3ec;
+    color: #5b7a59;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .player-info b {
+    display: block;
+    font-size: 14px;
+  }
+
+  .player-info small {
+    display: block;
+    color: #9aa49f;
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  .delete-btn {
+    margin-left: auto;
+    color: #b2bbb6;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .delete-btn:hover {
+    color: #c55a5a;
+  }
+
+  .rank {
+    display: inline-grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    font-size: 11px;
+    color: #8a9590;
+  }
+
+  .rank-1 {
+    background: #c9ef86;
+    color: #3e5c28;
+    font-weight: 700;
+  }
+
+  .rank-2 {
+    background: #e8ece9;
+  }
+
+  .rank-3 {
+    background: #f2e3cd;
+  }
+
+  .player-name-button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .player-name-button:hover {
+    color: #5d9e45;
+    text-decoration: underline;
+  }
+
+  .table-player-name.withdrawn-name {
+    text-decoration: line-through;
+  }
+
+  .games-behind {
+    color: #a0aaa5;
+    font-size: 10px;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  .status-btn,
+  .delete-btn {
+    border: 0;
+    background: transparent;
+    color: #8b9690;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .status-btn:hover {
+    color: #c28635;
+  }
+
+  .withdrawn-label {
+    color: #a36e2b;
+    font-size: 11px;
+    margin-left: 8px;
+  }
+
+  @media screen and (max-width: 760px) {
+    .player-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .player-info small,
+    :global(.section-head) span,
+    :global(.empty) {
+      color: #a1afa5;
+    }
+  }
+
+  :global(.player-card) .delete-btn {
+    width: 100%;
+    margin: 5px 0 -4px;
+    padding: 9px 0 0;
+    border-top: 1px solid #edf1ee;
+    text-align: left;
+  }
+
+  :global(.player-card) .delete-btn svg {
+    margin-left: 49px;
+  }
+
+  :global(.section-head) span,
+  .duplicate-warning {
+    font-size: clamp(12px, 0.72vw, 17px);
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .rank-cell {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .name-cell {
+      grid-column: 2;
+      grid-row: 1;
+      justify-content: center;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .name-cell .table-player-name {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody :global(.player-actions) .status-btn,
+    .participants-table tbody :global(.player-actions) .delete-btn {
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody :global(.player-actions) .delete-btn {
+      width: auto;
+      margin: 0;
+      padding: 5px;
+      border-top: 0;
+      text-align: initial;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody :global(.player-actions) .delete-btn svg {
+      margin-left: 0;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) .table-player-name,
+    .participants-table .player-name-button,
+    .participants-table :global(.player-name-input) {
+      font-size: 16px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) .rank {
+      width: 26px;
+      height: 26px;
+      font-size: 12px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .name-cell {
+      grid-column: 2 / -1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .name-cell .table-player-name,
+    .participants-table tbody td:nth-child(2) .player-name-button,
+    .participants-table tbody td:nth-child(2) :global(.player-name-input) {
+      max-width: min(62vw, 240px);
+      text-align: right;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .rank-cell .rank {
+      justify-self: end;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody :global(.player-actions) .status-btn,
+    .participants-table tbody :global(.player-actions) .delete-btn {
+      grid-column: auto;
+      grid-row: auto;
+    }
+  }
+
+  /* Participant management now lives in the ranking table. */
+  .ranking-participants-head {
+    margin-bottom: 15px;
+  }
+
+  :global(.ranking-table) .player-name-button {
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody :global(.player-actions) .status-btn,
+    :global(.ranking-table) tbody :global(.player-actions) .delete-btn {
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.ranking-table) tbody .name-cell .player-name-button,
+    :global(.ranking-table) tbody .name-cell :global(.player-name-input) {
+      max-width: min(62vw, 240px);
+      text-align: right;
+    }
+  }
+
+  :global(.readonly-focus-mode) :global(.ranking-table) .table-player-name,
+  :global(.readonly-focus-mode) :global(.ranking-table) .cell-value {
+    font-size: clamp(36px, 2.4vw, 54px);
+  }
+
+  :global(.readonly-focus-mode) :global(.ranking-table) .rank {
+    width: clamp(48px, 3.45vw, 69px);
+    height: clamp(48px, 3.45vw, 69px);
+    font-size: clamp(24px, 1.5vw, 36px);
+  }
+
+  :global(.readonly-focus-mode) :global(.ranking-table) .games-behind,
+  :global(.readonly-focus-mode) :global(.ranking-table) .withdrawn-label {
+    font-size: clamp(23px, 1.35vw, 33px);
+  }
+
+  :where(:global(.icon-btn), :global(.drag-handle-button), .status-btn, .delete-btn) {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  :global(.readonly-focus-mode)
+    :where(:global(.icon-btn), :global(.drag-handle-button), .status-btn, .delete-btn) {
+    min-width: calc(44px * var(--focus-ui-scale));
+    min-height: calc(44px * var(--focus-ui-scale));
+  }
+}

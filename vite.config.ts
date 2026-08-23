@@ -5,7 +5,6 @@ import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
-import tailwindcss from '@tailwindcss/vite'
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as {
   version: string
@@ -130,11 +129,15 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       babel({ presets: [reactCompilerPreset()] }),
-      tailwindcss(),
       serviceWorker(),
       webManifest(),
       inlineAssets(),
     ],
+    css: {
+      modules: {
+        localsConvention: 'camelCaseOnly',
+      },
+    },
     build: {
       outDir: '../dist',
       emptyOutDir: true,

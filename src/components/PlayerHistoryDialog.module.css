@@ -1,0 +1,81 @@
+@layer components {
+  .history-dialog {
+    width: min(700px, calc(100% - 32px));
+  }
+
+  .history-table-wrap {
+    overflow-x: auto;
+    margin: 0 25px;
+  }
+
+  .history-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .history-table-wrap th,
+  .history-table-wrap td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e4eae5;
+    text-align: left;
+  }
+
+  .history-table-wrap tr:global(.running) {
+    background: #fffdf0;
+    box-shadow: inset 4px 0 #b9ea5b;
+  }
+
+  .history-empty {
+    margin: 20px 0 !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .history-table-wrap tr:global(.running) {
+      background: #2d2c21;
+      box-shadow: inset 4px 0 #8fb54c;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .history-table-wrap {
+      margin-inline: 18px;
+    }
+  }
+
+  :global(.readonly-focus-mode) .history-dialog {
+    width: min(1000px, calc(100vw - 32px));
+    max-height: calc(100dvh - 24px);
+  }
+
+  :global(.readonly-focus-mode) .history-dialog > * {
+    margin-inline: clamp(18px, 2.5vw, 38px);
+  }
+
+  :global(.readonly-focus-mode) .history-dialog :global(.dialog-head) {
+    padding-top: clamp(18px, 2vw, 30px);
+  }
+
+  :global(.readonly-focus-mode) .history-dialog h2 {
+    font-size: clamp(30px, 2.4vw, 48px);
+  }
+
+  :global(.readonly-focus-mode) .history-dialog p {
+    font-size: clamp(20px, 1.35vw, 28px);
+    margin-top: 8px;
+    margin-bottom: clamp(16px, 1.5vw, 26px);
+  }
+
+  :global(.readonly-focus-mode) .history-table-wrap {
+    margin-inline: clamp(18px, 2.5vw, 38px);
+  }
+
+  :global(.readonly-focus-mode) .history-table-wrap table {
+    font-size: clamp(20px, 1.4vw, 30px);
+  }
+
+  :global(.readonly-focus-mode) .history-table-wrap th,
+  :global(.readonly-focus-mode) .history-table-wrap td {
+    padding: clamp(12px, 1vw, 20px) clamp(10px, 1vw, 20px);
+  }
+}

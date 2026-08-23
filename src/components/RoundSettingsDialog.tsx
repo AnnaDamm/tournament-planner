@@ -1,3 +1,6 @@
+import styles from './RoundSettingsDialog.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
@@ -61,12 +64,12 @@ export function RoundSettingsDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="dialog"
+      className={classNames(sharedStyles, styles, 'dialog')}
       aria-labelledby="round-settings-title"
       aria-describedby="round-settings-description"
       onCancel={close}
     >
-      <div className="dialog-head">
+      <div className={classNames(sharedStyles, styles, 'dialog-head')}>
         <div>
           <h2 id="round-settings-title">{t('roundSettings')}</h2>
           <p id="round-settings-description">
@@ -74,7 +77,7 @@ export function RoundSettingsDialog({
           </p>
         </div>
         <button
-          className="icon-btn"
+          className={classNames(sharedStyles, styles, 'icon-btn')}
           type="button"
           onClick={close}
           aria-label={t('close')}
@@ -83,7 +86,7 @@ export function RoundSettingsDialog({
           <X size={18} aria-hidden="true" />
         </button>
       </div>
-      <div className="round-settings-fields">
+      <div className={classNames(sharedStyles, styles, 'round-settings-fields')}>
         <label htmlFor="round-winning-games">
           <span>{t('winningGames')}</span>
           <input
@@ -108,11 +111,21 @@ export function RoundSettingsDialog({
           />
         </label>
       </div>
-      <div className="dialog-actions">
-        <button className="button ghost" type="button" onClick={close} title={t('cancel')}>
+      <div className={classNames(sharedStyles, styles, 'dialog-actions')}>
+        <button
+          className={classNames(sharedStyles, styles, 'button ghost')}
+          type="button"
+          onClick={close}
+          title={t('cancel')}
+        >
           {t('cancel')}
         </button>
-        <button className="button primary" type="button" onClick={save} title={t('save')}>
+        <button
+          className={classNames(sharedStyles, styles, 'button primary')}
+          type="button"
+          onClick={save}
+          title={t('save')}
+        >
           {t('save')}
         </button>
       </div>

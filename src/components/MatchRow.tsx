@@ -1,3 +1,6 @@
+import styles from './MatchRow.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
@@ -142,18 +145,21 @@ export const MatchRow = memo(function MatchRow({
     }, 200)
   }
   return (
-    <fieldset id={`match-${match.id}`} className={`match ${isRunning ? 'running' : ''}`}>
-      <legend className="sr-only">
+    <fieldset
+      id={`match-${match.id}`}
+      className={classNames(sharedStyles, styles, `match ${isRunning ? 'running' : ''}`)}
+    >
+      <legend className={classNames(sharedStyles, styles, 'sr-only')}>
         {t('matchLabel')} {matchIndex + 1}: {name(match.a)} {t('versus')} {name(match.b)}
         {match.court ? `, ${t('court')} ${match.court}` : ''}
         {isRunning ? `, ${t('running')}` : ''}
       </legend>
-      <span className="match-court" aria-hidden="true">
+      <span className={classNames(sharedStyles, styles, 'match-court')} aria-hidden="true">
         {match.court ?? '–'}
       </span>
       {(match.startedAt || match.predictedStart) && (
         <time
-          className="match-start"
+          className={classNames(sharedStyles, styles, 'match-start')}
           dateTime={match.startedAt ?? match.predictedStart}
           title={t(match.startedAt ? 'startedAt' : 'expectedStart')}
         >
@@ -167,7 +173,7 @@ export const MatchRow = memo(function MatchRow({
       )}
       {!isUnknownParticipantId(match.a) && !isUnknownParticipantId(match.b) && (
         <button
-          className="compare-button"
+          className={classNames(sharedStyles, styles, 'compare-button')}
           type="button"
           aria-label={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
           title={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
@@ -177,7 +183,10 @@ export const MatchRow = memo(function MatchRow({
         </button>
       )}
       <span
-        className={`drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
+        className={classNames(
+          styles,
+          `drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`,
+        )}
         draggable={canReorder}
         onDragStart={(event) => {
           if (canReorder) {
@@ -197,7 +206,7 @@ export const MatchRow = memo(function MatchRow({
       >
         {canReorder && (
           <button
-            className="drag-handle-button"
+            className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
             aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
             title={`${t('moveParticipant')}: ${name(match.a)}`}
@@ -209,25 +218,31 @@ export const MatchRow = memo(function MatchRow({
         )}
         <button
           type="button"
-          className="match-player-name"
+          className={classNames(sharedStyles, styles, 'match-player-name')}
           title={`${t('history')}: ${name(match.a)}`}
           onClick={() => onPlayerClick(match.a)}
         >
           {name(match.a)}
         </button>
-        <small className="player-record">{recordA}</small>
+        <small className={classNames(sharedStyles, styles, 'player-record')}>{recordA}</small>
       </span>
       {finalScore ? (
-        <span className="match-score" aria-label={`${finalScore.a}:${finalScore.b}`}>
+        <span
+          className={classNames(sharedStyles, styles, 'match-score')}
+          aria-label={`${finalScore.a}:${finalScore.b}`}
+        >
           {finalScore.a} : {finalScore.b}
         </span>
       ) : (
-        <span className="versus" aria-hidden="true">
+        <span className={classNames(sharedStyles, styles, 'versus')} aria-hidden="true">
           VS
         </span>
       )}
       <span
-        className={`drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`}
+        className={classNames(
+          styles,
+          `drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`,
+        )}
         draggable={canReorder}
         onDragStart={(event) => {
           if (canReorder) {
@@ -247,7 +262,7 @@ export const MatchRow = memo(function MatchRow({
       >
         {canReorder && (
           <button
-            className="drag-handle-button"
+            className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
             aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
             title={`${t('moveParticipant')}: ${name(match.b)}`}
@@ -259,13 +274,13 @@ export const MatchRow = memo(function MatchRow({
         )}
         <button
           type="button"
-          className="match-player-name"
+          className={classNames(sharedStyles, styles, 'match-player-name')}
           title={`${t('history')}: ${name(match.b)}`}
           onClick={() => onPlayerClick(match.b)}
         >
           {name(match.b)}
         </button>
-        <small className="player-record">{recordB}</small>
+        <small className={classNames(sharedStyles, styles, 'player-record')}>{recordB}</small>
       </span>
       <SetScores
         draftSets={draftSets}

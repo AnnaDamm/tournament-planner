@@ -1,0 +1,299 @@
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid #4f7c2e;
+    outline-offset: 3px;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  header {
+    height: 78px;
+    background: #fff;
+    border-bottom: 1px solid #e5eae6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+  }
+
+  main {
+    display: flex;
+    flex: 1 0 auto;
+    max-width: 1440px;
+    margin: auto;
+  }
+
+  aside {
+    width: 220px;
+    padding: 38px 22px;
+    border-right: 1px solid #e2e8e3;
+    min-height: calc(100vh - 78px);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  th {
+    background: #fafbfa;
+    text-align: left;
+    color: #9aa49f;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 14px 18px;
+  }
+
+  th button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: inherit;
+    border: 0;
+    background: none;
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 65px;
+    text-align: center;
+  }
+
+  td {
+    padding: 17px 18px;
+    border-top: 1px solid #eef1ef;
+  }
+
+  td b {
+    font-weight: 600;
+  }
+
+  input[type='number'] {
+    appearance: textfield;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dfe7e0;
+    border-radius: 7px;
+    background: white;
+  }
+
+  @media screen and (max-width: 760px) {
+    header {
+      padding: 0 20px;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    aside {
+      width: 64px;
+      padding: 30px 9px;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #111814;
+      color: #edf4ef;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: #edf4ef;
+    }
+  }
+
+  button[title] {
+    position: relative;
+  }
+
+  button[title]::after {
+    content: attr(title);
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 50;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-3px);
+    border-radius: 6px;
+    background: #17201d;
+    color: #fff;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    box-shadow: 0 8px 22px rgb(23 32 29 / 28%);
+    white-space: nowrap;
+    pointer-events: none;
+    transition:
+      opacity 140ms ease,
+      transform 140ms ease,
+      visibility 140ms ease;
+  }
+
+  button[title]:hover::after,
+  button[title]:focus-visible::after {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Responsive layout system
+     The layout grows with the viewport and only changes structure where the
+     available width actually requires it. */
+  html {
+    min-width: 320px;
+    background: #f5f7f5;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  header {
+    min-height: var(--top-menu-height);
+    height: var(--top-menu-height);
+    padding-inline: clamp(16px, 5vw, 112px);
+  }
+
+  main {
+    width: 100%;
+    max-width: 3200px;
+    align-items: stretch;
+  }
+
+  aside {
+    width: clamp(190px, 14vw, 340px);
+    padding: clamp(28px, 3vw, 72px) clamp(14px, 1.8vw, 40px);
+    min-height: calc(100vh - var(--top-menu-height));
+    flex: 0 0 auto;
+  }
+
+  @media screen and (max-width: 760px) {
+    header {
+      padding-inline: 16px;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    main {
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    aside {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      min-height: 0;
+      padding: 10px 16px;
+      border-right: 0;
+      border-bottom: 1px solid #e2e8e3;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:first-child {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:nth-child(2) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:first-child {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:nth-child(2) {
+      grid-column: 2 / -1;
+      grid-row: 1;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:nth-child(3) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .participants-table tbody td:nth-child(4) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    main {
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    header {
+      gap: 10px;
+    }
+  }
+
+  @media screen and (max-width: 340px) {
+    header {
+      min-height: 68px;
+      height: 68px;
+      padding-inline: 10px;
+      gap: 6px;
+    }
+  }
+}

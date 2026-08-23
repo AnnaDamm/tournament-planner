@@ -1,0 +1,140 @@
+@layer components {
+  .radio {
+    display: block;
+    padding: 10px 0;
+    font-size: 13px;
+  }
+
+  .radio input {
+    accent-color: #8bc74b;
+    margin-right: 9px;
+  }
+
+  .settings-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .settings-card label small {
+    color: #8d9992;
+    font-size: 12px;
+  }
+
+  .settings-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding-top: 4px;
+    border-top: 1px solid #e4e9e5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .settings-card label small {
+      color: #b4c5ab;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .settings-actions {
+      border-top-color: #3d4b42;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .setting-status {
+      color: #b4c5ab;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .setting-status.error {
+      color: #f08a82;
+    }
+  }
+
+  .setting-status {
+    font-size: 12px;
+    color: #748078;
+    margin: 0;
+  }
+
+  .setting-status.error {
+    color: #b94b4b;
+  }
+
+  .delete-all-button {
+    margin-top: 16px;
+  }
+
+  .settings-card {
+    gap: clamp(18px, 1.7vw, 34px);
+  }
+
+  @media screen and (max-width: 760px) {
+    .settings-actions :global(.button) {
+      flex: 1 1 180px;
+    }
+  }
+
+  .settings-drawer {
+    display: block;
+    position: relative;
+    width: min(580px, calc(100vw - 24px));
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    padding: clamp(24px, 3vw, 48px) clamp(18px, 3vw, 44px) 40px;
+    border-left: 1px solid var(--line, #e2e8e3);
+    background: var(--surface, #fff);
+    color: var(--ink, #17201d);
+    box-shadow:
+      -20px 0 48px rgb(21 31 26 / 22%),
+      -4px 0 12px rgb(21 31 26 / 10%);
+  }
+
+  .settings-drawer-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .settings-drawer-head h1 {
+    margin: 6px 0 0;
+    font: 700 clamp(28px, 2.6vw, 42px) var(--font-family);
+    letter-spacing: -0.04em;
+  }
+
+  .settings-drawer-close {
+    flex: 0 0 auto;
+  }
+
+  .settings-drawer .settings-card {
+    margin: 0 0 16px;
+  }
+
+  .settings-drawer .delete-all-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .settings-drawer {
+      background: #202c25;
+      border-left-color: #425443;
+      color: #edf4ef;
+      box-shadow:
+        -20px 0 48px rgb(0 0 0 / 48%),
+        -4px 0 12px rgb(0 0 0 / 32%);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .settings-drawer .settings-card {
+      background: #17201c;
+      border-color: #3d4b42;
+    }
+  }
+}

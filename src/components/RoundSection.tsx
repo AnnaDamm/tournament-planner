@@ -1,3 +1,6 @@
+import styles from './RoundSection.module.css'
+import sharedStyles from '../styles/shared.module.css'
+import { classNames } from '../styles/classNames'
 import { CalendarClock, Clock, GripVertical } from 'lucide-react'
 import { memo, useCallback, useMemo } from 'react'
 import { MatchRow } from './MatchRow'
@@ -90,21 +93,27 @@ export const RoundSection = memo(function RoundSection({
 
   return (
     <section
-      className={`round-card ${isCurrentRound ? 'current-round' : ''}`}
+      className={classNames(
+        sharedStyles,
+        styles,
+        `round-card ${isCurrentRound ? 'current-round' : ''}`,
+      )}
       aria-labelledby={`round-${round.number}-title`}
     >
-      <div className="round-head">
+      <div className={classNames(sharedStyles, styles, 'round-head')}>
         <div>
           {round.number === currentRoundNumber && (
-            <div className="current-round-label">{t('currentRound')}</div>
+            <div className={classNames(sharedStyles, styles, 'current-round-label')}>
+              {t('currentRound')}
+            </div>
           )}
-          <span className="round-kicker">
+          <span className={classNames(sharedStyles, styles, 'round-kicker')}>
             <span aria-hidden="true">
               {t('round')} {String(round.number).padStart(2, '0')}
             </span>
             {(round.startedAt || round.predictedStart) && (
               <time
-                className="round-started"
+                className={classNames(sharedStyles, styles, 'round-started')}
                 dateTime={round.startedAt ?? round.predictedStart}
                 title={t(round.startedAt ? 'startedAt' : 'expectedStart')}
               >
@@ -117,15 +126,19 @@ export const RoundSection = memo(function RoundSection({
               </time>
             )}
           </span>
-          <div className="round-title-line">
+          <div className={classNames(sharedStyles, styles, 'round-title-line')}>
             <h2 id={`round-${round.number}-title`}>
-              <span className="sr-only">
+              <span className={classNames(sharedStyles, styles, 'sr-only')}>
                 {t('round')} {round.number} –
               </span>
             </h2>
             {round.bye && (
               <span
-                className={`bye-pill ${canReorderBye ? '' : 'locked'}`}
+                className={classNames(
+                  sharedStyles,
+                  styles,
+                  `bye-pill ${canReorderBye ? '' : 'locked'}`,
+                )}
                 draggable={canReorderBye}
                 onDragStart={(event) => {
                   if (!canReorderBye) return
@@ -144,7 +157,7 @@ export const RoundSection = memo(function RoundSection({
               >
                 {canReorderBye && (
                   <button
-                    className="drag-handle-button"
+                    className={classNames(sharedStyles, styles, 'drag-handle-button')}
                     type="button"
                     aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
                     title={`${t('moveParticipant')}: ${name(round.bye)}`}
@@ -158,7 +171,7 @@ export const RoundSection = memo(function RoundSection({
                   </button>
                 )}
                 <button
-                  className="match-player-name"
+                  className={classNames(sharedStyles, styles, 'match-player-name')}
                   type="button"
                   title={`${t('history')}: ${name(round.bye)}`}
                   onClick={() => onPlayerClick(round.bye ?? '')}
@@ -183,11 +196,11 @@ export const RoundSection = memo(function RoundSection({
         )}
       </div>
       {round.matches.length === 0 ? (
-        <div className="round-pairings-pending">
+        <div className={classNames(sharedStyles, styles, 'round-pairings-pending')}>
           <p>{t('pairingsPending')}</p>
         </div>
       ) : (
-        <div className="matches">
+        <div className={classNames(sharedStyles, styles, 'matches')}>
           {orderedMatches.map((match, matchIndex) => (
             <MatchRow
               key={match.id}

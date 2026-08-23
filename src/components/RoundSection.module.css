@@ -1,0 +1,204 @@
+@layer components {
+  .round-status i {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #73ba42;
+    margin-right: 7px;
+  }
+
+  .round-status {
+    font-size: 12px;
+    color: #718078;
+  }
+
+  :global(.round-card).current-round {
+    background: #eef3ec;
+    border-color: #cbd8c9;
+  }
+
+  .current-round-label {
+    margin-bottom: 8px;
+    color: #5d9e45;
+    font-size: clamp(15px, 1vw, 21px);
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .round-title-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bye-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    background: #fff4d7;
+    color: #a27b31;
+    padding: 5px 9px;
+    border-radius: 14px;
+  }
+
+  .bye-pill:global(.locked) {
+    cursor: default;
+    opacity: 0.7;
+    padding-inline-start: 36px;
+  }
+
+  .matches {
+    border-top: 1px solid #edf1ee;
+  }
+
+  .round-pairings-pending {
+    border-top: 1px solid #edf1ee;
+    padding: 18px 0 2px;
+    color: #718078;
+    font-size: 14px;
+  }
+
+  .round-pairings-pending p {
+    margin: 0;
+  }
+
+  :global(.readonly-focus-mode) .bye-pill {
+    gap: clamp(8px, 0.6vw, 12px);
+    padding: clamp(8px, 0.6vw, 14px) clamp(14px, 1vw, 22px);
+    font-size: clamp(36px, 2.4vw, 54px);
+    line-height: 1.2;
+  }
+
+  :global(.readonly-focus-mode) .bye-pill:global(.locked) {
+    padding-inline-start: calc(clamp(14px, 1vw, 22px) + 22px + clamp(8px, 0.6vw, 12px));
+  }
+
+  :global(.readonly-focus-mode) :global(.round-card).current-round {
+    background: #eef3ec;
+    border: 1px solid #cbd8c9;
+    border-radius: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(.readonly-focus-mode) :global(.round-card):not(.current-round) {
+      background: #17201c;
+      border-color: #2c3931;
+    }
+  }
+
+  :global(.readonly-focus-mode) .round-pairings-pending {
+    padding-block: clamp(10px, 0.8vw, 16px);
+    font-size: clamp(24px, 1.6vw, 36px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(.table-wrap) td,
+    .matches,
+    :global(.match) {
+      border-color: #2c3931;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    .round-title-line {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    :global(.round-card).current-round {
+      background: #eef3ec;
+      border: 1px solid #cbd8c9;
+      border-radius: 10px;
+    }
+  }
+
+  :global(.readonly-focus-mode) .current-round-label {
+    margin-bottom: 3px;
+    font-size: clamp(33px, 2.25vw, 51px);
+  }
+
+  :global(.readonly-focus-mode) .current-round-group {
+    padding-block: 2px;
+    padding-inline: clamp(8px, 0.75vw, 16px);
+  }
+
+  :global(.round-card).current-round,
+  :global(.readonly-focus-mode) :global(.round-card).current-round {
+    background: #eef3ec;
+    border: 1px solid #cbd8c9;
+    border-radius: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(.round-card).current-round,
+    :global(.readonly-focus-mode) :global(.round-card).current-round {
+      background: #243026;
+      border-color: #425443;
+    }
+  }
+
+  .current-round-group {
+    background: #eef3ec;
+    border: 1px solid #cbd8c9;
+    border-radius: 10px;
+    padding: 8px 24px;
+  }
+
+  .current-round-group :global(.round-card) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding-inline: 0;
+  }
+
+  .current-round-group :global(.round-card) + :global(.round-card) {
+    border-top: 1px solid #cbd8c9;
+  }
+
+  :global(.readonly-focus-mode) .current-round-group {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1.5vw, 28px);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  :global(.readonly-focus-mode) .current-round-group :global(.round-card) {
+    padding-inline-start: clamp(18px, 1.6vw, 32px);
+    padding-inline-end: clamp(32px, 2.5vw, 52px);
+    border: 1px solid #cbd8c9;
+    border-radius: 10px;
+    background: #eef3ec;
+  }
+
+  :global(.readonly-focus-mode) .current-round-group :global(.round-card) + :global(.round-card) {
+    border-top: 1px solid #cbd8c9;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .current-round-group {
+      background: #243026;
+      border-color: #425443;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .current-round-group :global(.round-card) + :global(.round-card) {
+      border-color: #425443;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(.readonly-focus-mode) .current-round-group :global(.round-card) {
+      border-color: #425443;
+      background: #243026;
+    }
+  }
+}
