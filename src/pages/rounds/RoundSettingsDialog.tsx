@@ -1,10 +1,10 @@
 import styles from './RoundSettingsDialog.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
-import { t } from '../i18n'
-import type { Round } from '../tournamentTypes'
+import { t } from '../../i18n'
+import type { Round } from '../../tournamentTypes'
 
 type Props = {
   round: Round | null

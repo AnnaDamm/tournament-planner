@@ -1,6 +1,6 @@
-import styles from './Table.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import styles from './RankingsPage.module.css'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import {
   Check,
   ChevronDown,
@@ -13,18 +13,18 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
-import { PageTitle } from './PageTitle'
-import { PlayerHistoryDialog } from './PlayerHistoryDialog'
+import { PageTitle } from '../../shared/PageTitle'
+import { PlayerHistoryDialog } from '../../shared/PlayerHistoryDialog'
 import { PlayerNameEditor } from './PlayerNameEditor'
-import { t } from '../i18n'
-import type { Participant, Round } from '../tournamentTypes'
+import { t } from '../../i18n'
+import type { Participant, Round } from '../../tournamentTypes'
 import {
   deleteParticipant,
   reorderParticipants,
   shuffleParticipants,
   toggleParticipantWithdrawal,
-} from '../tournamentCommands'
-import { useAppDispatch } from '../storeHooks'
+} from '../../tournamentCommands'
+import { useAppDispatch } from '../../storeHooks'
 
 export type Stat = Participant & {
   diff: number
@@ -64,7 +64,7 @@ const getColumns = (participantLabel: string) => [
 ]
 
 // oxlint-disable-next-line eslint/max-lines-per-function
-export function Table({
+export function RankingsPage({
   sorted,
   players,
   defaultCourtCount,

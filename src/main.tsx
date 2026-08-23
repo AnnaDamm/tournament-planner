@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './styles.css'
 import { locale } from './i18n'
-import { TournamentApp } from './components/TournamentApp'
+import { TournamentApp } from './layout/TournamentApp'
 import { TournamentProvider } from './context/TournamentProvider'
 
 if (typeof document !== 'undefined') document.documentElement.lang = locale

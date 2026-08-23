@@ -1,15 +1,15 @@
 import styles from './RoundSection.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { CalendarClock, Clock } from 'lucide-react'
 import { memo, useCallback, useMemo } from 'react'
 import { MatchRow } from './MatchRow'
 import { RoundBye } from './RoundBye'
 import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
-import { t } from '../i18n'
-import { getMaxSetCount, isRoundComplete, sortMatchesByParticipantOrder } from '../tournament'
-import type { Match, Round } from '../tournamentTypes'
+import { t } from '../../i18n'
+import { getMaxSetCount, isRoundComplete, sortMatchesByParticipantOrder } from '../../tournament'
+import type { Match, Round } from '../../tournamentTypes'
 
 type Props = {
   round: Round

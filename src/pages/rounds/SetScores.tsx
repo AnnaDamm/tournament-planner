@@ -1,9 +1,9 @@
 import styles from './SetScores.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import type { CSSProperties } from 'react'
-import type { SetScore } from '../tournamentTypes'
-import { t } from '../i18n'
+import type { SetScore } from '../../tournamentTypes'
+import { t } from '../../i18n'
 
 type Props = {
   draftSets: SetScore[]

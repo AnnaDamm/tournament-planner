@@ -1,8 +1,8 @@
 import styles from './RoundSection.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import type { CSSProperties } from 'react'
-import { t } from '../i18n'
+import { t } from '../../i18n'
 
 type Props = {
   maxSetCount: number

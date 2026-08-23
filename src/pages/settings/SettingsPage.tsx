@@ -1,14 +1,14 @@
 import styles from './SettingsPage.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react'
 import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { t } from '../i18n'
-import type { TournamentSettings } from '../tournamentTypes'
-import { saveTournamentSettings } from '../tournamentCommands'
-import { selectTournamentSettings } from '../tournamentSelectors'
-import { useAppDispatch, useAppSelector } from '../storeHooks'
+import { t } from '../../i18n'
+import type { TournamentSettings } from '../../tournamentTypes'
+import { saveTournamentSettings } from '../../tournamentCommands'
+import { selectTournamentSettings } from '../../tournamentSelectors'
+import { useAppDispatch, useAppSelector } from '../../storeHooks'
 
 type SettingsDraft = {
   tournamentName: string

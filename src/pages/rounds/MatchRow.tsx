@@ -1,16 +1,16 @@
 import styles from './MatchRow.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
-import type { Match, SetScore } from '../tournamentTypes'
-import { t } from '../i18n'
+import type { Match, SetScore } from '../../tournamentTypes'
+import { t } from '../../i18n'
 import {
   getMatchResult,
   getMaxSetCount,
   hasEnteredScore,
   isUnknownParticipantId,
-} from '../tournament'
+} from '../../tournament'
 import { SetScores } from './SetScores'
 
 type Props = {

@@ -19,11 +19,11 @@ import {
 } from '../tournamentSelectors'
 import { importTournamentSnapshot } from '../tournamentCommands'
 import { useAppDispatch, useAppSelector, useAppStore } from '../storeHooks'
-import { Rounds } from './Rounds'
-import { SettingsPage } from './SettingsPage'
-import { SharePage } from './SharePage'
-import { Table } from './Table'
-import { DocumentationPage } from './DocumentationPage'
+import { DocumentationPage } from '../pages/documentation/DocumentationPage'
+import { RankingsPage } from '../pages/rankings/RankingsPage'
+import { RoundsPage } from '../pages/rounds/RoundsPage'
+import { SettingsPage } from '../pages/settings/SettingsPage'
+import { SharePage } from '../pages/share/SharePage'
 
 export type AppRoutesProps = {
   localMaster: LocalMasterConfig | null
@@ -113,7 +113,7 @@ export function AppRoutes({
       <Route
         path="/table"
         element={
-          <Table
+          <RankingsPage
             sorted={sorted}
             players={players}
             defaultCourtCount={courtCount}
@@ -146,7 +146,7 @@ export function AppRoutes({
       <Route
         path="/rounds"
         element={
-          <Rounds
+          <RoundsPage
             rounds={scheduledRounds}
             players={players}
             participantOrderByRound={participantOrderByRound}

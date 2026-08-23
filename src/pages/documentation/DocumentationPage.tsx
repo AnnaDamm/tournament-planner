@@ -1,11 +1,11 @@
 import styles from './DocumentationPage.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { ChevronRight } from 'lucide-react'
 import { Navigate, NavLink, useParams } from 'react-router-dom'
-import { getDocs } from '../docs/content'
-import { locale } from '../i18n'
-import type { DocContent } from '../docs/content'
+import { getDocs } from './content'
+import { locale } from '../../i18n'
+import type { DocContent } from './content'
 
 const renderDocContent = (content: DocContent) => (
   <>

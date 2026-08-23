@@ -1,4 +1,4 @@
-import type { locale } from '../i18n'
+import type { locale } from '../../i18n'
 
 export type DocContent = {
   text?: string[]

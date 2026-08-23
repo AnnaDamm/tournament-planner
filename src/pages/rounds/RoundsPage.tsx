@@ -1,17 +1,17 @@
-import styles from './Rounds.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import styles from './RoundsPage.module.css'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { Plus, Trophy } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { PageTitle } from './PageTitle'
+import { PageTitle } from '../../shared/PageTitle'
 import { PlayerComparisonDialog } from './PlayerComparisonDialog'
-import { PlayerHistoryDialog } from './PlayerHistoryDialog'
+import { PlayerHistoryDialog } from '../../shared/PlayerHistoryDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
-import { t } from '../i18n'
-import type { Match, Participant, Round } from '../tournamentTypes'
-import { getRunningMatchIdsByRound, isUnknownParticipantId } from '../tournament'
-import { useIdleRunningMatchScroll } from '../hooks/useIdleRunningMatchScroll'
+import { t } from '../../i18n'
+import type { Match, Participant, Round } from '../../tournamentTypes'
+import { getRunningMatchIdsByRound, isUnknownParticipantId } from '../../tournament'
+import { useIdleRunningMatchScroll } from '../../hooks/useIdleRunningMatchScroll'
 import {
   createRound,
   deleteRound,
@@ -22,8 +22,8 @@ import {
   startRound,
   swapPlayers,
   updateRoundMatch,
-} from '../tournamentCommands'
-import { useAppDispatch } from '../storeHooks'
+} from '../../tournamentCommands'
+import { useAppDispatch } from '../../storeHooks'
 
 type Props = {
   rounds: Round[]
@@ -59,7 +59,7 @@ type ComparisonSelection = {
 }
 
 // oxlint-disable-next-line eslint/max-lines-per-function
-export const Rounds = memo(function Rounds({
+export const RoundsPage = memo(function RoundsPage({
   rounds,
   players,
   participantOrderByRound,

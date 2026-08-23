@@ -1,11 +1,15 @@
 import styles from './PlayerComparisonDialog.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
-import { t } from '../i18n'
-import { compareRankingParticipants, getMatchResult, getRankingParticipants } from '../tournament'
-import type { Match, Participant, Round } from '../tournamentTypes'
+import { t } from '../../i18n'
+import {
+  compareRankingParticipants,
+  getMatchResult,
+  getRankingParticipants,
+} from '../../tournament'
+import type { Match, Participant, Round } from '../../tournamentTypes'
 
 type PlayerPair = readonly [string, string]
 

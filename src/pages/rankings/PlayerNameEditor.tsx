@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import type { Participant } from '../tournamentTypes'
-import { renameParticipant } from '../tournamentCommands'
-import { t } from '../i18n'
-import { useAppDispatch } from '../storeHooks'
+import type { Participant } from '../../tournamentTypes'
+import { renameParticipant } from '../../tournamentCommands'
+import { t } from '../../i18n'
+import { useAppDispatch } from '../../storeHooks'
 
 type Props = {
   player: Participant

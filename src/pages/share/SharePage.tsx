@@ -1,11 +1,11 @@
 import styles from './SharePage.module.css'
-import sharedStyles from '../styles/shared.module.css'
-import { classNames } from '../styles/classNames'
+import sharedStyles from '../../styles/shared.module.css'
+import { classNames } from '../../styles/classNames'
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
-import { t } from '../i18n'
-import { PageTitle } from './PageTitle'
+import { t } from '../../i18n'
+import { PageTitle } from '../../shared/PageTitle'
 
 type Props = { viewerUrl: string }
 
