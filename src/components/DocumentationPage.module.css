@@ -72,11 +72,33 @@
   .docs-article section {
     padding: 25px 0;
     border-top: 1px solid #e4e9e5;
+    scroll-margin-top: 12px;
   }
 
   .docs-article h2 {
-    margin: 0 0 12px;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin: -1px 0 12px;
+    padding: 11px 0 9px;
+    background: #f5f7f5;
+    box-shadow: 0 1px 0 #e4e9e5;
     font-size: 21px;
+  }
+
+  .docs-subsection {
+    scroll-margin-top: 56px;
+  }
+
+  .docs-article h3 {
+    position: sticky;
+    top: 46px;
+    z-index: 2;
+    margin: 20px 0 10px;
+    padding: 8px 0 7px;
+    background: #f5f7f5;
+    box-shadow: 0 1px 0 #e4e9e5;
+    font-size: 16px;
   }
 
   .docs-article p,
@@ -163,9 +185,26 @@
   }
 
   @media (prefers-color-scheme: dark) {
+    .docs-article h2,
+    .docs-article h3 {
+      background: #111814;
+      box-shadow: 0 1px 0 #2c3931;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
     .docs-note {
       background: #24371f;
       color: #cfddc9;
+    }
+  }
+
+  @media print {
+    .docs-article h2,
+    .docs-article h3 {
+      position: static;
+      background: transparent;
+      box-shadow: none;
     }
   }
 }

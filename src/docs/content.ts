@@ -1,16 +1,22 @@
 import type { locale } from '../i18n'
 
+export type DocContent = {
+  text?: string[]
+  items?: string[]
+  note?: string
+  links?: Array<{ label: string; to: string }>
+}
+
+type DocSection = DocContent & {
+  title: string
+  subsections?: Array<DocContent & { title: string }>
+}
+
 export type DocPage = {
   slug: string
   title: string
   summary: string
-  sections: Array<{
-    title: string
-    text?: string[]
-    items?: string[]
-    note?: string
-    links?: Array<{ label: string; to: string }>
-  }>
+  sections: DocSection[]
 }
 
 const en: DocPage[] = [
@@ -364,54 +370,185 @@ const en: DocPage[] = [
     summary: 'Released versions and the changes included in each release.',
     sections: [
       {
-        title: 'Unreleased — Features',
-        items: [
-          'Move tournament state to Redux.',
-          'Split styling into CSS modules and remove Tailwind.',
-          'Reduce Redux-driven rendering and enable the React Compiler.',
-          'Add print mode.',
-          'Add the player comparison overlay.',
-          'Show the release version in the footer.',
-          'Improve round score progression and bye handling.',
+        title: 'Unreleased',
+        subsections: [
+          {
+            title: 'Features',
+            items: [
+              'Move tournament state to Redux.',
+              'Split styling into CSS modules and remove Tailwind.',
+              'Reduce Redux-driven rendering and enable the React Compiler.',
+              'Add print mode.',
+              'Add the player comparison overlay.',
+              'Show the release version in the footer.',
+              'Improve round score progression and bye handling.',
+              'Keep documentation headings visible while scrolling.',
+            ],
+          },
+          {
+            title: 'Bugfixes',
+            items: [
+              'Refine drag-and-drop accessibility.',
+              'Skip non-droppable controls during keyboard drag-and-drop.',
+              'Restore top-menu focus behavior.',
+              'Stabilize the round layout.',
+              'Fix focus-mode idle scrolling.',
+              'Make tournament menus sticky.',
+              'Fix round-one pairing and lower-bracket pairing issues.',
+              'Fix bye selection and rerolling after a bye swap.',
+              'Make byes clickable in the player overlay.',
+              'Count byes as best-possible wins.',
+              'Improve dark-mode dialog contrast.',
+              'Fix player positions appearing before a match finishes.',
+              'Update container names and local start/build scripts.',
+            ],
+          },
         ],
       },
       {
-        title: 'Unreleased — Bugfixes',
-        items: [
-          'Refine drag-and-drop accessibility.',
-          'Skip non-droppable controls during keyboard drag-and-drop.',
-          'Restore top-menu focus behavior.',
-          'Stabilize the round layout.',
-          'Fix focus-mode idle scrolling.',
-          'Make tournament menus sticky.',
-          'Fix round-one pairing and lower-bracket pairing issues.',
-          'Fix bye selection and rerolling after a bye swap.',
-          'Make byes clickable in the player overlay.',
-          'Count byes as best-possible wins.',
-          'Improve dark-mode dialog contrast.',
-          'Fix player positions appearing before a match finishes.',
-          'Update container names and local start/build scripts.',
+        title: 'v2.1.2',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Fix time handling between rounds.'],
+          },
         ],
       },
       {
-        title: 'Releases',
-        items: [
-          'v2.1.2 — Fix time handling between rounds.',
-          'v2.1.1 — Improve start-time handling and round-related UX.',
-          'v2.1.0 — Enhance tournament views and round management.',
-          'v2.0.4 — Update dependency automation and formatting configuration.',
-          'v2.0.3 — Increase the maximum winning-games setting to 99.',
-          'v2.0.2 — Improve match scoring, read-only links, service-worker caching, and layouts.',
-          'v2.0.1 — Improve interactive control semantics.',
-          'v2.0.0 — Add the responsive interface, accessibility improvements, sharing, bilingual documentation, search, and storage architecture updates.',
-          'v1.2.2 — Improve rerolling existing match scores.',
-          'v1.2.1 — Enable matches across active rounds.',
-          'v1.2.0 — Fix 404 handling, bye logic, and release workflow warnings.',
-          'v1.1.1 — Maintenance release.',
-          'v1.1.0 — Add PWA installation and offline support.',
-          'v1.0.2 — Fix the build configuration.',
-          'v1.0.1 — Maintenance release.',
-          'v1.0.0 — Initial release.',
+        title: 'v2.1.1',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Improve start-time handling and round-related UX.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.1.0',
+        subsections: [
+          {
+            title: 'Features',
+            items: ['Enhance tournament views and round management.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.4',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Update dependency automation and formatting configuration.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.3',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Increase the maximum winning-games setting to 99.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.2',
+        subsections: [
+          {
+            title: 'Features',
+            items: ['Improve match scoring, read-only links, service-worker caching, and layouts.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.1',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Improve interactive control semantics.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.0',
+        subsections: [
+          {
+            title: 'Features',
+            items: [
+              'Add the responsive interface, accessibility improvements, sharing, bilingual documentation, search, and storage architecture updates.',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.2',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Improve rerolling existing match scores.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.1',
+        subsections: [
+          {
+            title: 'Features',
+            items: ['Enable matches across active rounds.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.0',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Fix 404 handling, bye logic, and release workflow warnings.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.1.1',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Maintenance release.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.1.0',
+        subsections: [
+          {
+            title: 'Features',
+            items: ['Add PWA installation and offline support.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.2',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Fix the build configuration.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.1',
+        subsections: [
+          {
+            title: 'Bugfixes',
+            items: ['Maintenance release.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.0',
+        subsections: [
+          {
+            title: 'Features',
+            items: ['Initial release.'],
+          },
         ],
       },
     ],
@@ -770,54 +907,187 @@ const de: DocPage[] = [
     summary: 'Veröffentlichte Versionen und die enthaltenen Änderungen.',
     sections: [
       {
-        title: 'Unveröffentlicht — Funktionen',
-        items: [
-          'Turnierstatus in Redux verschoben.',
-          'Styles in CSS-Module aufgeteilt und Tailwind entfernt.',
-          'Redux-gesteuerte Darstellung reduziert und den React Compiler aktiviert.',
-          'Druckansicht ergänzt.',
-          'Spielervergleichs-Overlay ergänzt.',
-          'Veröffentlichte Version im Footer angezeigt.',
-          'Rundenfortschritt und Freilosbehandlung verbessert.',
+        title: 'Unveröffentlicht',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: [
+              'Turnierstatus in Redux verschoben.',
+              'Styles in CSS-Module aufgeteilt und Tailwind entfernt.',
+              'Redux-gesteuerte Darstellung reduziert und den React Compiler aktiviert.',
+              'Druckansicht ergänzt.',
+              'Spielervergleichs-Overlay ergänzt.',
+              'Veröffentlichte Version im Footer angezeigt.',
+              'Rundenfortschritt und Freilosbehandlung verbessert.',
+              'Dokumentationsüberschriften bleiben beim Scrollen sichtbar.',
+            ],
+          },
+          {
+            title: 'Fehlerbehebungen',
+            items: [
+              'Barrierefreiheit beim Drag-and-drop verbessert.',
+              'Nicht ablegbare Bedienelemente beim Tastatur-Drag-and-drop übersprungen.',
+              'Fokusverhalten des oberen Menüs wiederhergestellt.',
+              'Rundenlayout stabilisiert.',
+              'Leerlauf-Scrolling im Fokusmodus korrigiert.',
+              'Turniermenüs fixiert.',
+              'Paarungsprobleme in Runde eins und unteren Gruppen korrigiert.',
+              'Freilosauswahl und erneutes Auslosen nach einem Freilos-Tausch korrigiert.',
+              'Freilose im Spieler-Overlay anklickbar gemacht.',
+              'Freilose als bestmögliche Siege gewertet.',
+              'Kontrast des Dialogs im dunklen Modus verbessert.',
+              'Spielerpositionen vor Abschluss einer Begegnung korrigiert.',
+              'Containernamen sowie lokale Start- und Build-Skripte aktualisiert.',
+            ],
+          },
         ],
       },
       {
-        title: 'Unveröffentlicht — Fehlerbehebungen',
-        items: [
-          'Barrierefreiheit beim Drag-and-drop verbessert.',
-          'Nicht ablegbare Bedienelemente beim Tastatur-Drag-and-drop übersprungen.',
-          'Fokusverhalten des oberen Menüs wiederhergestellt.',
-          'Rundenlayout stabilisiert.',
-          'Leerlauf-Scrolling im Fokusmodus korrigiert.',
-          'Turniermenüs fixiert.',
-          'Paarungsprobleme in Runde eins und unteren Gruppen korrigiert.',
-          'Freilosauswahl und erneutes Auslosen nach einem Freilos-Tausch korrigiert.',
-          'Freilose im Spieler-Overlay anklickbar gemacht.',
-          'Freilose als bestmögliche Siege gewertet.',
-          'Kontrast des Dialogs im dunklen Modus verbessert.',
-          'Spielerpositionen vor Abschluss einer Begegnung korrigiert.',
-          'Containernamen sowie lokale Start- und Build-Skripte aktualisiert.',
+        title: 'v2.1.2',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Zeitbehandlung zwischen Runden korrigiert.'],
+          },
         ],
       },
       {
-        title: 'Veröffentlichungen',
-        items: [
-          'v2.1.2 — Zeitbehandlung zwischen Runden korrigiert.',
-          'v2.1.1 — Startzeitbehandlung und Runden-UX verbessert.',
-          'v2.1.0 — Turnieransichten und Rundenverwaltung erweitert.',
-          'v2.0.4 — Abhängigkeitsautomatisierung und Formatierungskonfiguration aktualisiert.',
-          'v2.0.3 — Maximale Einstellung für Gewinnsätze auf 99 erhöht.',
-          'v2.0.2 — Begegnungserfassung, Read-only-Links, Service-Worker-Cache und Layouts verbessert.',
-          'v2.0.1 — Semantik interaktiver Bedienelemente verbessert.',
-          'v2.0.0 — Responsive Oberfläche, Barrierefreiheit, Teilen, zweisprachige Dokumentation, Suche und Speicherarchitektur erweitert.',
-          'v1.2.2 — Erneutes Auslosen bestehender Ergebnisse verbessert.',
-          'v1.2.1 — Begegnungen über aktive Runden hinweg ermöglicht.',
-          'v1.2.0 — 404-Behandlung, Freiloslogik und Warnungen im Release-Workflow korrigiert.',
-          'v1.1.1 — Wartungsrelease.',
-          'v1.1.0 — PWA-Installation und Offline-Unterstützung ergänzt.',
-          'v1.0.2 — Build-Konfiguration korrigiert.',
-          'v1.0.1 — Wartungsrelease.',
-          'v1.0.0 — Erste Veröffentlichung.',
+        title: 'v2.1.1',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Startzeitbehandlung und Runden-UX verbessert.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.1.0',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: ['Turnieransichten und Rundenverwaltung erweitert.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.4',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Abhängigkeitsautomatisierung und Formatierungskonfiguration aktualisiert.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.3',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Maximale Einstellung für Gewinnsätze auf 99 erhöht.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.2',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: [
+              'Begegnungserfassung, Read-only-Links, Service-Worker-Cache und Layouts verbessert.',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.1',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Semantik interaktiver Bedienelemente verbessert.'],
+          },
+        ],
+      },
+      {
+        title: 'v2.0.0',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: [
+              'Responsive Oberfläche, Barrierefreiheit, Teilen, zweisprachige Dokumentation, Suche und Speicherarchitektur erweitert.',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.2',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Erneutes Auslosen bestehender Ergebnisse verbessert.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.1',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: ['Begegnungen über aktive Runden hinweg ermöglicht.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.2.0',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['404-Behandlung, Freiloslogik und Warnungen im Release-Workflow korrigiert.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.1.1',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Wartungsrelease.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.1.0',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: ['PWA-Installation und Offline-Unterstützung ergänzt.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.2',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Build-Konfiguration korrigiert.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.1',
+        subsections: [
+          {
+            title: 'Fehlerbehebungen',
+            items: ['Wartungsrelease.'],
+          },
+        ],
+      },
+      {
+        title: 'v1.0.0',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: ['Erste Veröffentlichung.'],
+          },
         ],
       },
     ],

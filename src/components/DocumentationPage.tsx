@@ -5,6 +5,34 @@ import { ChevronRight } from 'lucide-react'
 import { Navigate, NavLink, useParams } from 'react-router-dom'
 import { getDocs } from '../docs/content'
 import { locale } from '../i18n'
+import type { DocContent } from '../docs/content'
+
+const renderDocContent = (content: DocContent) => (
+  <>
+    {content.text?.map((paragraph) => (
+      <p key={paragraph}>{paragraph}</p>
+    ))}
+    {content.items && (
+      <ul>
+        {content.items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    )}
+    {content.note && (
+      <div className={classNames(sharedStyles, styles, 'docs-note')}>{content.note}</div>
+    )}
+    {content.links && (
+      <p className={classNames(sharedStyles, styles, 'docs-links')}>
+        {content.links.map((link) => (
+          <NavLink key={link.to} to={link.to}>
+            {link.label}
+          </NavLink>
+        ))}
+      </p>
+    )}
+  </>
+)
 
 export function DocumentationPage() {
   const docs = getDocs(locale)
@@ -32,28 +60,16 @@ export function DocumentationPage() {
         {page.sections.map((section, index) => (
           <section key={section.title} aria-labelledby={`docs-section-${index}`}>
             <h2 id={`docs-section-${index}`}>{section.title}</h2>
-            {section.text?.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+            {renderDocContent(section)}
+            {section.subsections?.map((subsection, subsectionIndex) => (
+              <div
+                className={classNames(sharedStyles, styles, 'docs-subsection')}
+                key={subsection.title}
+              >
+                <h3 id={`docs-subsection-${index}-${subsectionIndex}`}>{subsection.title}</h3>
+                {renderDocContent(subsection)}
+              </div>
             ))}
-            {section.items && (
-              <ul>
-                {section.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            )}
-            {section.note && (
-              <div className={classNames(sharedStyles, styles, 'docs-note')}>{section.note}</div>
-            )}
-            {section.links && (
-              <p className={classNames(sharedStyles, styles, 'docs-links')}>
-                {section.links.map((link) => (
-                  <NavLink key={link.to} to={link.to}>
-                    {link.label}
-                  </NavLink>
-                ))}
-              </p>
-            )}
           </section>
         ))}
       </article>
