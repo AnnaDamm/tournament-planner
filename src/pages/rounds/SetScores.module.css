@@ -24,6 +24,10 @@
     gap: clamp(8px, 0.8cqw, 16px);
   }
 
+  :global(.readonly-focus-mode) .set-scores :global(.score) {
+    gap: clamp(0.5px, calc(0.75cqw / var(--set-count)), 3px);
+  }
+
   @container content (max-width: 900px) {
     :global(.readonly-focus-mode) .set-scores {
       width: 100%;
