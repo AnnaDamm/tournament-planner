@@ -639,9 +639,14 @@ export function AppLayout({
           <span className={classNames(sharedStyles, styles, 'app-footer-name')}>
             <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
             Tourny
-            <span className={classNames(sharedStyles, styles, 'app-footer-version')}>
+            <Link
+              className={classNames(sharedStyles, styles, 'app-footer-version')}
+              to="/docs/version-history"
+              aria-label={`${import.meta.env.VITE_APP_VERSION} – ${t('versionHistory')}`}
+              title={t('versionHistory')}
+            >
               {import.meta.env.VITE_APP_VERSION}
-            </span>
+            </Link>
           </span>
           <nav
             className={classNames(sharedStyles, styles, 'app-footer-links')}

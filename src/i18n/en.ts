@@ -12,6 +12,7 @@ export const en = {
   showHeaderMenu: 'Show header menu',
   actions: 'Actions',
   documentation: 'Documentation',
+  versionHistory: 'Version history',
   add: 'Add player',
   addTeam: 'Add team',
   participants: 'PARTICIPANTS',

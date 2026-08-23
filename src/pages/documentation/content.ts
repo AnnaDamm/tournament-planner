@@ -374,6 +374,15 @@ const en: DocPage[] = [
         subsections: [
           {
             title: 'Features',
+            items: ['Link the footer version to the version history documentation.'],
+          },
+        ],
+      },
+      {
+        title: 'v3.0.0',
+        subsections: [
+          {
+            title: 'Features',
             items: [
               'Improve round score progression and bye handling.',
               'Add print mode.',
@@ -910,6 +919,15 @@ const de: DocPage[] = [
     sections: [
       {
         title: 'Unveröffentlicht',
+        subsections: [
+          {
+            title: 'Funktionen',
+            items: ['Footer-Version mit der Versionshistorie verknüpft.'],
+          },
+        ],
+      },
+      {
+        title: 'v3.0.0',
         subsections: [
           {
             title: 'Funktionen',

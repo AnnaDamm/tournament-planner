@@ -190,7 +190,7 @@
     border-radius: 4px;
   }
 
-  .app-footer-version {
+  .app-footer-name .app-footer-version {
     color: #87948c;
     font-weight: 500;
   }

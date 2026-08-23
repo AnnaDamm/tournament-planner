@@ -16,6 +16,7 @@ export const de: Translation = {
   showHeaderMenu: 'Oberes Menü einblenden',
   actions: 'Aktionen',
   documentation: 'Dokumentation',
+  versionHistory: 'Versionshistorie',
   add: 'Spieler hinzufügen',
   addTeam: 'Teams hinzufügen',
   participants: 'TEILNEHMER',
