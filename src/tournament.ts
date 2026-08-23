@@ -306,6 +306,7 @@ export const createRoundPlan = (
   players: Participant[],
   previousRounds: Round[],
   roundNumber: number,
+  preferredBye?: string,
 ) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds)
@@ -328,10 +329,11 @@ export const createRoundPlan = (
   let knownPlayers = ranking.filter((player) => finalizedIds.has(player.id))
   let bye: string | null = null
   if (knownPlayers.length === activePlayers.length && activePlayers.length % 2 === 1) {
-    bye = selectBye(
-      knownPlayers.map((player) => player.id),
-      previousRounds,
-    )
+    const knownPlayerIds = knownPlayers.map((player) => player.id)
+    bye =
+      preferredBye && knownPlayerIds.includes(preferredBye)
+        ? preferredBye
+        : selectBye(knownPlayerIds, previousRounds)
     knownPlayers = knownPlayers.filter((player) => player.id !== bye)
   }
 
@@ -554,10 +556,47 @@ export const rerollRound = (players: Participant[], rounds: Round[], number: num
   if (index < 0) return rounds
   const round = rounds[index]
   if (round.matches.some(hasEnteredScore)) return rounds
-  const plan = createRoundPlan(players, rounds.slice(0, index), number)
+  const plan = createRoundPlan(players, rounds.slice(0, index), number, round.bye ?? undefined)
   return rounds.map((item, roundIndex) =>
     roundIndex === index
       ? { ...item, bye: plan.bye, matches: plan.matches, standings: plan.standings }
+      : item,
+  )
+}
+
+export const rerollBye = (players: Participant[], rounds: Round[], number: number) => {
+  const index = rounds.findIndex((round) => round.number === number)
+  if (index < 0) return rounds
+  const round = rounds[index]
+  if (!round.bye || round.matches.some(hasEnteredScore)) return rounds
+
+  const activePlayers = players.filter((player) => !player.withdrawn)
+  if (activePlayers.length % 2 === 0) return rounds
+  const ranking = getRankingParticipants(activePlayers, rounds.slice(0, index))
+  if (number > 1) ranking.sort(compareRankingParticipants)
+  const finalizedIds = finalizedParticipantIds(activePlayers, rounds.slice(0, index))
+  const candidateIds = ranking
+    .filter((player) => finalizedIds.has(player.id))
+    .map((player) => player.id)
+  if (!candidateIds.includes(round.bye) || candidateIds.length < 2) return rounds
+
+  const nextBye = selectBye(
+    candidateIds.filter((participantId) => participantId !== round.bye),
+    rounds.slice(0, index),
+  )
+  if (!nextBye) return rounds
+
+  return rounds.map((item, roundIndex) =>
+    roundIndex === index
+      ? {
+          ...item,
+          bye: nextBye,
+          matches: item.matches.map((match) => ({
+            ...match,
+            a: match.a === round.bye ? nextBye : match.a === nextBye ? round.bye! : match.a,
+            b: match.b === round.bye ? nextBye : match.b === nextBye ? round.bye! : match.b,
+          })),
+        }
       : item,
   )
 }

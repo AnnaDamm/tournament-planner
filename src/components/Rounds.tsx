@@ -24,6 +24,7 @@ type Props = {
   onDelete: (number: number) => void
   onFillUnknown: (number: number) => void
   onReroll: (number: number) => void
+  onRerollBye: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   readOnly?: boolean
 }
@@ -56,6 +57,7 @@ export function Rounds({
   onDelete,
   onFillUnknown,
   onReroll,
+  onRerollBye,
   onSwapPlayers,
   readOnly = false,
 }: Props) {
@@ -109,6 +111,7 @@ export function Rounds({
       onStart={() => onStart(round.number)}
       onFillUnknown={() => onFillUnknown(round.number)}
       onReroll={() => onReroll(round.number)}
+      onRerollBye={() => onRerollBye(round.number)}
       onDelete={() => onDelete(round.number)}
       onSwapPlayers={(draggedId, targetId) => onSwapPlayers(roundIndex, draggedId, targetId)}
       keyboardMove={keyboardMove}

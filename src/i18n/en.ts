@@ -89,6 +89,7 @@ export const en = {
   undoWithdrawal: 'Undo withdrawal',
   withdrawn: 'withdrawn',
   reroll: 'Recalculate pairings',
+  rerollBye: 'Recalculate bye',
   shuffle: 'Shuffle',
   scheduledStart: 'Scheduled start',
   scheduledStartHelp: 'The first round starts automatically at this local date and time.',

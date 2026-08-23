@@ -39,6 +39,7 @@ export type AppRoutesProps = {
   onDeleteRound: (number: number) => void
   onFillUnknown: (number: number) => void
   onReroll: (number: number) => void
+  onRerollBye: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
   setParticipantType: (value: 'players' | 'teams') => void
   setCourtCount: (value: number) => void
@@ -85,6 +86,7 @@ export function AppRoutes({
   onDeleteRound,
   onFillUnknown,
   onReroll,
+  onRerollBye,
   onSwapPlayers,
   setParticipantType,
   setCourtCount,
@@ -158,6 +160,7 @@ export function AppRoutes({
             onDelete={onDeleteRound}
             onFillUnknown={onFillUnknown}
             onReroll={onReroll}
+            onRerollBye={onRerollBye}
             onSwapPlayers={onSwapPlayers}
             readOnly={readOnly}
           />

@@ -93,6 +93,7 @@ export const de: Translation = {
   undoWithdrawal: 'Aufgabe rückgängig machen',
   withdrawn: 'aufgegeben',
   reroll: 'Paarungen neu berechnen',
+  rerollBye: 'Bye neu berechnen',
   shuffle: 'Mischen',
   scheduledStart: 'Geplanter Start',
   scheduledStartHelp: 'Die erste Runde startet zu diesem lokalen Termin automatisch.',

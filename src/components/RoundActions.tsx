@@ -1,4 +1,4 @@
-import { ArrowDown, Calculator, ListPlus, Play, Settings2, X } from 'lucide-react'
+import { ArrowDown, Calculator, ListPlus, Play, RefreshCw, Settings2, X } from 'lucide-react'
 import { t } from '../i18n'
 import { hasEnteredScore, isUnknownParticipantId } from '../tournament'
 import type { Round } from '../tournamentTypes'
@@ -10,6 +10,7 @@ type Props = {
   onStart: () => void
   onFillUnknown: () => void
   onReroll: () => void
+  onRerollBye: () => void
   onDelete: () => void
 }
 
@@ -20,6 +21,7 @@ export function RoundActions({
   onStart,
   onFillUnknown,
   onReroll,
+  onRerollBye,
   onDelete,
 }: Props) {
   const needsPairing = round.matches.length === 0
@@ -97,6 +99,22 @@ export function RoundActions({
             </div>
           </div>
         )
+      )}
+      {round.bye && isUnstarted && (
+        <div className="header-tooltip">
+          <button
+            className="button ghost"
+            type="button"
+            aria-label={t('rerollBye')}
+            title={t('rerollBye')}
+            onClick={onRerollBye}
+          >
+            <RefreshCw size={16} aria-hidden="true" />
+          </button>
+          <div className="tooltip-popover" aria-hidden="true">
+            {t('rerollBye')}
+          </div>
+        </div>
       )}
       {!round.matches.some((match) => match.scoreA || match.scoreB) && (
         <button

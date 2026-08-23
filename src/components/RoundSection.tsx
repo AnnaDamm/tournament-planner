@@ -21,6 +21,7 @@ type Props = {
   onStart: () => void
   onFillUnknown: () => void
   onReroll: () => void
+  onRerollBye: () => void
   onDelete: () => void
   onSwapPlayers: (draggedId: string, targetId: string) => void
   keyboardMove: { roundIndex: number; participantId: string } | null
@@ -44,6 +45,7 @@ export function RoundSection({
   onStart,
   onFillUnknown,
   onReroll,
+  onRerollBye,
   onDelete,
   onSwapPlayers,
   keyboardMove,
@@ -143,6 +145,7 @@ export function RoundSection({
             onStart={onStart}
             onFillUnknown={onFillUnknown}
             onReroll={onReroll}
+            onRerollBye={onRerollBye}
             onDelete={onDelete}
           />
         )}

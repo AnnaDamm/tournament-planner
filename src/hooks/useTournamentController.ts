@@ -18,6 +18,7 @@ import {
   getRunningMatchIdsByRound,
   isUnknownParticipantId,
   rerollRound,
+  rerollBye,
   assignCourtsToMatches,
   calculateExpectedMatchStarts,
   startReadyRounds,
@@ -62,6 +63,13 @@ const rerollRoundAndStartReadyRounds = (
   number: number,
   courtCount: number,
 ) => startReadyRounds(rerollRound(players, rounds, number), courtCount)
+
+const rerollByeAndStartReadyRounds = (
+  players: Participant[],
+  rounds: Round[],
+  number: number,
+  courtCount: number,
+) => startReadyRounds(rerollBye(players, rounds, number), courtCount)
 
 const fillRoundAndStartReadyRounds = (
   rounds: Round[],
@@ -417,6 +425,8 @@ export function useTournamentController(): TournamentContextValue {
       setRounds((current) => fillRoundAndStartReadyRounds(current, number, players, courtCount)),
     onReroll: (number) =>
       setRounds((current) => rerollRoundAndStartReadyRounds(players, current, number, courtCount)),
+    onRerollBye: (number) =>
+      setRounds((current) => rerollByeAndStartReadyRounds(players, current, number, courtCount)),
     onSwapPlayers: swapRoundPlayers,
     setParticipantType,
     setCourtCount: (value) => {
