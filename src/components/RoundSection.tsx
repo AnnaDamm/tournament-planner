@@ -123,7 +123,14 @@ export function RoundSection({
                     <GripVertical size={14} aria-hidden="true" />
                   </button>
                 )}
-                {t('bye')}: {name(round.bye)}
+                <button
+                  className="match-player-name"
+                  type="button"
+                  title={`${t('history')}: ${name(round.bye)}`}
+                  onClick={() => onPlayerClick(round.bye ?? '')}
+                >
+                  {t('bye')}: {name(round.bye)}
+                </button>
               </span>
             )}
           </div>
