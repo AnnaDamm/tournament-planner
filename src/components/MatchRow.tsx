@@ -193,13 +193,7 @@ export const MatchRow = memo(function MatchRow({
           styles,
           `drag-hint match-player match-player-a ${matchResult?.winner === match.a ? 'winner' : ''} ${canReorder ? '' : 'locked'}`,
         )}
-        draggable={canReorder}
-        onDragStart={(event) => {
-          if (canReorder) {
-            event.dataTransfer.setData('text/plain', match.a)
-            event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
-          }
-        }}
+        draggable={false}
         onDragOver={(event) => canReorder && event.preventDefault()}
         onDrop={(event) => {
           if (
@@ -214,12 +208,44 @@ export const MatchRow = memo(function MatchRow({
           <button
             className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
+            draggable={canReorder}
             aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
             title={`${t('moveParticipant')}: ${name(match.a)}`}
             aria-pressed={selectedParticipantId === match.a}
             onClick={() => onKeyboardSwap(match.a)}
+            onDragStart={(event) => {
+              if (!canReorder) return
+              event.stopPropagation()
+              event.dataTransfer.effectAllowed = 'move'
+              const dragPreview =
+                event.currentTarget.querySelector<HTMLElement>('[data-drag-preview]')
+              if (dragPreview) {
+                event.dataTransfer.setDragImage(
+                  dragPreview,
+                  dragPreview.offsetWidth / 2,
+                  dragPreview.offsetHeight / 2,
+                )
+              }
+              event.dataTransfer.setData('text/plain', match.a)
+              event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
+            }}
           >
             <GripVertical size={16} aria-hidden="true" />
+            <span
+              className={classNames(sharedStyles, 'drag-preview')}
+              data-drag-preview
+              aria-hidden="true"
+            >
+              <GripVertical size={16} aria-hidden="true" />
+              <span className={classNames(sharedStyles, 'drag-preview-info')}>
+                <span className={classNames(sharedStyles, 'drag-preview-name')}>
+                  {name(match.a)}
+                </span>
+                <small className={classNames(sharedStyles, styles, 'player-record')}>
+                  {recordA}
+                </small>
+              </span>
+            </span>
           </button>
         )}
         <span className={classNames(sharedStyles, styles, 'player-info')}>
@@ -251,13 +277,7 @@ export const MatchRow = memo(function MatchRow({
           styles,
           `drag-hint match-player match-player-b ${matchResult?.winner === match.b ? 'winner' : ''} ${canReorder ? '' : 'locked'}`,
         )}
-        draggable={canReorder}
-        onDragStart={(event) => {
-          if (canReorder) {
-            event.dataTransfer.setData('text/plain', match.b)
-            event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
-          }
-        }}
+        draggable={false}
         onDragOver={(event) => canReorder && event.preventDefault()}
         onDrop={(event) => {
           if (
@@ -272,12 +292,44 @@ export const MatchRow = memo(function MatchRow({
           <button
             className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
+            draggable={canReorder}
             aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
             title={`${t('moveParticipant')}: ${name(match.b)}`}
             aria-pressed={selectedParticipantId === match.b}
             onClick={() => onKeyboardSwap(match.b)}
+            onDragStart={(event) => {
+              if (!canReorder) return
+              event.stopPropagation()
+              event.dataTransfer.effectAllowed = 'move'
+              const dragPreview =
+                event.currentTarget.querySelector<HTMLElement>('[data-drag-preview]')
+              if (dragPreview) {
+                event.dataTransfer.setDragImage(
+                  dragPreview,
+                  dragPreview.offsetWidth / 2,
+                  dragPreview.offsetHeight / 2,
+                )
+              }
+              event.dataTransfer.setData('text/plain', match.b)
+              event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
+            }}
           >
             <GripVertical size={16} aria-hidden="true" />
+            <span
+              className={classNames(sharedStyles, 'drag-preview')}
+              data-drag-preview
+              aria-hidden="true"
+            >
+              <GripVertical size={16} aria-hidden="true" />
+              <span className={classNames(sharedStyles, 'drag-preview-info')}>
+                <span className={classNames(sharedStyles, 'drag-preview-name')}>
+                  {name(match.b)}
+                </span>
+                <small className={classNames(sharedStyles, styles, 'player-record')}>
+                  {recordB}
+                </small>
+              </span>
+            </span>
           </button>
         )}
         <span className={classNames(sharedStyles, styles, 'player-info')}>

@@ -445,6 +445,36 @@
     cursor: grab;
   }
 
+  :global(.drag-preview) {
+    position: fixed;
+    top: -10000px;
+    left: -10000px;
+    display: inline-grid;
+    grid-template-columns: 22px max-content;
+    align-items: center;
+    gap: 8px;
+    min-height: 22px;
+    max-width: 360px;
+    padding: 5px 7px;
+    place-items: center;
+    border: 1px solid #dfe8dd;
+    border-radius: 6px;
+    background: #fff;
+    color: #2d4a25;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  :global(.drag-preview-info) {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  :global(.drag-preview-name) {
+    font-weight: 700;
+  }
+
   :global(.drag-handle-button)[aria-pressed='true'] {
     background: #c9f268;
     color: #233117;

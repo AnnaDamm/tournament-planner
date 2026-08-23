@@ -44,7 +44,6 @@ export function SetScores({
             <input
               type="number"
               min="0"
-              tabIndex={0}
               aria-label={`${t('setScore')} ${setIndex + 1}: ${playerA}`}
               value={set.a}
               onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
@@ -59,7 +58,6 @@ export function SetScores({
             <input
               type="number"
               min="0"
-              tabIndex={0}
               aria-label={`${t('setScore')} ${setIndex + 1}: ${playerB}`}
               value={set.b}
               onChange={(event) => updateSet(setIndex, 'b', event.target.value)}

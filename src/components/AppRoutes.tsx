@@ -64,9 +64,10 @@ export function AppRoutes({ localMaster, readOnly, onAdd, onDeleteAll }: AppRout
       const round = rounds[roundIndex]
       const match = round?.matches.find((item) => item.a === id || item.b === id)
       const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
-      const nextWins = result?.winner === id ? player.wins + 1 : player.wins
+      const isBye = round?.bye === id
+      const nextWins = result?.winner === id || isBye ? player.wins + 1 : player.wins
 
-      return result ? `${player.wins} → ${nextWins}` : String(player.wins)
+      return result || isBye ? `${player.wins} → ${nextWins}` : String(player.wins)
     },
     [rounds, standingsBeforeRounds],
   )

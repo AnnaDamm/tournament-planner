@@ -12,7 +12,7 @@ export function RoundMatchesHeader({ maxSetCount }: Props) {
   const setHeadersStyle = { '--set-count': maxSetCount } as CSSProperties
 
   return (
-    <div className={classNames(sharedStyles, styles, 'matches-header')} aria-hidden="true">
+    <div className={classNames(sharedStyles, styles, 'matches-header')} aria-hidden="true" inert>
       <span className={classNames(sharedStyles, styles, 'match-heading match-heading-court')}>
         {t('court')}
       </span>

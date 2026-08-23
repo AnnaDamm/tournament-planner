@@ -1,9 +1,10 @@
 import styles from './RoundSection.module.css'
 import sharedStyles from '../styles/shared.module.css'
 import { classNames } from '../styles/classNames'
-import { CalendarClock, Clock, GripVertical } from 'lucide-react'
+import { CalendarClock, Clock } from 'lucide-react'
 import { memo, useCallback, useMemo } from 'react'
 import { MatchRow } from './MatchRow'
+import { RoundBye } from './RoundBye'
 import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
 import { t } from '../i18n'
@@ -138,52 +139,19 @@ export const RoundSection = memo(function RoundSection({
             </div>
           </div>
           {round.bye && (
-            <span
-              className={classNames(
-                sharedStyles,
-                styles,
-                `bye-pill ${canReorderBye ? '' : 'locked'}`,
-              )}
-              draggable={canReorderBye}
-              onDragStart={(event) => {
-                if (!canReorderBye) return
-                event.dataTransfer.setData('text/plain', round.bye ?? '')
-                event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
-              }}
-              onDragOver={(event) => canReorderBye && event.preventDefault()}
-              onDrop={(event) => {
-                if (
-                  canReorderBye &&
-                  event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
-                ) {
-                  handleSwapPlayers(event.dataTransfer.getData('text/plain'), round.bye ?? '')
-                }
-              }}
-            >
-              {canReorderBye && (
-                <button
-                  className={classNames(sharedStyles, styles, 'drag-handle-button')}
-                  type="button"
-                  aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
-                  title={`${t('moveParticipant')}: ${name(round.bye)}`}
-                  aria-pressed={
-                    keyboardMove?.roundIndex === roundIndex &&
-                    keyboardMove.participantId === round.bye
-                  }
-                  onClick={() => handleKeyboardSwap(round.bye ?? '')}
-                >
-                  <GripVertical size={14} aria-hidden="true" />
-                </button>
-              )}
-              <button
-                className={classNames(sharedStyles, styles, 'match-player-name')}
-                type="button"
-                title={`${t('history')}: ${name(round.bye)}`}
-                onClick={() => onPlayerClick(round.bye ?? '')}
-              >
-                {t('bye')}: {name(round.bye)}
-              </button>
-            </span>
+            <RoundBye
+              bye={round.bye}
+              canReorder={canReorderBye}
+              roundIndex={roundIndex}
+              isSelected={
+                keyboardMove?.roundIndex === roundIndex && keyboardMove.participantId === round.bye
+              }
+              name={name}
+              record={getRecord(round.bye)}
+              onPlayerClick={onPlayerClick}
+              onKeyboardSwap={handleKeyboardSwap}
+              onSwap={handleSwapPlayers}
+            />
           )}
         </div>
         {!readOnly && (
