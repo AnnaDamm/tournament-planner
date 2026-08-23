@@ -2,9 +2,13 @@
 
 A small local React/Vite application for organising sport-agnostic tournaments with Swiss-style rounds.
 
-## GitHub Pages
+## Live Version
 
-[Open Tourny on GitHub Pages](https://annadamm.github.io/tournament-planner/)
+[Open the Tourny live version](https://annadamm.github.io/tournament-planner/)
+
+## Documentation
+
+[Open the Tourny documentation](https://annadamm.github.io/tournament-planner/docs/)
 
 ## Features
 
@@ -18,9 +22,9 @@ A small local React/Vite application for organising sport-agnostic tournaments w
 - Browser language detection with English fallback and German translations
 - Automatic light/dark mode based on the browser or operating system preference
 
-## GitHub Pages / PWA
+## Live Version / PWA
 
-The [GitHub Pages version](https://annadamm.github.io/tournament-planner/) remains a
+The [live version](https://annadamm.github.io/tournament-planner/) remains a
 standalone tournament manager. It works without a local host service and persists data
 only in the browser's `localStorage`. Once the PWA has been loaded while online, it can
 also be opened offline; data is not synchronised with other devices.
@@ -88,20 +92,8 @@ See the [OrbStack domain documentation](https://docs.orbstack.dev/docker/domains
 Tournament data remains in the master's browser `localStorage`; the relay only retains the
 latest snapshot in memory and forgets it when it stops. The master republishes its current state
 every five seconds, so the relay automatically recovers after a restart without persisting
-tournament data on the server. `localhost:8080` is a different browser origin from GitHub Pages,
-so import an exported tournament JSON there the first time you use local master mode.
-
-## Documentation
-
-Detailed user documentation is available in the deployed application:
-
-[Open the Tourny documentation](https://annadamm.github.io/tournament-planner/docs/)
-
-The documentation is bundled with the React application, available in English and German
-based on the browser language, and accessible offline after the application has been loaded.
-English remains the canonical source-code language.
-
-The repository Wiki serves as a small landing page that links to this canonical documentation.
+tournament data on the server. `localhost:8080` is a different browser origin from the live
+version, so import an exported tournament JSON there the first time you use local master mode.
 
 ## Requirements
 
