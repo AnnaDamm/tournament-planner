@@ -797,10 +797,19 @@ select {
   cursor: grab;
 }
 .player-record {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border: 1px solid #dfe8dd;
+  border-radius: 999px;
+  background: #eef3ec;
   color: #59655e;
   font-size: 11px;
   font-weight: 700;
   margin-left: 2px;
+  line-height: 1;
+  white-space: nowrap;
 }
 .match-player-name {
   border: 0;

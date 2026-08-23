@@ -34,7 +34,6 @@ export const de: Translation = {
   fewerGames: 'Weniger Spiele als die aktuelle Höchstzahl',
   sets: 'SÄTZE',
   points: 'PUNKTE',
-  roundPoints: 'Punkte',
   difference: 'PUNKTE-DIFFERENZ',
   position: 'POS.',
   onePerLine: 'Ein Name pro Zeile · Strg/⌘ + Enter zum Hinzufügen',

@@ -268,7 +268,7 @@ export function useTournamentController(): TournamentContextValue {
     const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
     const nextWins = result?.winner === id ? player.wins + 1 : player.wins
 
-    return `${t('roundPoints')}: ${player.wins}${result ? ` -> ${nextWins}` : ''}`
+    return result ? `${player.wins} → ${nextWins}` : String(player.wins)
   }
   const toggleSort = (key: string) =>
     sort === key ? setDesc((value) => !value) : (setSort(key), setDesc(key !== 'name'))

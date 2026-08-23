@@ -30,7 +30,6 @@ export const en = {
   fewerGames: 'Fewer games played than the current maximum',
   sets: 'SETS',
   points: 'POINTS',
-  roundPoints: 'Points',
   difference: 'POINT DIFFERENCE',
   position: 'POS.',
   onePerLine: 'One name per line · Ctrl/⌘ + Enter to add',
