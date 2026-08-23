@@ -662,11 +662,11 @@
 
   :global(.readonly-focus-mode) :global(.score-readonly) :global(.score-value),
   :global(.readonly-focus-mode) :global(.match-score) {
-    font-size: clamp(5px, calc(4.5cqw / var(--set-count)), 66px);
+    font-size: clamp(4px, calc(19.5cqw / var(--set-count)), 66px);
   }
 
   :global(.readonly-focus-mode) :global(.score) b {
-    font-size: clamp(5px, calc(4.5cqw / var(--set-count)), 66px);
+    font-size: clamp(4px, calc(19.5cqw / var(--set-count)), 66px);
   }
 
   :global(.readonly-focus-mode) :global(.score) + :global(.score) {

@@ -388,6 +388,7 @@ const en: DocPage[] = [
           {
             title: 'Bugfixes',
             items: [
+              'Scale focus-mode set scores to the available container width and set count.',
               'Fix round-one pairing and lower-bracket pairing issues.',
               'Fix bye selection and rerolling after a bye swap.',
               'Count byes as best-possible wins.',
@@ -926,6 +927,7 @@ const de: DocPage[] = [
           {
             title: 'Fehlerbehebungen',
             items: [
+              'Satzwerte im Fokusmodus an verfügbare Containerbreite und Satzanzahl angepasst.',
               'Paarungsprobleme in Runde eins und unteren Gruppen korrigiert.',
               'Freilosauswahl und erneutes Auslosen nach einem Freilos-Tausch korrigiert.',
               'Freilose als bestmögliche Siege gewertet.',

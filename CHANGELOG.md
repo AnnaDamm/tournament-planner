@@ -15,6 +15,7 @@
 
 ### Bugfixes
 
+- Scale focus-mode set scores to the available container width and set count.
 - Fix round-one pairing and lower-bracket pairing issues.
 - Fix bye selection and rerolling after a bye swap.
 - Count byes as best-possible wins.
