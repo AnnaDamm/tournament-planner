@@ -62,6 +62,9 @@ export const RoundSection = memo(function RoundSection({
 }: Props) {
   const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(round)
   const isCurrentRound = runningMatchIds.size > 0
+  const keyboardMoveActive = keyboardMove !== null
+  const isKeyboardMoveRound = keyboardMove?.roundIndex === roundIndex
+  const selectedParticipantId = isKeyboardMoveRound ? keyboardMove.participantId : null
   const orderedMatches = useMemo(
     () => sortMatchesByParticipantOrder(round.matches, participantOrder),
     [participantOrder, round.matches],
@@ -102,6 +105,7 @@ export const RoundSection = memo(function RoundSection({
         `round-card ${isCurrentRound ? 'current-round' : ''}`,
       )}
       aria-labelledby={`round-${round.number}-title`}
+      inert={keyboardMoveActive && !isKeyboardMoveRound}
     >
       <div className={classNames(sharedStyles, styles, 'round-head')}>
         <div className={classNames(sharedStyles, styles, 'round-head-main')}>
@@ -143,9 +147,9 @@ export const RoundSection = memo(function RoundSection({
               bye={round.bye}
               canReorder={canReorderBye}
               roundIndex={roundIndex}
-              isSelected={
-                keyboardMove?.roundIndex === roundIndex && keyboardMove.participantId === round.bye
-              }
+              isSelected={selectedParticipantId === round.bye}
+              selectedParticipantId={selectedParticipantId}
+              keyboardMoveActive={keyboardMoveActive}
               name={name}
               record={getRecord(round.bye)}
               onPlayerClick={onPlayerClick}
@@ -164,6 +168,7 @@ export const RoundSection = memo(function RoundSection({
             onReroll={handleReroll}
             onRerollBye={handleRerollBye}
             onDelete={handleDelete}
+            keyboardMoveActive={keyboardMoveActive}
           />
         )}
       </div>
@@ -189,10 +194,9 @@ export const RoundSection = memo(function RoundSection({
               winningGames={round.winningGames ?? 1}
               isRunning={runningMatchIds.has(match.id)}
               onSwap={handleSwapPlayers}
-              selectedParticipantId={
-                keyboardMove?.roundIndex === roundIndex ? keyboardMove.participantId : null
-              }
+              selectedParticipantId={selectedParticipantId}
               onKeyboardSwap={handleKeyboardSwap}
+              keyboardMoveActive={keyboardMoveActive}
               readOnly={readOnly}
             />
           ))}

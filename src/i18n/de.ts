@@ -155,5 +155,5 @@ export const de: Translation = {
   setScore: 'Satz',
   moveParticipant: 'Teilnehmenden verschieben',
   moveInstructions:
-    'Teilnehmender ausgewählt. Wähle eine andere Verschieben-Schaltfläche, um die Positionen zu tauschen.',
+    'Teilnehmender ausgewählt. Wähle eine andere Verschieben-Schaltfläche, um die Positionen zu tauschen, oder drücke Escape zum Abbrechen.',
 }

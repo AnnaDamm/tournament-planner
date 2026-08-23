@@ -15,6 +15,7 @@ type Props = {
   onReroll: () => void
   onRerollBye: () => void
   onDelete: () => void
+  keyboardMoveActive?: boolean
 }
 
 export function RoundActions({
@@ -26,11 +27,12 @@ export function RoundActions({
   onReroll,
   onRerollBye,
   onDelete,
+  keyboardMoveActive = false,
 }: Props) {
   const needsPairing = round.matches.length === 0
   const isUnstarted = round.matches.every((match) => !hasEnteredScore(match))
   return (
-    <div className={classNames(sharedStyles, styles, 'round-actions')}>
+    <div className={classNames(sharedStyles, styles, 'round-actions')} inert={keyboardMoveActive}>
       <button
         className={classNames(sharedStyles, styles, 'button ghost')}
         type="button"

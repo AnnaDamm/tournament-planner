@@ -150,5 +150,6 @@ export const en = {
   versus: 'versus',
   setScore: 'Set',
   moveParticipant: 'Move participant',
-  moveInstructions: 'Participant selected. Choose another move button to swap positions.',
+  moveInstructions:
+    'Participant selected. Choose another move button to swap positions, or press Escape to cancel.',
 } as const

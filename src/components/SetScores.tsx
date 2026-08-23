@@ -14,6 +14,7 @@ type Props = {
   playerB: string
   updateSet: (setIndex: number, side: 'a' | 'b', value: string) => void
   scheduleCommit: () => void
+  keyboardMoveActive?: boolean
 }
 
 export function SetScores({
@@ -25,11 +26,16 @@ export function SetScores({
   playerB,
   updateSet,
   scheduleCommit,
+  keyboardMoveActive = false,
 }: Props) {
   const setScoresStyle = { '--set-count': maxSetCount } as CSSProperties
 
   return (
-    <div className={classNames(sharedStyles, styles, 'set-scores')} style={setScoresStyle}>
+    <div
+      className={classNames(sharedStyles, styles, 'set-scores')}
+      style={setScoresStyle}
+      inert={keyboardMoveActive}
+    >
       {Array.from(
         { length: visibleSetCount },
         (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },

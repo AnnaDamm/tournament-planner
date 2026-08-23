@@ -15,6 +15,7 @@
 ### Bugfixes
 
 - Refine drag-and-drop accessibility.
+- Skip non-droppable controls during keyboard drag-and-drop.
 - Restore top-menu focus behavior.
 - Stabilize the round layout.
 - Fix focus-mode idle scrolling.

@@ -26,6 +26,7 @@ type Props = {
   onSwap: (draggedId: string, targetId: string) => void
   selectedParticipantId?: string | null
   onKeyboardSwap: (participantId: string) => void
+  keyboardMoveActive?: boolean
   winningGames: number
   isRunning?: boolean
   readOnly?: boolean
@@ -90,6 +91,7 @@ export const MatchRow = memo(function MatchRow({
   onSwap,
   selectedParticipantId = null,
   onKeyboardSwap,
+  keyboardMoveActive = false,
   winningGames,
   isRunning = false,
   readOnly = false,
@@ -109,6 +111,10 @@ export const MatchRow = memo(function MatchRow({
   const targetWins = Math.max(1, Math.min(99, Number(winningGames) || 1))
   const matchResult = getMatchResult(match, targetWins)
   const canReorder = !readOnly && !hasEnteredScore(match)
+  const canKeyboardDropA =
+    keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.a
+  const canKeyboardDropB =
+    keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.b
   const { completedSets, winnerAt } = useMemo(
     () => getSetStats(draftSets, targetWins),
     [draftSets, targetWins],
@@ -181,6 +187,8 @@ export const MatchRow = memo(function MatchRow({
         <button
           className={classNames(sharedStyles, styles, 'compare-button')}
           type="button"
+          tabIndex={keyboardMoveActive ? -1 : undefined}
+          inert={keyboardMoveActive}
           aria-label={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
           title={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
           onClick={() => onCompare(match.a, match.b)}
@@ -208,13 +216,16 @@ export const MatchRow = memo(function MatchRow({
           <button
             className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
-            draggable={canReorder}
+            draggable={canReorder && !keyboardMoveActive}
+            disabled={keyboardMoveActive && !canKeyboardDropA}
+            tabIndex={keyboardMoveActive ? (canKeyboardDropA ? 0 : -1) : undefined}
+            data-keyboard-drop-target={canKeyboardDropA ? roundIndex : undefined}
             aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
             title={`${t('moveParticipant')}: ${name(match.a)}`}
             aria-pressed={selectedParticipantId === match.a}
             onClick={() => onKeyboardSwap(match.a)}
             onDragStart={(event) => {
-              if (!canReorder) return
+              if (!canReorder || keyboardMoveActive) return
               event.stopPropagation()
               event.dataTransfer.effectAllowed = 'move'
               const dragPreview =
@@ -253,6 +264,8 @@ export const MatchRow = memo(function MatchRow({
             type="button"
             className={classNames(sharedStyles, styles, 'match-player-name')}
             title={`${t('history')}: ${name(match.a)}`}
+            tabIndex={keyboardMoveActive ? -1 : undefined}
+            inert={keyboardMoveActive}
             onClick={() => onPlayerClick(match.a)}
           >
             {name(match.a)}
@@ -292,13 +305,16 @@ export const MatchRow = memo(function MatchRow({
           <button
             className={classNames(sharedStyles, styles, 'drag-handle-button')}
             type="button"
-            draggable={canReorder}
+            draggable={canReorder && !keyboardMoveActive}
+            disabled={keyboardMoveActive && !canKeyboardDropB}
+            tabIndex={keyboardMoveActive ? (canKeyboardDropB ? 0 : -1) : undefined}
+            data-keyboard-drop-target={canKeyboardDropB ? roundIndex : undefined}
             aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
             title={`${t('moveParticipant')}: ${name(match.b)}`}
             aria-pressed={selectedParticipantId === match.b}
             onClick={() => onKeyboardSwap(match.b)}
             onDragStart={(event) => {
-              if (!canReorder) return
+              if (!canReorder || keyboardMoveActive) return
               event.stopPropagation()
               event.dataTransfer.effectAllowed = 'move'
               const dragPreview =
@@ -337,6 +353,8 @@ export const MatchRow = memo(function MatchRow({
             type="button"
             className={classNames(sharedStyles, styles, 'match-player-name')}
             title={`${t('history')}: ${name(match.b)}`}
+            tabIndex={keyboardMoveActive ? -1 : undefined}
+            inert={keyboardMoveActive}
             onClick={() => onPlayerClick(match.b)}
           >
             {name(match.b)}
@@ -353,6 +371,7 @@ export const MatchRow = memo(function MatchRow({
         playerB={name(match.b)}
         updateSet={updateSet}
         scheduleCommit={scheduleCommit}
+        keyboardMoveActive={keyboardMoveActive}
       />
     </fieldset>
   )

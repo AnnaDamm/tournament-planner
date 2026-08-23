@@ -2,7 +2,7 @@ import styles from './Rounds.module.css'
 import sharedStyles from '../styles/shared.module.css'
 import { classNames } from '../styles/classNames'
 import { Plus, Trophy } from 'lucide-react'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { PageTitle } from './PageTitle'
 import { PlayerComparisonDialog } from './PlayerComparisonDialog'
 import { PlayerHistoryDialog } from './PlayerHistoryDialog'
@@ -85,6 +85,22 @@ export const Rounds = memo(function Rounds({
   )
   const currentRoundNumber = getCurrentRoundNumber(rounds, runningMatchIdsByRound)
   const firstRunningMatchId = getFirstRunningMatchId(rounds, runningMatchIdsByRound)
+  useEffect(() => {
+    if (!keyboardMove) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      setKeyboardMove(null)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document
+      .querySelector<HTMLButtonElement>(`[data-keyboard-drop-target="${keyboardMove.roundIndex}"]`)
+      ?.focus()
+
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [keyboardMove])
   const runningRoundIndices = useMemo(
     () =>
       new Set(

@@ -9,6 +9,8 @@ type Props = {
   canReorder: boolean
   roundIndex: number
   isSelected: boolean
+  selectedParticipantId: string | null
+  keyboardMoveActive: boolean
   name: (id: string) => string
   record: string
   onPlayerClick: (id: string) => void
@@ -21,12 +23,17 @@ export function RoundBye({
   canReorder,
   roundIndex,
   isSelected,
+  selectedParticipantId,
+  keyboardMoveActive,
   name,
   record,
   onPlayerClick,
   onKeyboardSwap,
   onSwap,
 }: Props) {
+  const canKeyboardDrop =
+    keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== bye
+
   return (
     <span
       className={classNames(sharedStyles, styles, `bye-pill ${canReorder ? '' : 'locked'}`)}
@@ -45,12 +52,16 @@ export function RoundBye({
         <button
           className={classNames(sharedStyles, styles, 'drag-handle-button')}
           type="button"
-          draggable={canReorder}
+          draggable={canReorder && !keyboardMoveActive}
+          disabled={keyboardMoveActive && !canKeyboardDrop}
+          tabIndex={keyboardMoveActive ? (canKeyboardDrop ? 0 : -1) : undefined}
+          data-keyboard-drop-target={canKeyboardDrop ? roundIndex : undefined}
           aria-label={`${t('moveParticipant')}: ${name(bye)}`}
           title={`${t('moveParticipant')}: ${name(bye)}`}
           aria-pressed={isSelected}
           onClick={() => onKeyboardSwap(bye)}
           onDragStart={(event) => {
+            if (keyboardMoveActive) return
             event.stopPropagation()
             event.dataTransfer.effectAllowed = 'move'
             const dragPreview =
@@ -85,6 +96,8 @@ export function RoundBye({
       <button
         className={classNames(sharedStyles, styles, 'match-player-name')}
         type="button"
+        tabIndex={keyboardMoveActive ? -1 : undefined}
+        inert={keyboardMoveActive}
         title={`${t('history')}: ${name(bye)}`}
         onClick={() => onPlayerClick(bye)}
       >
