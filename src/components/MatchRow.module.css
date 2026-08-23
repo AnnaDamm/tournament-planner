@@ -2,7 +2,8 @@
   .match-court {
     color: #aab3ae;
     font-size: 14px;
-    width: 20px;
+    grid-area: court;
+    width: 100%;
     font-weight: 900;
     text-align: center;
   }
@@ -11,16 +12,22 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    grid-area: start;
+    justify-self: start;
     color: #7d8981;
     font-size: 11px;
     white-space: nowrap;
   }
 
   .drag-hint {
-    display: flex;
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    grid-template-areas: 'handle info';
     align-items: center;
-    gap: 5px;
-    width: 190px;
+    column-gap: 8px;
+    row-gap: 5px;
+    width: 100%;
+    min-width: 0;
     cursor: grab;
   }
 
@@ -38,15 +45,47 @@
 
   .drag-hint:global(.locked) {
     cursor: default;
-    padding-inline-start: 27px;
-  }
-
-  .drag-hint:global(.winner):global(.locked) {
-    padding-inline-start: 34px;
   }
 
   .drag-hint svg {
     color: #c2cbc5;
+  }
+
+  :global(.drag-handle-button) {
+    grid-area: handle;
+  }
+
+  .player-info {
+    display: inline-flex;
+    grid-area: info;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  :global(.match-player-name) {
+    min-width: 0;
+  }
+
+  .match-player-a {
+    grid-area: player-a;
+  }
+
+  .match-player-b {
+    grid-area: player-b;
+  }
+
+  :global(.compare-button) {
+    grid-area: compare;
+    justify-self: center;
+  }
+
+  :global(.versus),
+  :global(.match-score) {
+    grid-area: versus;
+    justify-self: center;
+    text-align: center;
   }
 
   :global(.readonly-focus-mode) .match-court {
@@ -55,12 +94,11 @@
   }
 
   :global(.readonly-focus-mode) .drag-hint {
-    width: clamp(200px, 18vw, 400px);
+    width: 100%;
   }
 
   :global(.readonly-focus-mode) .match-player {
-    flex: 1 1 0;
-    width: auto;
+    width: 100%;
     min-width: 0;
   }
 
@@ -72,27 +110,25 @@
   }
 
   .match-court {
-    width: clamp(20px, 1.5vw, 30px);
+    width: 100%;
     font-size: clamp(14px, 0.8vw, 20px);
   }
 
   .drag-hint {
-    width: clamp(150px, 13vw, 270px);
+    width: 100%;
     min-width: 0;
   }
 
   @container content (max-width: 680px) {
     .drag-hint {
-      width: auto;
-      flex: 1;
+      width: 100%;
       font-size: 12px;
     }
   }
 
   @container content (max-width: 680px) {
     .match-court {
-      grid-area: court;
-      width: auto;
+      width: 100%;
     }
   }
 
@@ -105,20 +141,8 @@
 
   @container content (max-width: 680px) {
     .match-player {
-      width: auto;
+      width: 100%;
       min-width: 0;
-    }
-  }
-
-  @container content (max-width: 680px) {
-    .match-player-a {
-      grid-area: player-a;
-    }
-  }
-
-  @container content (max-width: 680px) {
-    .match-player-b {
-      grid-area: player-b;
     }
   }
 
@@ -133,5 +157,10 @@
       padding-inline: 5px;
       margin-inline: -5px;
     }
+  }
+
+  :global(.readonly-focus-mode) .match-start {
+    font-size: clamp(27px, 1.6vw, 38px);
+    gap: clamp(8px, 0.8vw, 16px);
   }
 }

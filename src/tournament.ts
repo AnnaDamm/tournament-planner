@@ -60,6 +60,11 @@ export const getMatchResult = (match: Match, winningGames: number) => {
   return winner ? { sets, winner } : null
 }
 
+export const getMaxSetCount = (winningGames: number) => {
+  const targetWins = Math.max(1, Math.min(99, Number(winningGames) || 1))
+  return targetWins * 2 - 1
+}
+
 const hasPlayed = (firstId: string, secondId: string, rounds: Round[]) =>
   rounds.some((round) =>
     round.matches.some(

@@ -5,7 +5,12 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
 import type { Match, SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
-import { getMatchResult, hasEnteredScore, isUnknownParticipantId } from '../tournament'
+import {
+  getMatchResult,
+  getMaxSetCount,
+  hasEnteredScore,
+  isUnknownParticipantId,
+} from '../tournament'
 import { SetScores } from './SetScores'
 
 type Props = {
@@ -108,6 +113,7 @@ export const MatchRow = memo(function MatchRow({
     () => getSetStats(draftSets, targetWins),
     [draftSets, targetWins],
   )
+  const maxSetCount = getMaxSetCount(targetWins)
   const finalScore = useMemo(() => {
     if (winnerAt < 0) return null
     return draftSets.slice(0, winnerAt + 1).reduce(
@@ -122,7 +128,7 @@ export const MatchRow = memo(function MatchRow({
   const visibleSetCount = Math.max(
     targetWins,
     Math.min(
-      targetWins * 2 - 1,
+      maxSetCount,
       winnerAt >= 0 ? winnerAt + 1 : completedSets >= targetWins ? completedSets + 1 : targetWins,
     ),
   )
@@ -216,15 +222,17 @@ export const MatchRow = memo(function MatchRow({
             <GripVertical size={16} aria-hidden="true" />
           </button>
         )}
-        <button
-          type="button"
-          className={classNames(sharedStyles, styles, 'match-player-name')}
-          title={`${t('history')}: ${name(match.a)}`}
-          onClick={() => onPlayerClick(match.a)}
-        >
-          {name(match.a)}
-        </button>
-        <small className={classNames(sharedStyles, styles, 'player-record')}>{recordA}</small>
+        <span className={classNames(sharedStyles, styles, 'player-info')}>
+          <button
+            type="button"
+            className={classNames(sharedStyles, styles, 'match-player-name')}
+            title={`${t('history')}: ${name(match.a)}`}
+            onClick={() => onPlayerClick(match.a)}
+          >
+            {name(match.a)}
+          </button>
+          <small className={classNames(sharedStyles, styles, 'player-record')}>{recordA}</small>
+        </span>
       </span>
       {finalScore ? (
         <span
@@ -272,19 +280,22 @@ export const MatchRow = memo(function MatchRow({
             <GripVertical size={16} aria-hidden="true" />
           </button>
         )}
-        <button
-          type="button"
-          className={classNames(sharedStyles, styles, 'match-player-name')}
-          title={`${t('history')}: ${name(match.b)}`}
-          onClick={() => onPlayerClick(match.b)}
-        >
-          {name(match.b)}
-        </button>
-        <small className={classNames(sharedStyles, styles, 'player-record')}>{recordB}</small>
+        <span className={classNames(sharedStyles, styles, 'player-info')}>
+          <button
+            type="button"
+            className={classNames(sharedStyles, styles, 'match-player-name')}
+            title={`${t('history')}: ${name(match.b)}`}
+            onClick={() => onPlayerClick(match.b)}
+          >
+            {name(match.b)}
+          </button>
+          <small className={classNames(sharedStyles, styles, 'player-record')}>{recordB}</small>
+        </span>
       </span>
       <SetScores
         draftSets={draftSets}
         visibleSetCount={visibleSetCount}
+        maxSetCount={maxSetCount}
         readOnly={readOnly}
         playerA={name(match.a)}
         playerB={name(match.b)}

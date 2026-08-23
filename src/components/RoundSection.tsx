@@ -4,9 +4,10 @@ import { classNames } from '../styles/classNames'
 import { CalendarClock, Clock, GripVertical } from 'lucide-react'
 import { memo, useCallback, useMemo } from 'react'
 import { MatchRow } from './MatchRow'
+import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
 import { t } from '../i18n'
-import { isRoundComplete, sortMatchesByParticipantOrder } from '../tournament'
+import { getMaxSetCount, isRoundComplete, sortMatchesByParticipantOrder } from '../tournament'
 import type { Match, Round } from '../tournamentTypes'
 
 type Props = {
@@ -64,6 +65,7 @@ export const RoundSection = memo(function RoundSection({
     () => sortMatchesByParticipantOrder(round.matches, participantOrder),
     [participantOrder, round.matches],
   )
+  const maxSetCount = getMaxSetCount(round.winningGames)
   const getRecord = useCallback((id: string) => record(roundIndex, id), [record, roundIndex])
   const handleCompare = useCallback(
     (firstId: string, secondId: string) => onCompare(firstId, secondId, roundIndex),
@@ -101,86 +103,88 @@ export const RoundSection = memo(function RoundSection({
       aria-labelledby={`round-${round.number}-title`}
     >
       <div className={classNames(sharedStyles, styles, 'round-head')}>
-        <div>
-          {round.number === currentRoundNumber && (
-            <div className={classNames(sharedStyles, styles, 'current-round-label')}>
-              {t('currentRound')}
-            </div>
-          )}
-          <span className={classNames(sharedStyles, styles, 'round-kicker')}>
-            <span aria-hidden="true">
-              {t('round')} {String(round.number).padStart(2, '0')}
-            </span>
-            {(round.startedAt || round.predictedStart) && (
-              <time
-                className={classNames(sharedStyles, styles, 'round-started')}
-                dateTime={round.startedAt ?? round.predictedStart}
-                title={t(round.startedAt ? 'startedAt' : 'expectedStart')}
-              >
-                {round.startedAt ? (
-                  <Clock size={12} aria-hidden="true" />
-                ) : (
-                  <CalendarClock size={12} aria-hidden="true" />
-                )}{' '}
-                {formatStartTime(round.startedAt ?? round.predictedStart!)}
-              </time>
+        <div className={classNames(sharedStyles, styles, 'round-head-main')}>
+          <div className={classNames(sharedStyles, styles, 'round-head-copy')}>
+            {round.number === currentRoundNumber && (
+              <div className={classNames(sharedStyles, styles, 'current-round-label')}>
+                {t('currentRound')}
+              </div>
             )}
-          </span>
-          <div className={classNames(sharedStyles, styles, 'round-title-line')}>
-            <h2 id={`round-${round.number}-title`}>
-              <span className={classNames(sharedStyles, styles, 'sr-only')}>
-                {t('round')} {round.number} –
-              </span>
-            </h2>
-            {round.bye && (
-              <span
-                className={classNames(
-                  sharedStyles,
-                  styles,
-                  `bye-pill ${canReorderBye ? '' : 'locked'}`,
-                )}
-                draggable={canReorderBye}
-                onDragStart={(event) => {
-                  if (!canReorderBye) return
-                  event.dataTransfer.setData('text/plain', round.bye ?? '')
-                  event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
-                }}
-                onDragOver={(event) => canReorderBye && event.preventDefault()}
-                onDrop={(event) => {
-                  if (
-                    canReorderBye &&
-                    event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
-                  ) {
-                    handleSwapPlayers(event.dataTransfer.getData('text/plain'), round.bye ?? '')
-                  }
-                }}
-              >
-                {canReorderBye && (
-                  <button
-                    className={classNames(sharedStyles, styles, 'drag-handle-button')}
-                    type="button"
-                    aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
-                    title={`${t('moveParticipant')}: ${name(round.bye)}`}
-                    aria-pressed={
-                      keyboardMove?.roundIndex === roundIndex &&
-                      keyboardMove.participantId === round.bye
-                    }
-                    onClick={() => handleKeyboardSwap(round.bye ?? '')}
+            <div className={classNames(sharedStyles, styles, 'round-title-line')}>
+              <h2 id={`round-${round.number}-title`}>
+                <span className={classNames(sharedStyles, styles, 'sr-only')}>
+                  {t('round')} {round.number} –
+                </span>
+              </h2>
+              <span className={classNames(sharedStyles, styles, 'round-kicker')}>
+                <span aria-hidden="true">
+                  {t('round')} {String(round.number).padStart(2, '0')}
+                </span>
+                {(round.startedAt || round.predictedStart) && (
+                  <time
+                    className={classNames(sharedStyles, styles, 'round-started')}
+                    dateTime={round.startedAt ?? round.predictedStart}
+                    title={t(round.startedAt ? 'startedAt' : 'expectedStart')}
                   >
-                    <GripVertical size={14} aria-hidden="true" />
-                  </button>
+                    {round.startedAt ? (
+                      <Clock size={12} aria-hidden="true" />
+                    ) : (
+                      <CalendarClock size={12} aria-hidden="true" />
+                    )}{' '}
+                    {formatStartTime(round.startedAt ?? round.predictedStart!)}
+                  </time>
                 )}
-                <button
-                  className={classNames(sharedStyles, styles, 'match-player-name')}
-                  type="button"
-                  title={`${t('history')}: ${name(round.bye)}`}
-                  onClick={() => onPlayerClick(round.bye ?? '')}
-                >
-                  {t('bye')}: {name(round.bye)}
-                </button>
               </span>
-            )}
+            </div>
           </div>
+          {round.bye && (
+            <span
+              className={classNames(
+                sharedStyles,
+                styles,
+                `bye-pill ${canReorderBye ? '' : 'locked'}`,
+              )}
+              draggable={canReorderBye}
+              onDragStart={(event) => {
+                if (!canReorderBye) return
+                event.dataTransfer.setData('text/plain', round.bye ?? '')
+                event.dataTransfer.setData('application/x-courtly-round', String(roundIndex))
+              }}
+              onDragOver={(event) => canReorderBye && event.preventDefault()}
+              onDrop={(event) => {
+                if (
+                  canReorderBye &&
+                  event.dataTransfer.getData('application/x-courtly-round') === String(roundIndex)
+                ) {
+                  handleSwapPlayers(event.dataTransfer.getData('text/plain'), round.bye ?? '')
+                }
+              }}
+            >
+              {canReorderBye && (
+                <button
+                  className={classNames(sharedStyles, styles, 'drag-handle-button')}
+                  type="button"
+                  aria-label={`${t('moveParticipant')}: ${name(round.bye)}`}
+                  title={`${t('moveParticipant')}: ${name(round.bye)}`}
+                  aria-pressed={
+                    keyboardMove?.roundIndex === roundIndex &&
+                    keyboardMove.participantId === round.bye
+                  }
+                  onClick={() => handleKeyboardSwap(round.bye ?? '')}
+                >
+                  <GripVertical size={14} aria-hidden="true" />
+                </button>
+              )}
+              <button
+                className={classNames(sharedStyles, styles, 'match-player-name')}
+                type="button"
+                title={`${t('history')}: ${name(round.bye)}`}
+                onClick={() => onPlayerClick(round.bye ?? '')}
+              >
+                {t('bye')}: {name(round.bye)}
+              </button>
+            </span>
+          )}
         </div>
         {!readOnly && (
           <RoundActions
@@ -201,6 +205,7 @@ export const RoundSection = memo(function RoundSection({
         </div>
       ) : (
         <div className={classNames(sharedStyles, styles, 'matches')}>
+          <RoundMatchesHeader maxSetCount={maxSetCount} />
           {orderedMatches.map((match, matchIndex) => (
             <MatchRow
               key={match.id}
@@ -229,9 +234,9 @@ export const RoundSection = memo(function RoundSection({
   )
 })
 
-const formatStartTime = (startedAt: string) => {
-  const date = new Date(startedAt)
+const formatStartTime = (value: string) => {
+  const date = new Date(value)
   return Number.isNaN(date.getTime())
-    ? startedAt
+    ? value
     : new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(date)
 }

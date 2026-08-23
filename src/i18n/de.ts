@@ -61,6 +61,7 @@ export const de: Translation = {
   courts: 'Spielfelder',
   courtsHelp: 'Anzahl der Begegnungen, die parallel laufen können.',
   court: 'Feld',
+  start: 'Start',
   defaultWinningGames: 'Gewinnsätze im Turnier',
   defaultWinningGamesHelp: 'Standardanzahl der Sätze, die gewonnen werden müssen.',
   defaultSetPoints: 'Standardpunkte pro Satz',

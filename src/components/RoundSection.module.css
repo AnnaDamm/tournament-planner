@@ -27,6 +27,18 @@
     text-transform: uppercase;
   }
 
+  .round-head-main {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .round-head-copy {
+    min-width: 0;
+  }
+
   .round-title-line {
     display: flex;
     align-items: center;
@@ -37,6 +49,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    margin: 0;
     font-size: 11px;
     background: #fff4d7;
     color: #a27b31;
@@ -66,6 +79,7 @@
   }
 
   :global(.readonly-focus-mode) .bye-pill {
+    margin-block: 0;
     gap: clamp(8px, 0.6vw, 12px);
     padding: clamp(8px, 0.6vw, 14px) clamp(14px, 1vw, 22px);
     font-size: clamp(36px, 2.4vw, 54px);

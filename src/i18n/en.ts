@@ -57,6 +57,7 @@ export const en = {
   courts: 'Courts',
   courtsHelp: 'Number of matches that can run in parallel.',
   court: 'Court',
+  start: 'Start',
   defaultWinningGames: 'Default winning games',
   defaultWinningGamesHelp: 'Default number of games a participant must win.',
   defaultSetPoints: 'Default points per set',

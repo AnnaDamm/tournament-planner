@@ -1,12 +1,14 @@
 import styles from './SetScores.module.css'
 import sharedStyles from '../styles/shared.module.css'
 import { classNames } from '../styles/classNames'
+import type { CSSProperties } from 'react'
 import type { SetScore } from '../tournamentTypes'
 import { t } from '../i18n'
 
 type Props = {
   draftSets: SetScore[]
   visibleSetCount: number
+  maxSetCount: number
   readOnly: boolean
   playerA: string
   playerB: string
@@ -17,14 +19,17 @@ type Props = {
 export function SetScores({
   draftSets,
   visibleSetCount,
+  maxSetCount,
   readOnly,
   playerA,
   playerB,
   updateSet,
   scheduleCommit,
 }: Props) {
+  const setScoresStyle = { '--set-count': maxSetCount } as CSSProperties
+
   return (
-    <div className={classNames(sharedStyles, styles, 'set-scores')}>
+    <div className={classNames(sharedStyles, styles, 'set-scores')} style={setScoresStyle}>
       {Array.from(
         { length: visibleSetCount },
         (_, setIndex) => draftSets[setIndex] ?? { a: '', b: '' },
@@ -33,9 +38,6 @@ export function SetScores({
           className={classNames(sharedStyles, styles, `score${readOnly ? ' score-readonly' : ''}`)}
           key={setIndex}
         >
-          <span className={classNames(sharedStyles, styles, 'set-label')} aria-hidden="true">
-            {setIndex + 1}
-          </span>
           {readOnly ? (
             <span className={classNames(sharedStyles, styles, 'score-value')}>{set.a || '–'}</span>
           ) : (

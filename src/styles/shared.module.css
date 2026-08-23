@@ -270,11 +270,15 @@
     gap: 18px;
   }
 
+  :global(.round-list) + :global(.button) {
+    margin-top: 18px;
+  }
+
   :global(.round-card) {
     background: #fff;
     border: 1px solid #e4eae5;
     border-radius: 10px;
-    padding: 24px;
+    padding: 16px 24px;
   }
 
   :global(.round-games) {
@@ -297,24 +301,89 @@
   :global(.round-head) {
     display: flex;
     justify-content: space-between;
-    align-items: start;
-    margin-bottom: 20px;
+    align-items: center;
+    margin-bottom: 8px;
   }
 
   :global(.round-head) h2 {
     margin-top: 7px;
   }
 
-  :global(.match) {
-    display: flex;
+  :global(.match),
+  :global(.matches-header) {
+    display: grid;
+    grid-template-columns:
+      [court] minmax(24px, 30px)
+      [start] minmax(72px, max-content)
+      [compare] 44px
+      [player-a] minmax(0, 1fr)
+      [versus] 48px
+      [player-b] minmax(0, 1fr)
+      [scores] minmax(200px, 1.4fr);
+    grid-template-areas: 'court start compare player-a versus player-b scores';
     min-width: 0;
-    margin: 0;
     align-items: center;
     gap: 14px;
+  }
+
+  :global(.match) {
+    margin: 0;
     border: 0;
     border-bottom: 1px solid #edf1ee;
     padding: 13px 0;
     font-size: 13px;
+  }
+
+  :global(.matches-header) {
+    padding: 0 0 4px;
+    border-bottom: 1px solid #edf1ee;
+    color: #a0aaa5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  :global(.match-heading-court) {
+    grid-area: court;
+    text-align: center;
+  }
+
+  :global(.match-heading-start) {
+    grid-area: start;
+  }
+
+  :global(.match-heading-player-a) {
+    grid-area: player-a;
+    padding-inline-start: 27px;
+  }
+
+  :global(.match-heading-versus) {
+    grid-area: versus;
+    text-align: center;
+  }
+
+  :global(.match-heading-player-b) {
+    grid-area: player-b;
+    padding-inline-start: 27px;
+  }
+
+  :global(.set-headers) {
+    --set-column-min-width: calc(clamp(31px, 2.2vw, 48px) + clamp(31px, 2.2vw, 48px) + 17px);
+    display: grid;
+    grid-template-columns: repeat(var(--set-count), minmax(var(--set-column-min-width), 1fr));
+    grid-area: scores;
+    gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-inline-end: clamp(12px, 1vw, 24px);
+  }
+
+  :global(.set-header) {
+    width: 100%;
+    min-width: var(--set-column-min-width);
+    text-align: center;
   }
 
   :global(.player-record) {
@@ -352,7 +421,6 @@
   :global(.match):global(.running) {
     background: #fffdf0;
     box-shadow: inset 4px 0 #b9ea5b;
-    padding-inline-start: clamp(12px, 1vw, 24px);
   }
 
   :global(.match):global(.search-target) {
@@ -446,11 +514,18 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-left: 9px;
+    margin-left: 0;
     color: #718078;
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
+  }
+
+  :global(.round-kicker) {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    line-height: 1;
   }
 
   :global(.versus) {
@@ -510,10 +585,27 @@
     padding-inline-end: clamp(32px, 2.5vw, 52px);
   }
 
-  :global(.readonly-focus-mode) :global(.match) {
+  :global(.readonly-focus-mode) :global(.match),
+  :global(.readonly-focus-mode) :global(.matches-header) {
+    grid-template-columns:
+      [court] clamp(42px, 3vw, 63px)
+      [start] minmax(80px, max-content)
+      [compare] clamp(44px, 3vw, 64px)
+      [player-a] minmax(0, 1fr)
+      [versus] clamp(72px, 5vw, 110px)
+      [player-b] minmax(0, 1fr)
+      [scores] clamp(220px, 21vw, 360px);
+    grid-template-areas: 'court start compare player-a versus player-b scores';
     gap: clamp(8px, 0.8vw, 16px);
     padding-block: clamp(5px, 0.5vw, 10px);
     font-size: clamp(32px, 2.2vw, 48px);
+  }
+
+  :global(.readonly-focus-mode) :global(.matches-header) {
+    --set-column-min-width: clamp(104px, 8vw, 150px);
+    gap: clamp(10px, 0.8vw, 16px);
+    padding-block: clamp(5px, 0.5vw, 10px);
+    font-size: clamp(24px, 1.4vw, 35px);
   }
 
   :global(.readonly-focus-mode) :global(.match-player-name) {
@@ -881,7 +973,8 @@
   }
 
   :global(.round-card) {
-    padding: clamp(18px, 1.7vw, 36px);
+    padding-block: clamp(14px, 1vw, 22px);
+    padding-inline: clamp(16px, 1.1vw, 24px);
   }
 
   :global(.round-head) {
@@ -896,8 +989,12 @@
     gap: clamp(7px, 0.7vw, 14px);
   }
 
-  :global(.match) {
+  :global(.match),
+  :global(.matches-header) {
     gap: clamp(9px, 1vw, 18px);
+  }
+
+  :global(.match) {
     padding-block: clamp(13px, 1vw, 22px);
     font-size: clamp(13px, 0.82vw, 19px);
   }
@@ -1023,6 +1120,10 @@
     :global(.round-list) {
       gap: 12px;
     }
+
+    :global(.round-list) + :global(.button) {
+      margin-top: 12px;
+    }
   }
 
   @container content (max-width: 680px) {
@@ -1046,8 +1147,25 @@
     }
   }
 
-  @container content (max-width: 680px) {
+  @container content (max-width: 900px) {
+    :global(.match),
+    :global(.matches-header) {
+      grid-template-columns: 28px 48px minmax(0, 1fr) 44px minmax(0, 1fr);
+      grid-template-areas:
+        'court compare player-a versus player-b'
+        '. start start start .'
+        '. scores scores scores scores';
+      gap: 10px 9px;
+    }
+
     :global(.match) {
+      padding-block: 12px;
+    }
+  }
+
+  @container content (max-width: 680px) {
+    :global(.match),
+    :global(.matches-header) {
       display: grid;
       grid-template-columns: 24px 44px minmax(0, 1fr) 24px minmax(0, 1fr);
       grid-template-areas:
@@ -1056,7 +1174,16 @@
         '. scores scores scores scores';
       gap: 8px 7px;
       align-items: center;
+    }
+
+    :global(.match) {
       padding-block: 12px;
+    }
+
+    :global(.set-headers) {
+      --set-column-min-width: 93px;
+      gap: 14px;
+      padding-bottom: 2px;
     }
   }
 
@@ -1106,7 +1233,8 @@
   }
 
   @container content (max-width: 430px) {
-    :global(.match) {
+    :global(.match),
+    :global(.matches-header) {
       grid-template-columns: 20px 44px minmax(0, 1fr) 20px minmax(0, 1fr);
     }
   }
