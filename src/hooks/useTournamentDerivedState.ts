@@ -10,31 +10,36 @@ import { sortStats } from '../tournamentStats'
 export function useTournamentDerivedState(
   players: Participant[],
   rounds: Round[],
+  defaultSetPoints: number,
   sort: string,
   desc: boolean,
 ) {
   const standingsBeforeRounds = useMemo(
-    () => calculateStandingsBeforeRounds(players, rounds),
-    [players, rounds],
+    () => calculateStandingsBeforeRounds(players, rounds, defaultSetPoints),
+    [defaultSetPoints, players, rounds],
   )
   const stats = useMemo(
     () =>
-      getRankingParticipants(players, rounds).map((player) => ({
+      getRankingParticipants(players, rounds, defaultSetPoints).map((player) => ({
         ...player,
         played: player.wins + player.losses,
         diff: player.scored - player.conceded,
         points: player.scored,
       })),
-    [players, rounds],
+    [defaultSetPoints, players, rounds],
   )
   const participantOrderByRound = useMemo(
     () =>
       rounds.map((_, roundIndex) => {
-        const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex))
+        const ranking = getRankingParticipants(
+          players,
+          rounds.slice(0, roundIndex),
+          defaultSetPoints,
+        )
         if (roundIndex > 0) ranking.sort(compareRankingParticipants)
         return ranking.map((player) => player.id)
       }),
-    [players, rounds],
+    [defaultSetPoints, players, rounds],
   )
   const positions = useMemo(
     () =>

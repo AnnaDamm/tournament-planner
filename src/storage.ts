@@ -6,6 +6,7 @@ export type StorageKey =
   | 'participantType'
   | 'courtCount'
   | 'defaultWinningGames'
+  | 'defaultSetPoints'
   | 'tournamentName'
   | 'expectedDurationMinutes'
   | 'breakBetweenMatchesMinutes'
@@ -19,6 +20,7 @@ const storageKeys: StorageKey[] = [
   'participantType',
   'courtCount',
   'defaultWinningGames',
+  'defaultSetPoints',
   'tournamentName',
   'expectedDurationMinutes',
   'breakBetweenMatchesMinutes',
@@ -69,6 +71,11 @@ export const loadDefaultWinningGames = () => {
   return Number.isFinite(value) ? Math.min(99, Math.max(1, Math.floor(value))) : 1
 }
 export const saveDefaultWinningGames = (value: number) => write('defaultWinningGames', value)
+export const loadDefaultSetPoints = () => {
+  const value = read<number>('defaultSetPoints', 21)
+  return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 21
+}
+export const saveDefaultSetPoints = (value: number) => write('defaultSetPoints', value)
 export const loadTournamentName = () => {
   const value = read<unknown>('tournamentName', 'Tourny')
   return typeof value === 'string' && value.trim() ? value.trim() : 'Tourny'

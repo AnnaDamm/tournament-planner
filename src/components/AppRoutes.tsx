@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { LocalMasterConfig } from '../liveSharing'
-import type { Match, Participant, Round } from '../tournamentTypes'
+import type { Match, Participant, Round, TournamentSettings } from '../tournamentTypes'
 import { hasEnteredScore } from '../tournament'
 import { Rounds } from './Rounds'
 import { SettingsPage } from './SettingsPage'
@@ -9,7 +9,6 @@ import { Table, type Stat } from './Table'
 import { DocumentationPage } from './DocumentationPage'
 
 export type AppRoutesProps = {
-  tournamentName: string
   localMaster: LocalMasterConfig | null
   readOnly: boolean
   players: Participant[]
@@ -18,7 +17,7 @@ export type AppRoutesProps = {
   participantType: 'players' | 'teams'
   courtCount: number
   defaultWinningGames: number
-  scheduledStart: string
+  settings: TournamentSettings
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   participantOrderByRound: string[][]
@@ -41,31 +40,21 @@ export type AppRoutesProps = {
   onReroll: (number: number) => void
   onRerollBye: (number: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
-  setParticipantType: (value: 'players' | 'teams') => void
-  setCourtCount: (value: number) => void
-  setDefaultWinningGames: (value: number) => void
-  setTournamentName: (value: string) => void
-  setScheduledStart: (value: string) => void
-  expectedDurationMinutes: number
-  setExpectedDurationMinutes: (value: number) => void
-  breakBetweenMatchesMinutes: number
-  setBreakBetweenMatchesMinutes: (value: number) => void
+  onSaveSettings: (settings: TournamentSettings) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
 }
 
 export function AppRoutes({
-  tournamentName,
   localMaster,
   readOnly,
   players,
   participantLabel,
   rounds,
-  participantType,
   courtCount,
   defaultWinningGames,
-  scheduledStart,
+  settings,
   name,
   record,
   participantOrderByRound,
@@ -88,15 +77,7 @@ export function AppRoutes({
   onReroll,
   onRerollBye,
   onSwapPlayers,
-  setParticipantType,
-  setCourtCount,
-  setDefaultWinningGames,
-  setTournamentName,
-  setScheduledStart,
-  expectedDurationMinutes,
-  setExpectedDurationMinutes,
-  breakBetweenMatchesMinutes,
-  setBreakBetweenMatchesMinutes,
+  onSaveSettings,
   onExport,
   onImport,
   onDeleteAll,
@@ -112,6 +93,7 @@ export function AppRoutes({
             sorted={sorted}
             players={players}
             defaultCourtCount={courtCount}
+            defaultSetPoints={settings.defaultSetPoints}
             participantLabel={participantLabel}
             rounds={rounds}
             name={name}
@@ -153,6 +135,7 @@ export function AppRoutes({
             record={record}
             defaultCourtCount={courtCount}
             defaultWinningGames={defaultWinningGames}
+            defaultSetPoints={settings.defaultSetPoints}
             onCreate={onCreateRound}
             onStart={onStartRound}
             onUpdate={onUpdateRound}
@@ -173,20 +156,8 @@ export function AppRoutes({
             <Navigate to="/table" replace />
           ) : (
             <SettingsPage
-              tournamentName={tournamentName}
-              setTournamentName={setTournamentName}
-              participantType={participantType}
-              setParticipantType={setParticipantType}
-              courtCount={courtCount}
-              setCourtCount={setCourtCount}
-              defaultWinningGames={defaultWinningGames}
-              setDefaultWinningGames={setDefaultWinningGames}
-              scheduledStart={scheduledStart}
-              setScheduledStart={setScheduledStart}
-              expectedDurationMinutes={expectedDurationMinutes}
-              setExpectedDurationMinutes={setExpectedDurationMinutes}
-              breakBetweenMatchesMinutes={breakBetweenMatchesMinutes}
-              setBreakBetweenMatchesMinutes={setBreakBetweenMatchesMinutes}
+              settings={settings}
+              onSave={onSaveSettings}
               onExport={onExport}
               onImport={onImport}
               onDeleteAll={onDeleteAll}

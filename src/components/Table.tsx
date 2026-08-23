@@ -28,6 +28,7 @@ type Props = {
   sorted: Stat[]
   players: Participant[]
   defaultCourtCount: number
+  defaultSetPoints: number
   participantLabel: string
   rounds: Round[]
   name: (id: string) => string
@@ -61,6 +62,7 @@ export function Table({
   sorted,
   players,
   defaultCourtCount,
+  defaultSetPoints,
   participantLabel,
   rounds,
   name,
@@ -275,6 +277,7 @@ export function Table({
         players={players}
         rounds={rounds}
         defaultCourtCount={defaultCourtCount}
+        defaultSetPoints={defaultSetPoints}
         name={name}
         onClose={() => setHistoryPlayer(null)}
       />

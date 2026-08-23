@@ -2,56 +2,56 @@ import { useEffect, useRef, useState, type SyntheticEvent } from 'react'
 import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t } from '../i18n'
+import type { TournamentSettings } from '../tournamentTypes'
 
-const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
-const clampCourtCount = (value: number) => Math.max(1, Math.floor(value) || 1)
-const clampDuration = (value: number) => Math.max(1, Math.floor(value) || 1)
-const clampBreak = (value: number) => Math.max(0, Math.floor(value) || 0)
+type SettingsDraft = {
+  tournamentName: string
+  participantType: TournamentSettings['participantType']
+  courtCount: string
+  defaultWinningGames: string
+  defaultSetPoints: string
+  scheduledStart: string
+  expectedDurationMinutes: string
+  breakBetweenMatchesMinutes: string
+}
 
 type Props = {
-  tournamentName: string
-  setTournamentName: (value: string) => void
-  participantType: 'players' | 'teams'
-  setParticipantType: (value: 'players' | 'teams') => void
-  courtCount: number
-  setCourtCount: (value: number) => void
-  defaultWinningGames: number
-  setDefaultWinningGames: (value: number) => void
-  scheduledStart: string
-  setScheduledStart: (value: string) => void
-  expectedDurationMinutes: number
-  setExpectedDurationMinutes: (value: number) => void
-  breakBetweenMatchesMinutes: number
-  setBreakBetweenMatchesMinutes: (value: number) => void
+  settings: TournamentSettings
+  onSave: (settings: TournamentSettings) => void
   onExport: () => void
   onImport: (file: File) => Promise<boolean>
   onDeleteAll: () => void
 }
 
+const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
+const clampPositiveInteger = (value: number) => Math.max(1, Math.floor(value) || 1)
+const clampDuration = (value: number) => Math.max(1, Math.floor(value) || 1)
+const clampBreak = (value: number) => Math.max(0, Math.floor(value) || 0)
+
+const createDraft = (settings: TournamentSettings): SettingsDraft => ({
+  tournamentName: settings.tournamentName,
+  participantType: settings.participantType,
+  courtCount: String(settings.courtCount),
+  defaultWinningGames: String(settings.defaultWinningGames),
+  defaultSetPoints: String(settings.defaultSetPoints),
+  scheduledStart: settings.scheduledStart,
+  expectedDurationMinutes: String(settings.expectedDurationMinutes),
+  breakBetweenMatchesMinutes: String(settings.breakBetweenMatchesMinutes),
+})
+
 // oxlint-disable-next-line eslint/max-lines-per-function
-export function SettingsPage({
-  tournamentName,
-  setTournamentName,
-  participantType,
-  setParticipantType,
-  courtCount,
-  setCourtCount,
-  defaultWinningGames,
-  setDefaultWinningGames,
-  scheduledStart,
-  setScheduledStart,
-  expectedDurationMinutes,
-  setExpectedDurationMinutes,
-  breakBetweenMatchesMinutes,
-  setBreakBetweenMatchesMinutes,
-  onExport,
-  onImport,
-  onDeleteAll,
-}: Props) {
+export function SettingsPage({ settings, onSave, onExport, onImport, onDeleteAll }: Props) {
   const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
+  const [draft, setDraft] = useState<SettingsDraft>(() => createDraft(settings))
   const [importError, setImportError] = useState(false)
+
+  useEffect(() => {
+    // The draft mirrors committed settings after imports and live updates.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setDraft(createDraft(settings))
+  }, [settings])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -72,9 +72,25 @@ export function SettingsPage({
     navigate(-1)
   }
 
+  const handleSave = (event: SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    onSave({
+      tournamentName: draft.tournamentName.trim() || 'Tourny',
+      participantType: draft.participantType,
+      courtCount: clampPositiveInteger(Number(draft.courtCount)),
+      defaultWinningGames: clampWinningGames(Number(draft.defaultWinningGames)),
+      defaultSetPoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
+      scheduledStart: draft.scheduledStart,
+      expectedDurationMinutes: clampDuration(Number(draft.expectedDurationMinutes)),
+      breakBetweenMatchesMinutes: clampBreak(Number(draft.breakBetweenMatchesMinutes)),
+    })
+    navigate(-1)
+  }
+
   const handleImport = async (file: File | undefined) => {
     if (!file) return
-    setImportError(!(await onImport(file)))
+    const imported = await onImport(file)
+    setImportError(!imported)
   }
 
   return (
@@ -100,7 +116,7 @@ export function SettingsPage({
             <ArrowLeft size={20} aria-hidden="true" />
           </button>
         </div>
-        <div className="round-card settings-card">
+        <form className="round-card settings-card" onSubmit={handleSave}>
           <div className="settings-field">
             <label htmlFor="expected-duration">
               <b>{t('expectedDuration')}</b>
@@ -108,15 +124,15 @@ export function SettingsPage({
             </label>
             <input
               id="expected-duration"
-              key={expectedDurationMinutes}
               type="number"
               min="1"
-              defaultValue={expectedDurationMinutes}
-              onBlur={(event) => {
-                const value = clampDuration(Number(event.currentTarget.value))
-                event.currentTarget.value = String(value)
-                setExpectedDurationMinutes(value)
-              }}
+              value={draft.expectedDurationMinutes}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  expectedDurationMinutes: event.currentTarget.value,
+                }))
+              }
             />
           </div>
           <div className="settings-field">
@@ -126,15 +142,15 @@ export function SettingsPage({
             </label>
             <input
               id="break-between-matches"
-              key={breakBetweenMatchesMinutes}
               type="number"
               min="0"
-              defaultValue={breakBetweenMatchesMinutes}
-              onBlur={(event) => {
-                const value = clampBreak(Number(event.currentTarget.value))
-                event.currentTarget.value = String(value)
-                setBreakBetweenMatchesMinutes(value)
-              }}
+              value={draft.breakBetweenMatchesMinutes}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  breakBetweenMatchesMinutes: event.currentTarget.value,
+                }))
+              }
             />
           </div>
           <div className="settings-field">
@@ -145,8 +161,10 @@ export function SettingsPage({
             <input
               id="scheduled-start"
               type="datetime-local"
-              value={scheduledStart}
-              onChange={(event) => setScheduledStart(event.target.value)}
+              value={draft.scheduledStart}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, scheduledStart: event.target.value }))
+              }
             />
           </div>
           <div className="settings-field">
@@ -157,8 +175,10 @@ export function SettingsPage({
             <input
               id="tournament-name"
               type="text"
-              value={tournamentName}
-              onChange={(event) => setTournamentName(event.target.value)}
+              value={draft.tournamentName}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, tournamentName: event.target.value }))
+              }
               maxLength={80}
             />
           </div>
@@ -169,8 +189,13 @@ export function SettingsPage({
             </label>
             <select
               id="participant-type"
-              value={participantType}
-              onChange={(event) => setParticipantType(event.target.value as 'players' | 'teams')}
+              value={draft.participantType}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  participantType: event.target.value as SettingsDraft['participantType'],
+                }))
+              }
             >
               <option value="players">{t('players')}</option>
               <option value="teams">{t('teams')}</option>
@@ -183,15 +208,12 @@ export function SettingsPage({
             </label>
             <input
               id="court-count"
-              key={courtCount}
               type="number"
               min="1"
-              defaultValue={courtCount}
-              onBlur={(event) => {
-                const value = clampCourtCount(Number(event.currentTarget.value))
-                event.currentTarget.value = String(value)
-                setCourtCount(value)
-              }}
+              value={draft.courtCount}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, courtCount: event.currentTarget.value }))
+              }
             />
           </div>
           <div className="settings-field">
@@ -201,17 +223,49 @@ export function SettingsPage({
             </label>
             <input
               id="default-winning-games"
-              key={defaultWinningGames}
               type="number"
               min="1"
               max="99"
-              defaultValue={defaultWinningGames}
-              onBlur={(event) => {
-                const value = clampWinningGames(Number(event.currentTarget.value))
-                event.currentTarget.value = String(value)
-                setDefaultWinningGames(value)
-              }}
+              value={draft.defaultWinningGames}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  defaultWinningGames: event.currentTarget.value,
+                }))
+              }
             />
+          </div>
+          <div className="settings-field">
+            <label htmlFor="default-set-points">
+              <b>{t('defaultSetPoints')}</b>
+              <small>{t('defaultSetPointsHelp')}</small>
+            </label>
+            <input
+              id="default-set-points"
+              type="number"
+              min="1"
+              step="1"
+              value={draft.defaultSetPoints}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  defaultSetPoints: event.currentTarget.value,
+                }))
+              }
+            />
+          </div>
+          <div className="dialog-actions settings-form-actions">
+            <button
+              className="button ghost"
+              type="button"
+              onClick={() => navigate(-1)}
+              title={t('cancel')}
+            >
+              {t('cancel')}
+            </button>
+            <button className="button primary" type="submit" title={t('save')}>
+              {t('save')}
+            </button>
           </div>
           <div className="settings-actions">
             <button
@@ -247,9 +301,10 @@ export function SettingsPage({
               {t('importError')}
             </p>
           )}
-        </div>
+        </form>
         <button
           className="button danger delete-all-button"
+          type="button"
           onClick={onDeleteAll}
           title={t('deleteAll')}
         >

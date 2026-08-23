@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   loadCourtCount,
   loadDefaultWinningGames,
+  loadDefaultSetPoints,
   loadParticipantType,
   loadParticipants,
   loadRounds,
@@ -31,6 +32,9 @@ export function useTournamentLiveState() {
   const [courtCount, setCourtCount] = useState(() => (isViewer ? 1 : loadCourtCount()))
   const [defaultWinningGames, setDefaultWinningGames] = useState(() =>
     isViewer ? 1 : loadDefaultWinningGames(),
+  )
+  const [defaultSetPoints, setDefaultSetPoints] = useState(() =>
+    isViewer ? 21 : loadDefaultSetPoints(),
   )
   const initialRounds = useMemo(
     () => (isViewer ? [] : startReadyRounds(loadRounds(), loadCourtCount())),
@@ -66,6 +70,8 @@ export function useTournamentLiveState() {
     setCourtCount,
     defaultWinningGames,
     setDefaultWinningGames,
+    defaultSetPoints,
+    setDefaultSetPoints,
     tournamentName,
     setTournamentName,
     scheduledStart,
@@ -87,6 +93,7 @@ export function useTournamentLiveState() {
       participantType,
       courtCount,
       defaultWinningGames,
+      defaultSetPoints,
       scheduledStart,
       expectedDurationMinutes,
       breakBetweenMatchesMinutes,
@@ -94,6 +101,7 @@ export function useTournamentLiveState() {
     [
       courtCount,
       defaultWinningGames,
+      defaultSetPoints,
       participantType,
       players,
       rounds,
@@ -114,6 +122,7 @@ export function useTournamentLiveState() {
       setParticipantType(incoming.participantType)
       setCourtCount(incoming.courtCount)
       setDefaultWinningGames(incoming.defaultWinningGames)
+      setDefaultSetPoints(incoming.defaultSetPoints)
       setScheduledStart(incoming.scheduledStart ?? '')
       setExpectedDurationMinutes(incoming.expectedDurationMinutes ?? 25)
       setBreakBetweenMatchesMinutes(incoming.breakBetweenMatchesMinutes ?? 5)
@@ -131,7 +140,9 @@ export function useTournamentLiveState() {
     courtCount,
     setCourtCount,
     defaultWinningGames,
+    defaultSetPoints,
     setDefaultWinningGames,
+    setDefaultSetPoints,
     rounds,
     setRounds,
     participantType,

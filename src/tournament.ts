@@ -83,10 +83,19 @@ const applyRoundToStandings = (
   standings: Map<string, RoundStanding>,
   round: Round,
   nextRound?: Round,
+  defaultSetPoints = 21,
 ) => {
   if (isByeCounted(round, nextRound)) {
     const byeStanding = standings.get(round.bye!)
-    if (byeStanding) byeStanding.wins += 1
+    if (byeStanding) {
+      const winningGames = Math.max(1, round.winningGames || 1)
+      const setPoints = Number.isFinite(defaultSetPoints)
+        ? Math.max(1, Math.floor(defaultSetPoints))
+        : 21
+      byeStanding.wins += 1
+      byeStanding.setsWon += winningGames
+      byeStanding.scored += winningGames * setPoints
+    }
   }
 
   round.matches.forEach((match) => {
@@ -128,18 +137,28 @@ const standingsSnapshot = (players: Participant[], standings: Map<string, RoundS
     ...(standings.get(player.id) ?? newStanding(player)),
   }))
 
-export const calculateStandings = (players: Participant[], rounds: Round[]) => {
+export const calculateStandings = (
+  players: Participant[],
+  rounds: Round[],
+  defaultSetPoints = 21,
+) => {
   const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
-  rounds.forEach((round, index) => applyRoundToStandings(standings, round, rounds[index + 1]))
+  rounds.forEach((round, index) =>
+    applyRoundToStandings(standings, round, rounds[index + 1], defaultSetPoints),
+  )
 
   return standingsSnapshot(players, standings)
 }
 
-export const calculateStandingsBeforeRounds = (players: Participant[], rounds: Round[]) => {
+export const calculateStandingsBeforeRounds = (
+  players: Participant[],
+  rounds: Round[],
+  defaultSetPoints = 21,
+) => {
   const standings = new Map(players.map((player) => [player.id, newStanding(player)]))
   return rounds.map((round, index) => {
     const snapshot = standingsSnapshot(players, standings)
-    applyRoundToStandings(standings, round, rounds[index + 1])
+    applyRoundToStandings(standings, round, rounds[index + 1], defaultSetPoints)
     return snapshot
   })
 }
@@ -164,8 +183,12 @@ const getLastLossRounds = (players: Participant[], rounds: Round[]) => {
   return lastLossRounds
 }
 
-export const getRankingParticipants = (players: Participant[], rounds: Round[]) => {
-  const standings = calculateStandings(players, rounds)
+export const getRankingParticipants = (
+  players: Participant[],
+  rounds: Round[],
+  defaultSetPoints = 21,
+) => {
+  const standings = calculateStandings(players, rounds, defaultSetPoints)
   const lastLossRounds = getLastLossRounds(players, rounds)
   return standings.map((player) => ({
     ...player,
@@ -307,10 +330,11 @@ export const createRoundPlan = (
   previousRounds: Round[],
   roundNumber: number,
   preferredBye?: string,
+  defaultSetPoints = 21,
 ) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
-  const standings = calculateStandings(activePlayers, previousRounds)
-  const ranking = getRankingParticipants(activePlayers, previousRounds)
+  const standings = calculateStandings(activePlayers, previousRounds, defaultSetPoints)
+  const ranking = getRankingParticipants(activePlayers, previousRounds, defaultSetPoints)
   if (roundNumber > 1) ranking.sort(compareRankingParticipants)
   const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(ranking.map((standing) => [standing.id, standing]))
@@ -476,10 +500,15 @@ const chooseCandidate = (
   )[0]
 }
 
-export const fillUnknownRound = (round: Round, players: Participant[], previousRounds: Round[]) => {
+export const fillUnknownRound = (
+  round: Round,
+  players: Participant[],
+  previousRounds: Round[],
+  defaultSetPoints = 21,
+) => {
   const activePlayers = players.filter((player) => !player.withdrawn)
-  const standings = calculateStandings(activePlayers, previousRounds)
-  const ranking = getRankingParticipants(activePlayers, previousRounds).sort(
+  const standings = calculateStandings(activePlayers, previousRounds, defaultSetPoints)
+  const ranking = getRankingParticipants(activePlayers, previousRounds, defaultSetPoints).sort(
     compareRankingParticipants,
   )
   const participantOrder = ranking.map((player) => player.id)
@@ -551,12 +580,23 @@ export const fillUnknownRound = (round: Round, players: Participant[], previousR
 export const hasEnteredScore = (match: Match) =>
   getMatchSets(match).some((set) => set.a.trim() !== '' || set.b.trim() !== '')
 
-export const rerollRound = (players: Participant[], rounds: Round[], number: number) => {
+export const rerollRound = (
+  players: Participant[],
+  rounds: Round[],
+  number: number,
+  defaultSetPoints = 21,
+) => {
   const index = rounds.findIndex((round) => round.number === number)
   if (index < 0) return rounds
   const round = rounds[index]
   if (round.matches.some(hasEnteredScore)) return rounds
-  const plan = createRoundPlan(players, rounds.slice(0, index), number, round.bye ?? undefined)
+  const plan = createRoundPlan(
+    players,
+    rounds.slice(0, index),
+    number,
+    round.bye ?? undefined,
+    defaultSetPoints,
+  )
   return rounds.map((item, roundIndex) =>
     roundIndex === index
       ? { ...item, bye: plan.bye, matches: plan.matches, standings: plan.standings }
@@ -564,7 +604,12 @@ export const rerollRound = (players: Participant[], rounds: Round[], number: num
   )
 }
 
-export const rerollBye = (players: Participant[], rounds: Round[], number: number) => {
+export const rerollBye = (
+  players: Participant[],
+  rounds: Round[],
+  number: number,
+  defaultSetPoints = 21,
+) => {
   const index = rounds.findIndex((round) => round.number === number)
   if (index < 0) return rounds
   const round = rounds[index]
@@ -572,7 +617,7 @@ export const rerollBye = (players: Participant[], rounds: Round[], number: numbe
 
   const activePlayers = players.filter((player) => !player.withdrawn)
   if (activePlayers.length % 2 === 0) return rounds
-  const ranking = getRankingParticipants(activePlayers, rounds.slice(0, index))
+  const ranking = getRankingParticipants(activePlayers, rounds.slice(0, index), defaultSetPoints)
   if (number > 1) ranking.sort(compareRankingParticipants)
   const finalizedIds = finalizedParticipantIds(activePlayers, rounds.slice(0, index))
   const candidateIds = ranking

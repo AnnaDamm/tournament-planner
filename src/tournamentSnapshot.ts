@@ -48,6 +48,7 @@ export const parseTournamentSnapshot = (value: unknown): TournamentSnapshot | nu
   if (!Array.isArray(value.rounds) || !value.rounds.every(isRound)) return null
   if (value.participantType !== 'players' && value.participantType !== 'teams') return null
   if (!isFiniteNumber(value.courtCount) || !isFiniteNumber(value.defaultWinningGames)) return null
+  if (value.defaultSetPoints !== undefined && !isFiniteNumber(value.defaultSetPoints)) return null
 
   const tournamentName = typeof value.tournamentName === 'string' ? value.tournamentName.trim() : ''
   if (!tournamentName) return null
@@ -60,6 +61,10 @@ export const parseTournamentSnapshot = (value: unknown): TournamentSnapshot | nu
     participantType: value.participantType,
     courtCount: Math.max(1, Math.floor(value.courtCount)),
     defaultWinningGames: Math.min(99, Math.max(1, Math.floor(value.defaultWinningGames))),
+    defaultSetPoints:
+      value.defaultSetPoints === undefined
+        ? 21
+        : Math.max(1, Math.floor(value.defaultSetPoints as number)),
     expectedDurationMinutes:
       typeof value.expectedDurationMinutes === 'number'
         ? Math.max(1, Math.floor(value.expectedDurationMinutes))

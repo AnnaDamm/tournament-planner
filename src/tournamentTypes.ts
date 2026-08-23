@@ -45,15 +45,19 @@ export type Round = {
   standings?: RoundStanding[]
 }
 
-export type TournamentSnapshot = {
-  version: 1
+export type TournamentSettings = {
   tournamentName: string
-  players: Participant[]
-  rounds: Round[]
   participantType: 'players' | 'teams'
   courtCount: number
   defaultWinningGames: number
-  expectedDurationMinutes?: number
-  breakBetweenMatchesMinutes?: number
-  scheduledStart?: string
+  defaultSetPoints: number
+  expectedDurationMinutes: number
+  breakBetweenMatchesMinutes: number
+  scheduledStart: string
+}
+
+export type TournamentSnapshot = TournamentSettings & {
+  version: 1
+  players: Participant[]
+  rounds: Round[]
 }

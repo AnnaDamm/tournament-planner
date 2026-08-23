@@ -16,6 +16,7 @@ type Props = {
   players: Participant[]
   rounds: Round[]
   defaultCourtCount: number
+  defaultSetPoints: number
   name: (id: string) => string
   onClose: () => void
 }
@@ -40,11 +41,23 @@ const getSetScore = (playerId: string, match: Round['matches'][number]) =>
     { own: 0, opponent: 0 },
   )
 
+const getByeSetScore = (round: Round) => ({
+  own: Math.max(1, round.winningGames || 1),
+  opponent: 0,
+})
+
+const getByePlayerScores = (round: Round, defaultSetPoints: number) =>
+  Array.from({ length: Math.max(1, round.winningGames || 1) }, () => ({
+    own: defaultSetPoints,
+    opponent: 0,
+  }))
+
 export function PlayerHistoryDialog({
   player,
   players,
   rounds,
   defaultCourtCount,
+  defaultSetPoints,
   name,
   onClose,
 }: Props) {
@@ -71,12 +84,12 @@ export function PlayerHistoryDialog({
           ? [...roundsThroughCurrent, { ...nextRound, bye: null, matches: [] }]
           : roundsThroughCurrent
         return new Map(
-          getRankingParticipants(players, rankingRounds)
+          getRankingParticipants(players, rankingRounds, defaultSetPoints)
             .sort(compareRankingParticipants)
             .map((participant, position) => [participant.id, position + 1]),
         )
       }),
-    [players, rounds],
+    [defaultSetPoints, players, rounds],
   )
   const runningMatchIdsByRound = useMemo(
     () => getRunningMatchIdsByRound(rounds, defaultCourtCount),
@@ -116,8 +129,12 @@ export function PlayerHistoryDialog({
                 ? '—'
                 : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
             opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
-            sets: isBye || !match ? null : getSetScore(player.id, match),
-            score: isBye || !match ? [] : getPlayerScores(player.id, match),
+            sets: isBye ? getByeSetScore(round) : !match ? null : getSetScore(player.id, match),
+            score: isBye
+              ? getByePlayerScores(round, defaultSetPoints)
+              : !match
+                ? []
+                : getPlayerScores(player.id, match),
             outcome: isWithdrawal
               ? t('withdrawn')
               : isRunning

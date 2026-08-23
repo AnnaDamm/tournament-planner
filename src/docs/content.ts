@@ -22,7 +22,7 @@ const en: DocPage[] = [
       {
         title: 'Configure the tournament',
         text: [
-          'Open Tournament settings using the cog. Set the tournament name, participant type, court count, and default games required to win.',
+          'Open Tournament settings using the cog. Set the tournament name, participant type, court count, default games required to win, and default points per set. Changes are applied with Save; Cancel discards the draft.',
         ],
         links: [{ label: 'Open Settings', to: '/settings' }],
       },
@@ -89,7 +89,7 @@ const en: DocPage[] = [
         items: [
           'A set is counted only when both values are numeric, non-negative, and different.',
           'A match is complete as soon as one side reaches the configured number of wins. Later set rows do not count.',
-          'A bye counts as one win when the following round starts, but produces no sets or points.',
+          "A bye counts as one best-possible win when the following round starts: it receives the round's winning games as won sets and the configured default points for each set, with zero conceded points.",
           'The official position is sorted by: more wins, later last-loss round, more sets won, fewer sets lost, more own points scored, fewer opponent points conceded, then name alphabetically.',
           'A participant without a loss ranks above every participant with a loss when the number of wins is equal. A later last loss is better than an earlier last loss.',
         ],
@@ -159,6 +159,12 @@ const en: DocPage[] = [
         ],
       },
       {
+        title: 'Default points per set',
+        text: [
+          'The default is 21 and the minimum is 1. It is used for the synthetic score of counted byes. Changing it updates existing counted byes after Save.',
+        ],
+      },
+      {
         title: 'Per-round settings',
         text: [
           'The cog on a round overrides games to win and courts for that round. It immediately affects score fields, completion, standings, and court assignment.',
@@ -189,7 +195,7 @@ const en: DocPage[] = [
       {
         title: 'Byes',
         text: [
-          'Participants with the fewest already-counted byes are preferred, with random tie-breaking. A bye counts as one win when the following round starts but awards no games or points.',
+          'Participants with the fewest already-counted byes are preferred, with random tie-breaking. A bye counts as one best-possible win when the following round starts: all round winning games are won at the configured default points, with zero conceded points.',
         ],
       },
       {
@@ -235,7 +241,7 @@ const en: DocPage[] = [
       {
         title: 'Scoring',
         text: [
-          'A completed match records a win, loss, games, and points. A bye records only a win when the following round starts. Open matches and matches with unknown or deleted participants do not count.',
+          'A completed match records a win, loss, games, and points. A bye records the best possible win, sets, and points when the following round starts. Open matches and matches with unknown or deleted participants do not count.',
         ],
       },
       {
@@ -364,7 +370,7 @@ const de: DocPage[] = [
       {
         title: 'Turnier konfigurieren',
         text: [
-          'Öffne über das Zahnrad die Turniereinstellungen und lege Name, Teilnehmendentyp, Spielfelder und Gewinnsätze fest.',
+          'Öffne über das Zahnrad die Turniereinstellungen und lege Name, Teilnehmendentyp, Spielfelder, Gewinnsätze und Standardpunkte pro Satz fest. Änderungen werden erst mit „Speichern“ angewendet; „Abbrechen“ verwirft den Entwurf.',
         ],
         links: [{ label: 'Einstellungen öffnen', to: '/settings' }],
       },
@@ -431,7 +437,7 @@ const de: DocPage[] = [
         items: [
           'Ein Satz zählt nur, wenn beide Werte numerisch, nichtnegativ und unterschiedlich sind.',
           'Eine Begegnung ist fertig, sobald eine Seite die konfigurierte Zahl an Satzsiegen erreicht. Spätere Satzzeilen werden nicht gewertet.',
-          'Ein Freilos zählt als Sieg, sobald die folgende Runde startet, erzeugt aber keine Sätze und Punkte.',
+          'Ein Freilos zählt als bestmöglicher Sieg, sobald die folgende Runde startet: Alle Gewinnsätze der Runde gelten als gewonnen, mit der Standardpunktzahl pro Satz und null gegnerischen Punkten.',
           'Die offizielle Position wird sortiert nach: mehr Siege, spätere Runde des letzten Verlusts, mehr gewonnene Sätze, weniger verlorene Sätze, mehr eigene Punkte, weniger gegnerische Punkte und anschließend alphabetisch nach Name.',
           'Bei gleicher Siegzahl steht eine Person ohne Niederlage vor allen Personen mit Niederlage. Ein späterer letzter Verlust ist besser als ein früherer.',
         ],
@@ -501,6 +507,12 @@ const de: DocPage[] = [
         ],
       },
       {
+        title: 'Standardpunkte pro Satz',
+        text: [
+          'Standard sind 21 Punkte, das Minimum ist 1. Die Einstellung wird für die synthetische Wertung gewerteter Freilose verwendet. Eine Änderung aktualisiert bestehende Freilose nach dem Speichern.',
+        ],
+      },
+      {
         title: 'Rundeneinstellungen',
         text: [
           'Das Zahnrad überschreibt Gewinnsätze und Spielfelder dieser Runde und beeinflusst Eingabe, Abschluss, Tabelle und Feldbelegung sofort.',
@@ -531,7 +543,7 @@ const de: DocPage[] = [
       {
         title: 'Freilose',
         text: [
-          'Bevorzugt werden Personen mit wenigen bereits gewerteten Freilosen, Gleichstände entscheidet der Zufall. Ein Freilos zählt als Sieg, sobald die folgende Runde startet, ohne Sätze oder Punkte.',
+          'Bevorzugt werden Personen mit wenigen bereits gewerteten Freilosen, Gleichstände entscheidet der Zufall. Ein Freilos zählt als bestmöglicher Sieg, sobald die folgende Runde startet: Alle Gewinnsätze gelten mit der Standardpunktzahl als gewonnen, gegnerische Punkte sind null.',
         ],
       },
       {
@@ -577,7 +589,7 @@ const de: DocPage[] = [
       {
         title: 'Wertung',
         text: [
-          'Fertige Begegnungen erzeugen Sieg, Niederlage, Sätze und Punkte. Gewertete Freilose erzeugen nur einen Sieg. Offene, unbekannte oder gelöschte Begegnungen zählen nicht.',
+          'Fertige Begegnungen erzeugen Sieg, Niederlage, Sätze und Punkte. Gewertete Freilose erzeugen den bestmöglichen Sieg, die Gewinnsätze und die entsprechenden Punkte. Offene, unbekannte oder gelöschte Begegnungen zählen nicht.',
         ],
       },
       {

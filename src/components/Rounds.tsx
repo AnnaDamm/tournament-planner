@@ -17,6 +17,7 @@ type Props = {
   record: (roundIndex: number, id: string) => string
   defaultCourtCount: number
   defaultWinningGames: number
+  defaultSetPoints: number
   onCreate: () => void
   onStart: (number: number) => void
   onUpdate: (index: number, matches: Match[]) => void
@@ -50,6 +51,7 @@ export function Rounds({
   record,
   defaultCourtCount,
   defaultWinningGames,
+  defaultSetPoints,
   onCreate,
   onStart,
   onUpdate,
@@ -158,6 +160,7 @@ export function Rounds({
         players={players}
         rounds={rounds}
         defaultCourtCount={defaultCourtCount}
+        defaultSetPoints={defaultSetPoints}
         name={name}
         onClose={() => setHistoryPlayerId(null)}
       />

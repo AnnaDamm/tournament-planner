@@ -5,6 +5,7 @@ import {
   loadRounds,
   loadCourtCount,
   loadDefaultWinningGames,
+  loadDefaultSetPoints,
   loadTournamentName,
   loadScheduledStart,
   saveParticipantType,
@@ -12,6 +13,7 @@ import {
   saveRounds,
   saveCourtCount,
   saveDefaultWinningGames,
+  saveDefaultSetPoints,
   saveTournamentName,
   saveScheduledStart,
   loadExpectedDurationMinutes,
@@ -35,6 +37,8 @@ export function useTournamentStorage(
   setCourtCount: (value: number) => void,
   defaultWinningGames: number,
   setDefaultWinningGames: (value: number) => void,
+  defaultSetPoints: number,
+  setDefaultSetPoints: (value: number) => void,
   tournamentName: string,
   setTournamentName: (value: string) => void,
   scheduledStart: string,
@@ -57,6 +61,7 @@ export function useTournamentStorage(
       if (key === 'participantType') setParticipantType(loadParticipantType())
       if (key === 'courtCount') setCourtCount(loadCourtCount())
       if (key === 'defaultWinningGames') setDefaultWinningGames(loadDefaultWinningGames())
+      if (key === 'defaultSetPoints') setDefaultSetPoints(loadDefaultSetPoints())
       if (key === 'tournamentName') setTournamentName(loadTournamentName())
       if (key === 'scheduledStart') setScheduledStart(loadScheduledStart())
       if (key === 'expectedDurationMinutes')
@@ -67,6 +72,7 @@ export function useTournamentStorage(
   }, [
     setCourtCount,
     setDefaultWinningGames,
+    setDefaultSetPoints,
     setParticipantType,
     setPlayers,
     setRounds,
@@ -101,6 +107,11 @@ export function useTournamentStorage(
     if (skipRemoteSave.current.delete('defaultWinningGames')) return
     saveDefaultWinningGames(defaultWinningGames)
   }, [defaultWinningGames, enabled, writable])
+  useEffect(() => {
+    if (!enabled || !writable) return
+    if (skipRemoteSave.current.delete('defaultSetPoints')) return
+    saveDefaultSetPoints(defaultSetPoints)
+  }, [defaultSetPoints, enabled, writable])
   useEffect(() => {
     if (!enabled || !writable) return
     if (skipRemoteSave.current.delete('tournamentName')) return

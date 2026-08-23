@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AppRoutesProps } from '../components/AppRoutes'
-import type { Participant, Round } from '../tournamentTypes'
+import type { Participant, Round, TournamentSettings } from '../tournamentTypes'
 import { parseTournamentSnapshot } from '../tournamentSnapshot'
 import {
   createParticipant,
@@ -62,24 +62,27 @@ const rerollRoundAndStartReadyRounds = (
   rounds: Round[],
   number: number,
   courtCount: number,
-) => startReadyRounds(rerollRound(players, rounds, number), courtCount)
+  defaultSetPoints: number,
+) => startReadyRounds(rerollRound(players, rounds, number, defaultSetPoints), courtCount)
 
 const rerollByeAndStartReadyRounds = (
   players: Participant[],
   rounds: Round[],
   number: number,
   courtCount: number,
-) => startReadyRounds(rerollBye(players, rounds, number), courtCount)
+  defaultSetPoints: number,
+) => startReadyRounds(rerollBye(players, rounds, number, defaultSetPoints), courtCount)
 
 const fillRoundAndStartReadyRounds = (
   rounds: Round[],
   number: number,
   players: Participant[],
   courtCount: number,
+  defaultSetPoints: number,
 ) => {
   const index = rounds.findIndex((round) => round.number === number)
   if (index < 0) return rounds
-  const filled = fillUnknownRound(rounds[index], players, rounds.slice(0, index))
+  const filled = fillUnknownRound(rounds[index], players, rounds.slice(0, index), defaultSetPoints)
   return startReadyRounds(
     rounds.map((round, roundIndex) => (roundIndex === index ? filled : round)),
     courtCount,
@@ -131,6 +134,8 @@ export function useTournamentController(): TournamentContextValue {
     setCourtCount,
     defaultWinningGames,
     setDefaultWinningGames,
+    defaultSetPoints,
+    setDefaultSetPoints,
     rounds,
     setRounds,
     participantType,
@@ -161,7 +166,7 @@ export function useTournamentController(): TournamentContextValue {
       setRounds((current) => {
         if (current.some((round) => round.startedAt)) return current
         const existing = current[0]
-        const plan = createRoundPlan(players, [], 1)
+        const plan = createRoundPlan(players, [], 1, undefined, defaultSetPoints)
         const firstRound = existing
           ? {
               ...existing,
@@ -192,6 +197,7 @@ export function useTournamentController(): TournamentContextValue {
   }, [
     courtCount,
     defaultWinningGames,
+    defaultSetPoints,
     players,
     readOnly,
     scheduledStart,
@@ -202,6 +208,7 @@ export function useTournamentController(): TournamentContextValue {
   const { standingsBeforeRounds, participantOrderByRound, sorted } = useTournamentDerivedState(
     players,
     rounds,
+    defaultSetPoints,
     sort,
     desc,
   )
@@ -301,7 +308,7 @@ export function useTournamentController(): TournamentContextValue {
     setRounds((current) =>
       current.some((round) => round.matches.some((match) => hasEnteredScore(match)))
         ? current
-        : rerollRound(ordered, current, 1),
+        : rerollRound(ordered, current, 1, defaultSetPoints),
     )
   }
   const reorderParticipants = (draggedId: string, targetId: string) => {
@@ -365,6 +372,7 @@ export function useTournamentController(): TournamentContextValue {
       participantType,
       courtCount,
       defaultWinningGames,
+      defaultSetPoints,
       expectedDurationMinutes,
       breakBetweenMatchesMinutes,
       scheduledStart,
@@ -379,6 +387,7 @@ export function useTournamentController(): TournamentContextValue {
       setParticipantType(snapshot.participantType)
       setCourtCount(snapshot.courtCount)
       setDefaultWinningGames(snapshot.defaultWinningGames)
+      setDefaultSetPoints(snapshot.defaultSetPoints)
       setExpectedDurationMinutes(snapshot.expectedDurationMinutes ?? 25)
       setBreakBetweenMatchesMinutes(snapshot.breakBetweenMatchesMinutes ?? 5)
       setScheduledStart(snapshot.scheduledStart ?? '')
@@ -387,8 +396,40 @@ export function useTournamentController(): TournamentContextValue {
       return false
     }
   }
+  const saveSettings = (nextSettings: TournamentSettings) => {
+    setTournamentName(nextSettings.tournamentName)
+    setParticipantType(nextSettings.participantType)
+    setCourtCount(nextSettings.courtCount)
+    setRounds((current) => updateRoundsForCourtCount(current, nextSettings.courtCount))
+    setDefaultWinningGames(nextSettings.defaultWinningGames)
+    setDefaultSetPoints(nextSettings.defaultSetPoints)
+    setScheduledStart(nextSettings.scheduledStart)
+    setExpectedDurationMinutes(nextSettings.expectedDurationMinutes)
+    setBreakBetweenMatchesMinutes(nextSettings.breakBetweenMatchesMinutes)
+  }
+  const settings = useMemo<TournamentSettings>(
+    () => ({
+      tournamentName,
+      participantType,
+      courtCount,
+      defaultWinningGames,
+      defaultSetPoints,
+      expectedDurationMinutes,
+      breakBetweenMatchesMinutes,
+      scheduledStart,
+    }),
+    [
+      breakBetweenMatchesMinutes,
+      courtCount,
+      defaultSetPoints,
+      defaultWinningGames,
+      expectedDurationMinutes,
+      participantType,
+      scheduledStart,
+      tournamentName,
+    ],
+  )
   const routes: AppRoutesProps = {
-    tournamentName,
     localMaster,
     readOnly,
     players,
@@ -397,7 +438,7 @@ export function useTournamentController(): TournamentContextValue {
     participantType,
     courtCount,
     defaultWinningGames,
-    scheduledStart,
+    settings,
     name,
     record: recordBeforeRound,
     participantOrderByRound,
@@ -422,24 +463,19 @@ export function useTournamentController(): TournamentContextValue {
     onDeleteRound: (number) =>
       setRounds((current) => deleteRoundAndStartReadyRounds(current, number, courtCount)),
     onFillUnknown: (number) =>
-      setRounds((current) => fillRoundAndStartReadyRounds(current, number, players, courtCount)),
+      setRounds((current) =>
+        fillRoundAndStartReadyRounds(current, number, players, courtCount, defaultSetPoints),
+      ),
     onReroll: (number) =>
-      setRounds((current) => rerollRoundAndStartReadyRounds(players, current, number, courtCount)),
+      setRounds((current) =>
+        rerollRoundAndStartReadyRounds(players, current, number, courtCount, defaultSetPoints),
+      ),
     onRerollBye: (number) =>
-      setRounds((current) => rerollByeAndStartReadyRounds(players, current, number, courtCount)),
+      setRounds((current) =>
+        rerollByeAndStartReadyRounds(players, current, number, courtCount, defaultSetPoints),
+      ),
     onSwapPlayers: swapRoundPlayers,
-    setParticipantType,
-    setCourtCount: (value) => {
-      setCourtCount(value)
-      setRounds((current) => updateRoundsForCourtCount(current, value))
-    },
-    setDefaultWinningGames,
-    setTournamentName,
-    setScheduledStart,
-    expectedDurationMinutes,
-    breakBetweenMatchesMinutes,
-    setExpectedDurationMinutes,
-    setBreakBetweenMatchesMinutes,
+    onSaveSettings: saveSettings,
     onExport: exportTournament,
     onImport: importTournament,
     onDeleteAll: () => confirmRef.current?.showModal(),
