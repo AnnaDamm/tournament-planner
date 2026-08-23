@@ -34,6 +34,7 @@ type Props = {
   defaultCourtCount: number
   defaultWinningGames: number
   defaultSetPoints: number
+  onKeyboardMoveActiveChange: (active: boolean) => void
   readOnly?: boolean
 }
 
@@ -67,6 +68,7 @@ export const Rounds = memo(function Rounds({
   defaultCourtCount,
   defaultWinningGames,
   defaultSetPoints,
+  onKeyboardMoveActiveChange,
   readOnly = false,
 }: Props) {
   const dispatch = useAppDispatch()
@@ -85,6 +87,10 @@ export const Rounds = memo(function Rounds({
   )
   const currentRoundNumber = getCurrentRoundNumber(rounds, runningMatchIdsByRound)
   const firstRunningMatchId = getFirstRunningMatchId(rounds, runningMatchIdsByRound)
+  useEffect(() => {
+    onKeyboardMoveActiveChange(keyboardMove !== null)
+  }, [keyboardMove, onKeyboardMoveActiveChange])
+  useEffect(() => () => onKeyboardMoveActiveChange(false), [onKeyboardMoveActiveChange])
   useEffect(() => {
     if (!keyboardMove) return
 
@@ -236,6 +242,7 @@ export const Rounds = memo(function Rounds({
       {!readOnly && (
         <button
           className={classNames(sharedStyles, styles, 'button primary')}
+          inert={keyboardMove !== null}
           onClick={() => dispatch(createRound())}
           title={t('create')}
         >

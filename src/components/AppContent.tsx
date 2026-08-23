@@ -3,7 +3,11 @@ import { AppDialogs } from './AppDialogs'
 import { AppRoutes } from './AppRoutes'
 import { useTournament, useTournamentDialogRefs } from '../context/TournamentContext'
 
-export function AppContent() {
+type Props = {
+  onKeyboardMoveActiveChange: (active: boolean) => void
+}
+
+export function AppContent({ onKeyboardMoveActiveChange }: Props) {
   const { localMaster, readOnly } = useTournament()
   const { bulkRef, bulkInputRef, confirmRef } = useTournamentDialogRefs()
   const onAdd = useCallback(() => {
@@ -23,6 +27,7 @@ export function AppContent() {
         readOnly={readOnly}
         onAdd={onAdd}
         onDeleteAll={onDeleteAll}
+        onKeyboardMoveActiveChange={onKeyboardMoveActiveChange}
       />
       {!readOnly && <AppDialogs />}
     </>

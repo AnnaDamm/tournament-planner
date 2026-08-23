@@ -10,9 +10,11 @@ import {
 } from '../tournamentSelectors'
 import { AppContent } from './AppContent'
 import { AppLayout } from './AppLayout'
+import { useState } from 'react'
 
 export function TournamentApp() {
   const { localMaster, readOnly, isLive } = useTournament()
+  const [keyboardMoveActive, setKeyboardMoveActive] = useState(false)
   const tournamentName = useAppSelector(selectTournamentName)
   const participantNames = useAppSelector(selectParticipantNames)
   const participantTargets = useAppSelector(selectParticipantTargets)
@@ -31,8 +33,9 @@ export function TournamentApp() {
       nextMatchTargets={nextMatchTargets}
       roundCount={roundCount}
       currentRound={currentRound}
+      keyboardMoveActive={keyboardMoveActive}
     >
-      <AppContent />
+      <AppContent onKeyboardMoveActiveChange={setKeyboardMoveActive} />
     </AppLayout>
   )
 }

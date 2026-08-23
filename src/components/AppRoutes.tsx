@@ -30,9 +30,16 @@ export type AppRoutesProps = {
   readOnly: boolean
   onAdd: () => void
   onDeleteAll: () => void
+  onKeyboardMoveActiveChange: (active: boolean) => void
 }
 
-export function AppRoutes({ localMaster, readOnly, onAdd, onDeleteAll }: AppRoutesProps) {
+export function AppRoutes({
+  localMaster,
+  readOnly,
+  onAdd,
+  onDeleteAll,
+  onKeyboardMoveActiveChange,
+}: AppRoutesProps) {
   const dispatch = useAppDispatch()
   const store = useAppStore()
   const [sort, setSort] = useState('position')
@@ -148,6 +155,7 @@ export function AppRoutes({ localMaster, readOnly, onAdd, onDeleteAll }: AppRout
             defaultCourtCount={courtCount}
             defaultWinningGames={defaultWinningGames}
             defaultSetPoints={defaultSetPoints}
+            onKeyboardMoveActiveChange={onKeyboardMoveActiveChange}
             readOnly={readOnly}
           />
         }

@@ -22,6 +22,7 @@
 - Stabilize the round layout.
 - Refine drag-and-drop accessibility.
 - Skip non-droppable controls during keyboard drag-and-drop.
+- Keep layout links out of the tab order during keyboard drag-and-drop.
 - Restore top-menu focus behavior.
 - Improve dark-mode dialog contrast.
 - Make byes clickable in the player overlay.

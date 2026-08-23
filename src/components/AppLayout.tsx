@@ -33,6 +33,7 @@ type Props = {
   nextMatchTargets: { participantName: string; matchId: string }[]
   roundCount: number
   currentRound: number
+  keyboardMoveActive: boolean
   children: ReactNode
 }
 
@@ -80,6 +81,7 @@ export function AppLayout({
   nextMatchTargets,
   roundCount,
   currentRound,
+  keyboardMoveActive,
   children,
 }: Props) {
   const navigate = useNavigate()
@@ -344,10 +346,14 @@ export function AppLayout({
         `app-shell ${readonlyFocusMode ? 'readonly-focus-mode' : ''}`,
       )}
     >
-      <a className={classNames(sharedStyles, styles, 'skip-link')} href="#main-content">
+      <a
+        className={classNames(sharedStyles, styles, 'skip-link')}
+        href="#main-content"
+        inert={keyboardMoveActive}
+      >
         {t('skipToContent')}
       </a>
-      <div className={classNames(sharedStyles, styles, 'top-menu-slot')}>
+      <div className={classNames(sharedStyles, styles, 'top-menu-slot')} inert={keyboardMoveActive}>
         <header
           id="top-menu-header"
           className={classNames(sharedStyles, styles, 'top-menu-header')}
@@ -611,6 +617,7 @@ export function AppLayout({
         <nav
           className={classNames(sharedStyles, styles, 'desktop-side-nav')}
           aria-label={t('tournamentNavigation')}
+          inert={keyboardMoveActive}
         >
           {renderNavigation()}
         </nav>
@@ -621,12 +628,13 @@ export function AppLayout({
           className={classNames(sharedStyles, styles, 'mobile-side-nav')}
           aria-label={t('tournamentNavigation')}
           popover="auto"
+          inert={keyboardMoveActive}
         >
           {renderNavigation(true)}
         </nav>
         <div className={classNames(sharedStyles, styles, 'content')}>{children}</div>
       </main>
-      <footer className={classNames(sharedStyles, styles, 'app-footer')}>
+      <footer className={classNames(sharedStyles, styles, 'app-footer')} inert={keyboardMoveActive}>
         <div className={classNames(sharedStyles, styles, 'app-footer-inner')}>
           <span className={classNames(sharedStyles, styles, 'app-footer-name')}>
             <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
