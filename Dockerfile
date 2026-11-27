@@ -2,7 +2,7 @@ FROM node:lts-alpine AS base
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+RUN npm install --global pnpm@12.23.0
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
