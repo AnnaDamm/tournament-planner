@@ -4,31 +4,24 @@ import { classNames } from '../../styles/classNames'
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../../i18n'
-import type { Round } from '../../tournamentTypes'
+import type { MatchFormat, Round } from '../../tournamentTypes'
+import type { SportId } from '../../domain/sports/types'
+import { MatchFormatFields } from '../../shared/form/MatchFormatFields'
+import { NumberField } from '../../shared/form/NumberField'
 
 type Props = {
+  /** Give the component a key per round so its fields start with the values of that round. */
   round: Round | null
+  sportId: SportId
   defaultCourtCount: number
-  defaultWinningGames: number
-  onSave: (roundNumber: number, winningGames: number, courtCount: number) => void
+  onSave: (roundNumber: number, format: MatchFormat, courtCount: number) => void
   onClose: () => void
 }
 
-const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
-const clampCourtCount = (value: number) => Math.max(1, Math.floor(value) || 1)
-
-export function RoundSettingsDialog({
-  round,
-  defaultCourtCount,
-  defaultWinningGames,
-  onSave,
-  onClose,
-}: Props) {
+export function RoundSettingsDialog({ round, sportId, defaultCourtCount, onSave, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const [winningGames, setWinningGames] = useState(
-    String(round?.format.winningGames ?? defaultWinningGames),
-  )
-  const [courtCount, setCourtCount] = useState(String(round?.courtCount ?? defaultCourtCount))
+  const [format, setFormat] = useState<MatchFormat>(round?.format ?? { winningGames: 1 })
+  const [courtCount, setCourtCount] = useState(round?.courtCount ?? defaultCourtCount)
   const close = () => {
     dialogRef.current?.close()
     onClose()
@@ -53,11 +46,7 @@ export function RoundSettingsDialog({
 
   if (!round) return null
   const save = () => {
-    onSave(
-      round.number,
-      clampWinningGames(Number(winningGames)),
-      clampCourtCount(Number(courtCount)),
-    )
+    onSave(round.number, format, courtCount)
     close()
   }
 
@@ -87,28 +76,16 @@ export function RoundSettingsDialog({
         </button>
       </div>
       <div className={classNames(sharedStyles, styles, 'round-settings-fields')}>
-        <label htmlFor="round-winning-games">
-          <span>{t('winningGames')}</span>
-          <input
-            id="round-winning-games"
-            type="number"
-            min="1"
-            max="99"
-            value={winningGames}
-            onChange={(event) => setWinningGames(event.currentTarget.value)}
-            onBlur={() => setWinningGames(String(clampWinningGames(Number(winningGames))))}
-          />
-        </label>
+        <MatchFormatFields
+          idPrefix="round-format"
+          sportId={sportId}
+          format={format}
+          variant="dialog"
+          onChange={setFormat}
+        />
         <label htmlFor="round-court-count">
           <span>{t('courts')}</span>
-          <input
-            id="round-court-count"
-            type="number"
-            min="1"
-            value={courtCount}
-            onChange={(event) => setCourtCount(event.currentTarget.value)}
-            onBlur={() => setCourtCount(String(clampCourtCount(Number(courtCount))))}
-          />
+          <NumberField id="round-court-count" value={courtCount} onChange={setCourtCount} />
         </label>
       </div>
       <div className={classNames(sharedStyles, styles, 'dialog-actions')}>

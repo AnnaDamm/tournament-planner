@@ -5,6 +5,8 @@
 ### Features
 
 - Store tournaments in a versioned format (v2) with automatic migration of existing data.
+- Configure several tournament phases with participant transitions.
+- Set the match format per round and per match.
 - Link the footer version to the version history documentation.
 
 ### Bugfixes

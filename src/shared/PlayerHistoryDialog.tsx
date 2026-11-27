@@ -4,6 +4,8 @@ import { classNames } from '../styles/classNames'
 import { useEffect, useMemo, useRef } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
+import { useTerm } from '../i18n/useTerm'
+import { usePhaseScopes } from '../hooks/usePhaseScopes'
 import {
   compareRankingParticipants,
   getMatchSets,
@@ -56,6 +58,7 @@ const getByePlayerScores = (round: Round, ctx: EvaluationContext) =>
     opponent: 0,
   }))
 
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function PlayerHistoryDialog({
   player,
   players,
@@ -66,6 +69,8 @@ export function PlayerHistoryDialog({
   onClose,
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const term = useTerm()
+  const scopeFor = usePhaseScopes(players, rounds)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -81,27 +86,34 @@ export function PlayerHistoryDialog({
 
   const positionsAfterRounds = useMemo(
     () =>
-      rounds.map((_, roundIndex) => {
-        const roundsThroughCurrent = rounds.slice(0, roundIndex + 1)
-        const nextRound = rounds[roundIndex + 1]
+      rounds.map((round) => {
+        // Positions are those of the phase the round belongs to.
+        const scope = scopeFor(round.phaseId)
+        const index = scope.rounds.findIndex((item) => item.number === round.number)
+        const roundsThroughCurrent = scope.rounds.slice(0, index + 1)
+        const nextRound = scope.rounds[index + 1]
         const rankingRounds = nextRound?.startedAt
           ? [...roundsThroughCurrent, { ...nextRound, bye: null, matches: [] }]
           : roundsThroughCurrent
         return new Map(
-          getRankingParticipants(players, rankingRounds, ctx)
+          getRankingParticipants(scope.entrants, rankingRounds, scope.ctx)
             .sort(compareRankingParticipants)
             .map((participant, position) => [participant.id, position + 1]),
         )
       }),
-    [ctx, players, rounds],
+    [rounds, scopeFor],
   )
+  const getNextRoundInPhase = (roundIndex: number) =>
+    rounds[roundIndex + 1]?.phaseId === rounds[roundIndex].phaseId
+      ? rounds[roundIndex + 1]
+      : undefined
   const runningMatchIdsByRound = useMemo(
     () => getRunningMatchIdsByRound(ctx.rules, rounds, defaultCourtCount),
     [ctx.rules, defaultCourtCount, rounds],
   )
   const playedRoundIndexes = player
     ? rounds.flatMap((round, roundIndex) =>
-        (isByeCounted(round, rounds[roundIndex + 1]) && round.bye === player.id) ||
+        (isByeCounted(round, getNextRoundInPhase(roundIndex)) && round.bye === player.id) ||
         round.matches.some((match) => match.a === player.id || match.b === player.id)
           ? [roundIndex]
           : [],
@@ -118,7 +130,8 @@ export function PlayerHistoryDialog({
         const result = match ? getRoundMatchResult(ctx, round, match) : null
         const won = result?.winner === player.id
         const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
-        const isBye = isByeCounted(round, rounds[roundIndex + 1]) && round.bye === player.id
+        const isBye =
+          isByeCounted(round, getNextRoundInPhase(roundIndex)) && round.bye === player.id
         const isWithdrawal = !match && !isBye && roundIndex === withdrawalRoundIndex
         if (!match && !isBye && !isWithdrawal) return []
         const isRunning = match
@@ -146,19 +159,23 @@ export function PlayerHistoryDialog({
                 : isBye
                   ? t('win')
                   : result
-                    ? won
-                      ? t('win')
-                      : t('loss')
+                    ? result.outcome === 'draw'
+                      ? t('draw')
+                      : won
+                        ? t('win')
+                        : t('loss')
                     : t('pending'),
             outcomeClass: isWithdrawal
               ? 'negative'
               : isRunning
                 ? 'running'
-                : isBye || result
-                  ? won || isBye
-                    ? 'positive'
-                    : 'negative'
-                  : '',
+                : result?.outcome === 'draw'
+                  ? ''
+                  : isBye || result
+                    ? won || isBye
+                      ? 'positive'
+                      : 'negative'
+                    : '',
             rowClass: isRunning ? 'running' : '',
           },
         ]
@@ -201,7 +218,7 @@ export function PlayerHistoryDialog({
                 <th scope="col">{t('round')}</th>
                 <th scope="col">{t('positionAfterRound')}</th>
                 <th scope="col">{t('opponent')}</th>
-                <th scope="col">{t('sets')}</th>
+                <th scope="col">{term('gamesHeader')}</th>
                 <th scope="col">{t('score')}</th>
                 <th scope="col">{t('result')}</th>
               </tr>

@@ -1,2 +1,17 @@
 @layer components {
+  .phase-heading {
+    margin: 18px 0 8px;
+    font-size: 18px;
+  }
+
+  :global(.readonly-focus-mode) .phase-heading {
+    margin: clamp(16px, 1.4cqw, 32px) 0 clamp(8px, 0.8cqw, 16px);
+    font-size: clamp(24px, 2cqw, 52px);
+  }
+
+  .round-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 }

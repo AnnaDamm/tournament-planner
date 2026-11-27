@@ -297,4 +297,35 @@
     min-width: calc(44px * var(--focus-ui-scale));
     min-height: calc(44px * var(--focus-ui-scale));
   }
+
+  .phase-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 12px;
+  }
+
+  .phase-tab {
+    padding: 6px 12px;
+    border: 1px solid #d5ddd7;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .phase-tab[aria-selected='true'] {
+    border-color: #8bc74b;
+    background: #8bc74b;
+    color: #17201d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .phase-tab {
+      border-color: #3d4b42;
+    }
+  }
 }

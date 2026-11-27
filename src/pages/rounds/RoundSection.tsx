@@ -7,7 +7,8 @@ import { MatchRow } from './MatchRow'
 import { RoundBye } from './RoundBye'
 import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
-import { t } from '../../i18n'
+import { t, tf } from '../../i18n'
+import type { PhaseCapabilities } from '../../domain/phases/types'
 import { getMatchFormat, isRoundComplete, sortMatchesByParticipantOrder } from '../../tournament'
 import { selectEvaluationContext } from '../../tournamentSelectors'
 import { useAppSelector } from '../../storeHooks'
@@ -18,6 +19,8 @@ type Props = {
   roundIndex: number
   nextRoundStarted: boolean
   canCalculatePairings: boolean
+  capabilities: PhaseCapabilities
+  matchLabels: ReadonlyMap<string, string>
   participantOrder: string[]
   currentRoundNumber: number | undefined
   runningMatchIds: Set<string>
@@ -33,16 +36,20 @@ type Props = {
   onRerollBye: (roundNumber: number) => void
   onDelete: (roundNumber: number) => void
   onSwapPlayers: (roundIndex: number, draggedId: string, targetId: string) => void
+  onMatchSettings: (roundNumber: number, matchId: string) => void
   keyboardMove: { roundIndex: number; participantId: string } | null
   onKeyboardSwap: (roundIndex: number, participantId: string) => void
   readOnly: boolean
 }
 
+// oxlint-disable-next-line eslint/max-lines-per-function
 export const RoundSection = memo(function RoundSection({
   round,
   roundIndex,
   nextRoundStarted,
   canCalculatePairings,
+  capabilities,
+  matchLabels,
   participantOrder,
   currentRoundNumber,
   runningMatchIds,
@@ -58,12 +65,17 @@ export const RoundSection = memo(function RoundSection({
   onRerollBye,
   onDelete,
   onSwapPlayers,
+  onMatchSettings,
   keyboardMove,
   onKeyboardSwap,
   readOnly,
 }: Props) {
   const { rules } = useAppSelector(selectEvaluationContext)
-  const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(rules, round)
+  const canReorderBye =
+    capabilities.swapParticipants &&
+    !readOnly &&
+    !nextRoundStarted &&
+    !isRoundComplete(rules, round)
   const isCurrentRound = runningMatchIds.size > 0
   const keyboardMoveActive = keyboardMove !== null
   const isKeyboardMoveRound = keyboardMove?.roundIndex === roundIndex
@@ -72,7 +84,10 @@ export const RoundSection = memo(function RoundSection({
     () => sortMatchesByParticipantOrder(round.matches, participantOrder),
     [participantOrder, round.matches],
   )
-  const maxSetCount = rules.getMaxGameCount(round.format)
+  const maxSetCount = Math.max(
+    rules.getMaxGameCount(round.format),
+    ...round.matches.map((match) => rules.getMaxGameCount(getMatchFormat(round, match))),
+  )
   const setCount = readOnly
     ? Math.max(
         1,
@@ -103,6 +118,10 @@ export const RoundSection = memo(function RoundSection({
     (draggedId: string, targetId: string) => onSwapPlayers(roundIndex, draggedId, targetId),
     [onSwapPlayers, roundIndex],
   )
+  const handleMatchSettings = useCallback(
+    (matchId: string) => onMatchSettings(round.number, matchId),
+    [onMatchSettings, round.number],
+  )
   const handleKeyboardSwap = useCallback(
     (participantId: string) => onKeyboardSwap(roundIndex, participantId),
     [onKeyboardSwap, roundIndex],
@@ -131,6 +150,11 @@ export const RoundSection = memo(function RoundSection({
                 <span className={classNames(sharedStyles, styles, 'sr-only')}>
                   {t('round')} {round.number} –
                 </span>
+                {round.title && (
+                  <span className={classNames(sharedStyles, styles, 'round-title')}>
+                    {tf(round.title.key, round.title.params)}
+                  </span>
+                )}
               </h2>
               <span className={classNames(sharedStyles, styles, 'round-kicker')}>
                 <span aria-hidden="true">
@@ -173,6 +197,7 @@ export const RoundSection = memo(function RoundSection({
           <RoundActions
             round={round}
             canCalculatePairings={canCalculatePairings}
+            capabilities={capabilities}
             onSettings={handleSettings}
             onStart={handleStart}
             onFillUnknown={handleFillUnknown}
@@ -207,6 +232,9 @@ export const RoundSection = memo(function RoundSection({
               setCount={setCount}
               isRunning={runningMatchIds.has(match.id)}
               onSwap={handleSwapPlayers}
+              onMatchSettings={handleMatchSettings}
+              matchLabels={matchLabels}
+              canSwap={capabilities.swapParticipants}
               selectedParticipantId={selectedParticipantId}
               onKeyboardSwap={handleKeyboardSwap}
               keyboardMoveActive={keyboardMoveActive}

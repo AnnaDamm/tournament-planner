@@ -385,6 +385,8 @@ const en: DocPage[] = [
             title: 'Features',
             items: [
               'Store tournaments in a versioned format (v2) with automatic migration of existing data.',
+              'Configure several tournament phases with participant transitions.',
+              'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
             ],
           },
@@ -943,6 +945,8 @@ const de: DocPage[] = [
             title: 'Funktionen',
             items: [
               'Turniere werden in einem versionierten Format (v2) gespeichert; bestehende Daten werden automatisch migriert.',
+              'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
+              'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
             ],
           },

@@ -4,6 +4,8 @@ import { classNames } from '../../styles/classNames'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../../i18n'
+import { useTerm } from '../../i18n/useTerm'
+import { usePhaseScopes } from '../../hooks/usePhaseScopes'
 import {
   compareRankingParticipants,
   getRoundMatchResult,
@@ -98,7 +100,7 @@ const getDirectStats = (
         if (result.winner === firstId) {
           first.wins += 1
           second.losses += 1
-        } else {
+        } else if (result.winner === secondId) {
           first.losses += 1
           second.wins += 1
         }
@@ -138,6 +140,7 @@ const formatSets = (player: ComparisonPlayer | DirectStats) =>
 const formatPoints = (player: ComparisonPlayer | DirectStats) =>
   `${player.scored}:${player.conceded}`
 
+// oxlint-disable-next-line eslint/max-lines-per-function
 export function PlayerComparisonDialog({
   playerIds,
   roundIndex,
@@ -150,25 +153,40 @@ export function PlayerComparisonDialog({
   const dialogRef = useRef<HTMLDialogElement>(null)
   const cn = (...values: Array<string | false | null | undefined>) =>
     classNames(sharedStyles, styles, ...values)
+  const term = useTerm()
   const [view, setView] = useState<ComparisonView>('current')
-  const roundsBeforeSelected = useMemo(
-    () => (roundIndex === null ? rounds : rounds.slice(0, roundIndex)),
-    [roundIndex, rounds],
+  const scopeFor = usePhaseScopes(players, rounds)
+  // Players are compared within the phase of the round the comparison was opened from.
+  const selectedRound = rounds[roundIndex ?? rounds.length - 1]
+  const scope = useMemo(
+    () => scopeFor(selectedRound?.phaseId ?? ''),
+    [scopeFor, selectedRound?.phaseId],
   )
-  const currentStats = useMemo(() => getStats(players, rounds, ctx), [ctx, players, rounds])
+  const phaseRounds = scope.rounds
+  const roundsBeforeSelected = useMemo(
+    () =>
+      roundIndex === null
+        ? phaseRounds
+        : phaseRounds.filter((round) => round.number < rounds[roundIndex].number),
+    [phaseRounds, roundIndex, rounds],
+  )
+  const currentStats = useMemo(
+    () => getStats(scope.entrants, phaseRounds, scope.ctx),
+    [scope, phaseRounds],
+  )
   const previousStats = useMemo(
-    () => getStats(players, roundsBeforeSelected, ctx),
-    [ctx, players, roundsBeforeSelected],
+    () => getStats(scope.entrants, roundsBeforeSelected, scope.ctx),
+    [scope, roundsBeforeSelected],
   )
   const comparison = useMemo(() => {
     if (!playerIds) return null
     const stats = view === 'current' ? currentStats : previousStats
-    const comparisonRounds = view === 'current' ? rounds : roundsBeforeSelected
+    const comparisonRounds = view === 'current' ? phaseRounds : roundsBeforeSelected
     const first = stats.get(playerIds[0])
     const second = stats.get(playerIds[1])
     if (!first || !second) return null
     return { first, second, direct: getDirectStats(ctx, first.id, second.id, comparisonRounds) }
-  }, [ctx, currentStats, playerIds, previousStats, rounds, roundsBeforeSelected, view])
+  }, [ctx, currentStats, phaseRounds, playerIds, previousStats, roundsBeforeSelected, view])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -188,10 +206,10 @@ export function PlayerComparisonDialog({
         [t('wins'), comparison.first.wins, comparison.second.wins],
         [t('losses'), comparison.first.losses, comparison.second.losses],
         [t('games'), comparison.first.played, comparison.second.played],
-        [t('sets'), formatSets(comparison.first), formatSets(comparison.second)],
-        [t('points'), formatPoints(comparison.first), formatPoints(comparison.second)],
+        [term('gamesHeader'), formatSets(comparison.first), formatSets(comparison.second)],
+        [term('pointsHeader'), formatPoints(comparison.first), formatPoints(comparison.second)],
         [
-          t('difference'),
+          term('differenceHeader'),
           formatDifference(comparison.first.scored - comparison.first.conceded),
           formatDifference(comparison.second.scored - comparison.second.conceded),
         ],
@@ -310,12 +328,12 @@ export function PlayerComparisonDialog({
                         <td>{formatRecord(comparison.direct[1])}</td>
                       </tr>
                       <tr>
-                        <th scope="row">{t('sets')}</th>
+                        <th scope="row">{term('gamesHeader')}</th>
                         <td>{formatSets(comparison.direct[0])}</td>
                         <td>{formatSets(comparison.direct[1])}</td>
                       </tr>
                       <tr>
-                        <th scope="row">{t('points')}</th>
+                        <th scope="row">{term('pointsHeader')}</th>
                         <td>{formatPoints(comparison.direct[0])}</td>
                         <td>{formatPoints(comparison.direct[1])}</td>
                       </tr>
