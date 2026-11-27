@@ -4,6 +4,7 @@
 
 ### Features
 
+- Link the footer version to the version history documentation.
 - Store tournaments in a versioned format (v2) with automatic migration of existing data.
 
 ### Bugfixes
