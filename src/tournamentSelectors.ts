@@ -11,6 +11,8 @@ import {
   getRunningMatchIdsByRound,
   isUnknownParticipantId,
 } from './tournament'
+import { getActivePhase, getStartablePhase } from './domain/phases/phaseState'
+import { getPhaseScope } from './domain/phases/scope'
 import { sortStats } from './tournamentStats'
 import type { TournamentSettings } from './tournamentTypes'
 
@@ -77,52 +79,102 @@ export const selectTournamentSettings = createSelector(
   }),
 )
 
-export const selectStandingsBeforeRounds = createSelector(
-  [selectPlayers, selectRounds, selectEvaluationContext],
-  (players, rounds, ctx) => calculateStandingsBeforeRounds(players, rounds, ctx),
+export const selectActivePhaseId = createSelector(
+  [selectPlayers, selectRounds, selectScoring, selectTieBreakers, selectPhases],
+  (players, rounds, scoring, tieBreakers, phases) =>
+    getActivePhase({ players, rounds, scoring, tieBreakers, phases }).id,
 )
 
-export const selectRankingStats = createSelector(
-  [selectPlayers, selectRounds, selectEvaluationContext],
-  (players, rounds, ctx) =>
-    getRankingParticipants(players, rounds, ctx).map((player) => ({
-      ...player,
-      played: player.wins + player.draws + player.losses,
-      diff: player.scored - player.conceded,
-      points: player.scored,
-    })),
+/** Entrants, rounds and evaluation context of one phase (the first phase covers everybody). */
+export const selectPhaseScope = createSelector(
+  [
+    selectPlayers,
+    selectRounds,
+    selectScoring,
+    selectTieBreakers,
+    selectPhases,
+    (_state: RootState, phaseId: string) => phaseId,
+  ],
+  (players, rounds, scoring, tieBreakers, phases, phaseId) =>
+    getPhaseScope({ players, rounds, scoring, tieBreakers, phases }, phaseId),
+)
+
+/** The next phase when "Start next phase" is possible right now. */
+export const selectStartablePhase = createSelector(
+  [selectPlayers, selectRounds, selectScoring, selectTieBreakers, selectPhases],
+  (players, rounds, scoring, tieBreakers, phases) =>
+    getStartablePhase({ players, rounds, scoring, tieBreakers, phases }),
+)
+
+type PhaseSnapshotParts = Parameters<typeof getPhaseScope>[0]
+
+/** Runs a per-phase computation and returns its results in the order of the flat round list. */
+const mapRoundsByPhase = <T>(
+  parts: PhaseSnapshotParts,
+  compute: (scope: ReturnType<typeof getPhaseScope>) => T[],
+): T[] => {
+  const byNumber = new Map<number, T>()
+  parts.phases.forEach((phase) => {
+    const scope = getPhaseScope(parts, phase.id)
+    const values = compute(scope)
+    scope.rounds.forEach((round, index) => byNumber.set(round.number, values[index]))
+  })
+  return parts.rounds.map((round) => byNumber.get(round.number) as T)
+}
+
+export const selectStandingsBeforeRounds = createSelector(
+  [selectPlayers, selectRounds, selectScoring, selectTieBreakers, selectPhases],
+  (players, rounds, scoring, tieBreakers, phases) =>
+    mapRoundsByPhase({ players, rounds, scoring, tieBreakers, phases }, (scope) =>
+      calculateStandingsBeforeRounds(scope.entrants, scope.rounds, scope.ctx),
+    ),
+)
+
+export const selectRankingStats = createSelector([selectPhaseScope], (scope) =>
+  getRankingParticipants(scope.entrants, scope.rounds, scope.ctx).map((player) => ({
+    ...player,
+    played: player.wins + player.draws + player.losses,
+    diff: player.scored - player.conceded,
+    points: player.scored,
+  })),
 )
 
 export const selectParticipantOrderByRound = createSelector(
-  [selectPlayers, selectRounds, selectEvaluationContext],
-  (players, rounds, ctx) =>
-    rounds.map((_, roundIndex) => {
-      const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex), ctx)
-      if (roundIndex > 0) ranking.sort(compareRankingParticipants)
-      return ranking.map((player) => player.id)
-    }),
+  [selectPlayers, selectRounds, selectScoring, selectTieBreakers, selectPhases],
+  (players, rounds, scoring, tieBreakers, phases) =>
+    mapRoundsByPhase({ players, rounds, scoring, tieBreakers, phases }, (scope) =>
+      scope.rounds.map((_, roundIndex) => {
+        const ranking = getRankingParticipants(
+          scope.entrants,
+          scope.rounds.slice(0, roundIndex),
+          scope.ctx,
+        )
+        if (roundIndex > 0) ranking.sort(compareRankingParticipants)
+        return ranking.map((player) => player.id)
+      }),
+    ),
 )
 
 export const selectSortedParticipants = createSelector(
   [
     selectRankingStats,
-    selectRounds,
-    (_state: RootState, sort: string) => sort,
-    (_state: RootState, _sort: string, desc: boolean) => desc,
+    selectPhaseScope,
+    (_state: RootState, _phaseId: string, sort: string) => sort,
+    (_state: RootState, _phaseId: string, _sort: string, desc: boolean) => desc,
   ],
-  (stats, rounds, sort, desc) => {
+  (stats, scope, sort, desc) => {
+    const started = scope.rounds.some((round) => round.startedAt)
     const positions = new Map(
-      (rounds.some((round) => round.startedAt) ? sortStats(stats, 'position', true) : stats).map(
-        (player, index) => [player.id, index + 1],
-      ),
+      (started ? sortStats(stats, 'position', true) : stats).map((player, index) => [
+        player.id,
+        index + 1,
+      ]),
     )
 
-    return (rounds.some((round) => round.startedAt) ? sortStats(stats, sort, desc) : stats).map(
-      (player) => ({
-        ...player,
-        position: positions.get(player.id) ?? 0,
-      }),
-    )
+    return (started ? sortStats(stats, sort, desc) : stats).map((player) => ({
+      ...player,
+      position: positions.get(player.id) ?? 0,
+    }))
   },
 )
 

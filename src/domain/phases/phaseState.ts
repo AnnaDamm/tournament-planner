@@ -1,7 +1,8 @@
 import { createEvaluationContext } from '../evaluation'
-import type { Participant, Phase, Round, TournamentSnapshot } from '../types'
+import type { Phase, Round, TournamentSnapshot } from '../types'
 import { hasEnteredScore } from '../scoring/games'
 import { getPhaseMode } from './registry'
+import { getPhaseEntrants } from './scope'
 import { transitionResolvers } from './transitions'
 import type { PhaseContext, PhaseMode } from './types'
 
@@ -32,11 +33,7 @@ export const buildPhaseContext = (
   const phase = snapshot.phases[phaseIndex]
   const mode = phase && getPhaseMode(phase.mode)
   if (!phase || !mode) return null
-  const byId = new Map(snapshot.players.map((player) => [player.id, player]))
-  const entrants: Participant[] =
-    phaseIndex === 0
-      ? snapshot.players
-      : (phase.entrants ?? []).flatMap((id) => (byId.has(id) ? [byId.get(id)!] : []))
+  const entrants = getPhaseEntrants(snapshot, phaseId)
   return {
     phase: { ...phase, config: mode.parseConfig(phase.config) ?? mode.defaultConfig() },
     phaseIndex,
@@ -67,6 +64,14 @@ export const applyPhaseResolution = <T extends PhaseSnapshot>(snapshot: T): T =>
     rounds = rounds.map((round) => byNumber.get(round.number) ?? round)
   })
   return rounds === snapshot.rounds ? snapshot : { ...snapshot, rounds }
+}
+
+/** The phase that "Start next phase" would start now, if any. */
+export const getStartablePhase = (snapshot: PhaseSnapshot): Phase | undefined => {
+  const active = getActivePhase(snapshot)
+  const next = snapshot.phases[snapshot.phases.findIndex((phase) => phase.id === active.id) + 1]
+  if (!next || next.startedAt || !isPhaseComplete(snapshot, active.id)) return undefined
+  return transitionResolvers[next.entry.kind] && getPhaseMode(next.mode) ? next : undefined
 }
 
 /** Starts the phase after the active one when the active one is complete. */

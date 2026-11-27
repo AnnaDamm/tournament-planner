@@ -1,4 +1,5 @@
 export * from './lifecycle'
 export * from './participants'
+export * from './phases'
 export * from './rounds'
 export * from './settings'

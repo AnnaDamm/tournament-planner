@@ -7,10 +7,12 @@ import {
   rerollRoundInSnapshot,
 } from '../domain/phases/phaseState'
 import { getPhaseMode } from '../domain/phases/registry'
+import { clampFormat } from '../domain/format'
 import {
   assignCourtsToMatches,
   createEvaluationContext,
   getRoundMatchResult,
+  hasEnteredScore,
   startReadyRounds,
   startRoundInRounds,
 } from '../tournament'
@@ -26,7 +28,7 @@ import {
   roundUnknownParticipantsFilled,
 } from '../tournamentSlice'
 import type { RootState } from '../store'
-import type { Match, Round } from '../tournamentTypes'
+import type { Match, MatchFormat, Round } from '../tournamentTypes'
 import { swapRoundPlayers } from '../tournamentActions'
 import type { TournamentCommand } from './types'
 
@@ -48,17 +50,46 @@ const finishRoundChange = (
   )
 }
 
-const updateRoundSettings = (
+const updateRoundFormat = (state: State, number: number, format: MatchFormat, courtCount: number) =>
+  finishRoundChange(
+    state,
+    state.rounds.map((round) =>
+      round.number === number
+        ? { ...round, format: clampFormat(format, round.format), courtCount }
+        : round,
+    ),
+  )
+
+/** Keeps only the fields of an override that differ from the round format. */
+const toMatchOverride = (round: Round, format: Partial<MatchFormat> | undefined) => {
+  const clamped = format && clampFormat(format, round.format)
+  const override = Object.fromEntries(
+    Object.entries(clamped ?? {}).filter(
+      ([key, value]) => value !== round.format[key as keyof MatchFormat],
+    ),
+  ) as Partial<MatchFormat>
+  return Object.keys(override).length > 0 ? override : undefined
+}
+
+const updateMatchFormat = (
   state: State,
   number: number,
-  winningGames: number,
-  courtCount: number,
+  matchId: string,
+  format: Partial<MatchFormat> | undefined,
 ) =>
   finishRoundChange(
     state,
     state.rounds.map((round) =>
       round.number === number
-        ? { ...round, format: { ...round.format, winningGames }, courtCount }
+        ? {
+            ...round,
+            matches: round.matches.map((match) => {
+              if (match.id !== matchId || hasEnteredScore(match)) return match
+              const { format: _previous, ...rest } = match
+              const override = toMatchOverride(round, format)
+              return override ? { ...rest, format: override } : rest
+            }),
+          }
         : round,
     ),
   )
@@ -140,11 +171,19 @@ export const updateRoundMatch =
     dispatch(updateRoundMatches(index, matches))
   }
 
-export const setRoundSettings =
-  (number: number, winningGames: number, courtCount: number): TournamentCommand =>
+export const setRoundFormat =
+  (number: number, format: MatchFormat, courtCount: number): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(roundSettingsChanged(updateRoundSettings(state, number, winningGames, courtCount)))
+    dispatch(roundSettingsChanged(updateRoundFormat(state, number, format, courtCount)))
+  }
+
+/** Sets (or, with undefined, clears) the format override of one match that has no score yet. */
+export const setMatchFormat =
+  (number: number, matchId: string, format: Partial<MatchFormat> | undefined): TournamentCommand =>
+  (dispatch, getState) => {
+    const state = getState().tournament
+    dispatch(roundSettingsChanged(updateMatchFormat(state, number, matchId, format)))
   }
 
 export const deleteRound =
