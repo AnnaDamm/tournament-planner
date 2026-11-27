@@ -63,11 +63,23 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 
   if (
     requestUrl.origin === self.location.origin &&
-    requestUrl.pathname.startsWith(baseUrl.pathname)
+    requestUrl.pathname.startsWith(baseUrl.pathname) &&
+    !isLiveRequest(request, requestUrl)
   ) {
     event.respondWith(cacheFirst(request))
   }
 })
+
+// The live-sharing API (including the endless Server-Sent Events stream) must never be
+// handled by the worker: caching would never settle for SSE and would serve stale data.
+// server.ts serves /api at the origin root, other deployments below the base path.
+function isLiveRequest(request: Request, url: URL) {
+  return (
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith(`${baseUrl.pathname}api/`) ||
+    (request.headers.get('accept') ?? '').includes('text/event-stream')
+  )
+}
 
 async function networkFirst(request: Request) {
   const cache = await caches.open(cacheName)
@@ -90,6 +102,12 @@ async function cacheFirst(request: Request) {
   if (cached) return cached
 
   const response = await fetch(request)
-  if (response.ok) await cache.put(request, response.clone())
+  if (
+    response.ok &&
+    response.type === 'basic' &&
+    !(response.headers.get('cache-control') ?? '').includes('no-store')
+  ) {
+    await cache.put(request, response.clone())
+  }
   return response
 }

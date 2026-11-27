@@ -378,7 +378,10 @@ const en: DocPage[] = [
           },
           {
             title: 'Bugfixes',
-            items: ['Hide table and round action controls from print views.'],
+            items: [
+              'Hide table and round action controls from print views.',
+              'Live viewers on the local network receive tournament updates again when the app is installed or cached (the service worker no longer intercepts the live API).',
+            ],
           },
         ],
       },
@@ -932,6 +935,7 @@ const de: DocPage[] = [
             title: 'Fehlerbehebungen',
             items: [
               'Aktionsschaltflächen der Tabellen- und Rundenansicht in Druckansichten ausgeblendet.',
+              'Live-Zuschauer im lokalen Netzwerk erhalten Turnier-Updates wieder, wenn die App installiert oder gecacht ist (der Service Worker fängt die Live-API nicht mehr ab).',
             ],
           },
         ],
