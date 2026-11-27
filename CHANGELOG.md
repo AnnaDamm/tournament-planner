@@ -5,6 +5,7 @@
 ### Bugfixes
 
 - Hide table and round action controls from print views.
+- Live viewers on the local network receive tournament updates again when the app is installed or cached (the service worker no longer intercepts the live API).
 
 ## v3.0.0
 
