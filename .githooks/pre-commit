@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# CI mode for the test run: missing snapshots fail instead of being written silently.
+export CI=true
+
 if command -v pnpm >/dev/null 2>&1 && command -v node >/dev/null 2>&1 && [ -d node_modules ]; then
   run_pnpm() {
     pnpm "$@"
@@ -15,7 +18,7 @@ elif command -v docker >/dev/null 2>&1; then
       docker build --target build --tag "$check_image" .
       check_image_ready=true
     fi
-    docker run --rm "$check_image" pnpm "$@"
+    docker run --rm -e CI=true "$check_image" pnpm "$@"
   }
 else
   echo "Skipping pre-commit checks: neither pnpm nor Docker is available."
@@ -37,3 +40,6 @@ fi
 
 echo "Running TypeScript check..."
 run_pnpm typecheck
+
+echo "Running tests..."
+run_pnpm test

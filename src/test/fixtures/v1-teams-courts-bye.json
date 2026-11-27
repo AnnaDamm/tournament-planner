@@ -1,0 +1,521 @@
+{
+  "version": 1,
+  "defaultSetPoints": 21,
+  "scheduledStart": "2026-01-01T10:00",
+  "breakBetweenMatchesMinutes": 5,
+  "expectedDurationMinutes": 30,
+  "tournamentName": "Team Cup",
+  "participantType": "teams",
+  "courtCount": 3,
+  "defaultWinningGames": 3,
+  "players": [
+    {
+      "id": "t1",
+      "name": "Team Aces",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t2",
+      "name": "Team Bears",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t3",
+      "name": "Team Cobras",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t4",
+      "name": "Team Dragons",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t5",
+      "name": "Team Eagles",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t6",
+      "name": "Team Foxes",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "t7",
+      "name": "Team Giants",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    }
+  ],
+  "rounds": [
+    {
+      "number": 1,
+      "winningGames": 3,
+      "bye": "t5",
+      "matches": [
+        {
+          "id": "1-0-rth3yr",
+          "a": "t1",
+          "b": "t4",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "1-1-7wt9gu",
+          "a": "t2",
+          "b": "t6",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            },
+            {
+              "a": "21",
+              "b": "11"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "1-2-mfn14c",
+          "a": "t3",
+          "b": "t7",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "10",
+              "b": "21"
+            },
+            {
+              "a": "11",
+              "b": "21"
+            },
+            {
+              "a": "12",
+              "b": "21"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        }
+      ],
+      "standings": [
+        {
+          "id": "t1",
+          "name": "Team Aces",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t1",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t2",
+          "name": "Team Bears",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t2",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t3",
+          "name": "Team Cobras",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t3",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t4",
+          "name": "Team Dragons",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t4",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t5",
+          "name": "Team Eagles",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t5",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t6",
+          "name": "Team Foxes",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t6",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t7",
+          "name": "Team Giants",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t7",
+          "setsWon": 0,
+          "setsLost": 0
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z",
+      "predictedStart": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "number": 2,
+      "winningGames": 3,
+      "bye": "t3",
+      "matches": [
+        {
+          "id": "2-0-32c5sz",
+          "a": "t7",
+          "b": "t1",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "2-1-lbg1ph",
+          "a": "t2",
+          "b": "t5",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "9",
+              "b": "21"
+            },
+            {
+              "a": "10",
+              "b": "21"
+            },
+            {
+              "a": "11",
+              "b": "21"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "2-2-px9394",
+          "a": "t6",
+          "b": "t4",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            },
+            {
+              "a": "21",
+              "b": "11"
+            },
+            {
+              "a": "21",
+              "b": "12"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        }
+      ],
+      "standings": [
+        {
+          "id": "t1",
+          "name": "Team Aces",
+          "wins": 1,
+          "losses": 0,
+          "scored": 82,
+          "conceded": 48,
+          "participantId": "t1",
+          "setsWon": 3,
+          "setsLost": 1
+        },
+        {
+          "id": "t2",
+          "name": "Team Bears",
+          "wins": 1,
+          "losses": 0,
+          "scored": 101,
+          "conceded": 72,
+          "participantId": "t2",
+          "setsWon": 3,
+          "setsLost": 2
+        },
+        {
+          "id": "t3",
+          "name": "Team Cobras",
+          "wins": 0,
+          "losses": 1,
+          "scored": 33,
+          "conceded": 63,
+          "participantId": "t3",
+          "setsWon": 0,
+          "setsLost": 3
+        },
+        {
+          "id": "t4",
+          "name": "Team Dragons",
+          "wins": 0,
+          "losses": 1,
+          "scored": 48,
+          "conceded": 82,
+          "participantId": "t4",
+          "setsWon": 1,
+          "setsLost": 3
+        },
+        {
+          "id": "t5",
+          "name": "Team Eagles",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "t5",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "t6",
+          "name": "Team Foxes",
+          "wins": 0,
+          "losses": 1,
+          "scored": 72,
+          "conceded": 101,
+          "participantId": "t6",
+          "setsWon": 2,
+          "setsLost": 3
+        },
+        {
+          "id": "t7",
+          "name": "Team Giants",
+          "wins": 1,
+          "losses": 0,
+          "scored": 63,
+          "conceded": 33,
+          "participantId": "t7",
+          "setsWon": 3,
+          "setsLost": 0
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z",
+      "predictedStart": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "number": 3,
+      "winningGames": 3,
+      "bye": "t4",
+      "matches": [
+        {
+          "id": "3-0-ghpb5x",
+          "a": "t7",
+          "b": "t5",
+          "scoreA": "",
+          "scoreB": "",
+          "court": 1,
+          "startedAt": "2026-01-01T10:00:00.000Z",
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "3-1-wlood0",
+          "a": "t1",
+          "b": "t2",
+          "scoreA": "",
+          "scoreB": "",
+          "court": 2,
+          "startedAt": "2026-01-01T10:00:00.000Z",
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "3-2-89c8km",
+          "a": "t6",
+          "b": "t3",
+          "scoreA": "",
+          "scoreB": "",
+          "court": 3,
+          "startedAt": "2026-01-01T10:00:00.000Z",
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        }
+      ],
+      "standings": [
+        {
+          "id": "t1",
+          "name": "Team Aces",
+          "wins": 1,
+          "losses": 1,
+          "scored": 151,
+          "conceded": 149,
+          "participantId": "t1",
+          "setsWon": 5,
+          "setsLost": 4
+        },
+        {
+          "id": "t2",
+          "name": "Team Bears",
+          "wins": 1,
+          "losses": 1,
+          "scored": 131,
+          "conceded": 135,
+          "participantId": "t2",
+          "setsWon": 3,
+          "setsLost": 5
+        },
+        {
+          "id": "t3",
+          "name": "Team Cobras",
+          "wins": 0,
+          "losses": 1,
+          "scored": 33,
+          "conceded": 63,
+          "participantId": "t3",
+          "setsWon": 0,
+          "setsLost": 3
+        },
+        {
+          "id": "t4",
+          "name": "Team Dragons",
+          "wins": 0,
+          "losses": 2,
+          "scored": 102,
+          "conceded": 164,
+          "participantId": "t4",
+          "setsWon": 2,
+          "setsLost": 6
+        },
+        {
+          "id": "t5",
+          "name": "Team Eagles",
+          "wins": 1,
+          "losses": 0,
+          "scored": 63,
+          "conceded": 30,
+          "participantId": "t5",
+          "setsWon": 3,
+          "setsLost": 0
+        },
+        {
+          "id": "t6",
+          "name": "Team Foxes",
+          "wins": 1,
+          "losses": 1,
+          "scored": 154,
+          "conceded": 155,
+          "participantId": "t6",
+          "setsWon": 5,
+          "setsLost": 4
+        },
+        {
+          "id": "t7",
+          "name": "Team Giants",
+          "wins": 2,
+          "losses": 0,
+          "scored": 164,
+          "conceded": 102,
+          "participantId": "t7",
+          "setsWon": 6,
+          "setsLost": 2
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z",
+      "predictedStart": "2026-01-01T10:00:00.000Z"
+    }
+  ]
+}
