@@ -161,11 +161,14 @@ const readIndex = (): TournamentIndex | null => {
   return value as TournamentIndex
 }
 
+/** Returns whether the index was actually written. */
 const writeIndex = (index: TournamentIndex) => {
   try {
     localStorage.setItem(indexStorageKey, JSON.stringify(index))
+    return true
   } catch {
     // Storage may be full or unavailable; the in-memory state keeps working.
+    return false
   }
 }
 
@@ -203,8 +206,19 @@ const writeEnvelope = (value: PersistedTournamentState, broadcast: boolean) => {
 
 const activate = (state: PersistedTournamentState) => {
   const index = upsertIndexItem(readIndex(), state.snapshot)
-  writeIndex({ ...index, activeId: state.snapshot.id })
-  return state
+  return writeIndex({ ...index, activeId: state.snapshot.id })
+}
+
+const readStoredState = (id: string) =>
+  parseEnvelope(readJson<unknown>(snapshotStorageKey(id), null), 2)
+
+/** Small stable hash, so every tab derives the same id from the same v1 data. */
+const stableId = (text: string) => {
+  let hash = 0x811c9dc5
+  for (let index = 0; index < text.length; index += 1) {
+    hash = Math.imul(hash ^ text.charCodeAt(index), 0x01000193) >>> 0
+  }
+  return `m${hash.toString(36)}`
 }
 
 const createFreshState = (snapshot: TournamentSnapshot, source: string) => {
@@ -214,23 +228,58 @@ const createFreshState = (snapshot: TournamentSnapshot, source: string) => {
     revision: { updatedAt: Date.now(), source },
   }
   writeEnvelope(state, false)
-  return activate(state)
+  return { state, indexWritten: activate(state) }
+}
+
+/** Rebuilds a lost or unreadable index from the per-tournament keys; the newest valid one is active. */
+const rebuildIndex = (): PersistedTournamentState | null => {
+  const ids: string[] = []
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index)
+    if (key?.startsWith(`${storagePrefix}tournament:`)) {
+      ids.push(key.slice(`${storagePrefix}tournament:`.length))
+    }
+  }
+  const states = ids.flatMap((id) => {
+    const state = readStoredState(id)
+    return state && state.snapshot.id === id ? [state] : []
+  })
+  if (states.length === 0) return null
+  const newest = states.reduce((best, state) =>
+    state.revision.updatedAt > best.revision.updatedAt ? state : best,
+  )
+  writeIndex({
+    storageVersion: 2,
+    activeId: newest.snapshot.id,
+    items: states.map(({ snapshot, revision }) => ({
+      id: snapshot.id,
+      name: snapshot.tournamentName,
+      updatedAt: revision.updatedAt,
+    })),
+  })
+  return newest
 }
 
 const migrateFromV1 = (): PersistedTournamentState => {
   const rawV1 = localStorage.getItem(legacySnapshotStorageKey)
   const v1State =
     rawV1 === null ? null : parseEnvelope(readJson<unknown>(legacySnapshotStorageKey, null), 1)
-  if (v1State) return createFreshState(v1State.snapshot, 'migration')
-  if (rawV1 !== null) {
+  if (rawV1 !== null && !v1State) {
     // The key exists but cannot be read: never overwrite it, continue with a new tournament.
     console.error('The stored tournament could not be read; starting a new tournament.')
-    return createFreshState(createEmptyTournamentSnapshot(), 'recovery')
+    return createFreshState(createEmptyTournamentSnapshot(), 'recovery').state
   }
 
-  const legacy = parseTournamentSnapshot(createLegacySnapshot())
-  const state = createFreshState(legacy ?? createEmptyTournamentSnapshot(), 'migration')
-  removeLegacyKeys()
+  const legacy = v1State ? null : parseTournamentSnapshot(createLegacySnapshot())
+  const snapshot = v1State?.snapshot ?? legacy ?? createEmptyTournamentSnapshot()
+  // A stable id lets concurrent first loads in several tabs converge on one migrated tournament.
+  const id =
+    v1State || legacy ? stableId(rawV1 ?? JSON.stringify(createLegacySnapshot())) : snapshot.id
+  const existing = readIndex() ? readStoredState(id) : (readStoredState(id) ?? rebuildIndex())
+  if (existing) return existing
+
+  const { state, indexWritten } = createFreshState({ ...snapshot, id }, 'migration')
+  if (indexWritten && !v1State) removeLegacyKeys()
   return state
 }
 
@@ -244,13 +293,15 @@ export const loadTournamentState = (isViewer = false): PersistedTournamentState 
   }
 
   const index = readIndex()
-  if (!index) return migrateFromV1()
-  const raw = localStorage.getItem(snapshotStorageKey(index.activeId))
-  const persisted = parseEnvelope(readJson<unknown>(snapshotStorageKey(index.activeId), null), 2)
+  if (!index) return rebuildIndex() ?? migrateFromV1()
+  const persisted = readStoredState(index.activeId)
   if (persisted) return persisted
-  if (raw !== null)
+  const rebuilt = rebuildIndex()
+  if (rebuilt) return rebuilt
+  if (localStorage.getItem(snapshotStorageKey(index.activeId)) !== null) {
     console.error('The stored tournament could not be read; starting a new tournament.')
-  return createFreshState(createEmptyTournamentSnapshot(), 'recovery')
+  }
+  return createFreshState(createEmptyTournamentSnapshot(), 'recovery').state
 }
 
 export const persistTournamentState = (

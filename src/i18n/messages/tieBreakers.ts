@@ -1,7 +1,8 @@
 // Messages of the tieBreakers feature. Keys are prefixed with "tieBreakers"; edit only this file for that feature.
 export const tieBreakersEn = {
   tieBreakersLastLoss: 'Last loss',
-  tieBreakersLastLossHelp: 'Participants who never lost, or lost earlier, rank higher.',
+  tieBreakersLastLossHelp:
+    'Participants who never lost, or whose last loss came later, rank higher.',
   tieBreakersGamesWon: 'Games won',
   tieBreakersGamesWonHelp: 'More games (sets) won ranks higher.',
   tieBreakersGamesLost: 'Games lost',
@@ -14,7 +15,7 @@ export const tieBreakersEn = {
 
 export const tieBreakersDe: { [Key in keyof typeof tieBreakersEn]: string } = {
   tieBreakersLastLoss: 'Letzte Niederlage',
-  tieBreakersLastLossHelp: 'Wer nie oder früher verloren hat, steht weiter oben.',
+  tieBreakersLastLossHelp: 'Wer nie oder erst später verloren hat, steht weiter oben.',
   tieBreakersGamesWon: 'Gewonnene Sätze',
   tieBreakersGamesWonHelp: 'Mehr gewonnene Sätze stehen weiter oben.',
   tieBreakersGamesLost: 'Verlorene Sätze',

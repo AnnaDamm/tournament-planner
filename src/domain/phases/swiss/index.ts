@@ -32,6 +32,8 @@ export const swissMode: PhaseMode<SwissConfig> = {
       number,
       phaseId: p.phase.id,
       bye: null,
+      // Note: round.format.gamePoints is informational only; the bye credit always uses
+      // ctx.defaultFormat (the tournament default), as before.
       format: previous?.format ?? p.phase.format ?? p.ctx.scoring.format,
       matches: [],
     }

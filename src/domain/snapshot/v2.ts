@@ -156,14 +156,24 @@ const parseRound = (
     (raw.courtCount !== undefined && !isFiniteNumber(raw.courtCount))
   )
     return null
-  const format =
-    isRecord(raw.format) && isFiniteNumber(raw.format.winningGames)
-      ? (raw.format as Round['format'])
-      : { winningGames: fallback.winningGames }
+  // Hand-edited or legacy documents may still carry winningGames on the round.
+  const legacyGames = isFiniteNumber(raw.winningGames) ? raw.winningGames : fallback.winningGames
+  const format = clampFormat(isRecord(raw.format) ? raw.format : undefined, {
+    winningGames: legacyGames,
+  })
   return {
-    ...(raw as unknown as Round),
+    number: raw.number,
     phaseId: typeof raw.phaseId === 'string' ? raw.phaseId : firstPhaseId,
+    ...(isRecord(raw.title) && typeof raw.title.key === 'string'
+      ? { title: raw.title as unknown as Round['title'] }
+      : {}),
+    ...(typeof raw.predictedStart === 'string' ? { predictedStart: raw.predictedStart } : {}),
+    ...(typeof raw.startedAt === 'string' ? { startedAt: raw.startedAt } : {}),
+    ...(raw.bye === null || typeof raw.bye === 'string' ? { bye: raw.bye as string | null } : {}),
     format,
+    ...(isFiniteNumber(raw.courtCount) ? { courtCount: raw.courtCount } : {}),
+    matches: raw.matches,
+    ...(Array.isArray(raw.standings) ? { standings: raw.standings as Round['standings'] } : {}),
   }
 }
 

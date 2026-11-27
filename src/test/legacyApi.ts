@@ -6,6 +6,8 @@ import { createEvaluationContext, type EvaluationContext } from '../domain/evalu
 import { isUnknownParticipantId } from '../domain/ids'
 import * as pairing from '../domain/phases/swiss/pairing'
 import { compareRankingParticipants as compareRanking } from '../domain/ranking/rank'
+import { tieBreakers } from '../domain/ranking/registry'
+import type { CountedResult, RankingInput } from '../domain/ranking/types'
 import * as ranking from '../domain/ranking/rank'
 import { DEFAULT_TIE_BREAKERS } from '../domain/ranking/registry'
 import * as courts from '../domain/schedule/courts'
@@ -113,24 +115,69 @@ export const getRankingParticipants = (
   defaultSetPoints = 21,
 ) => ranking.getRankingParticipants(players, toV2Rounds(rounds), contextFor(defaultSetPoints))
 
-/** Compares v1-shaped ranking rows: their fields are mapped to match points and tie-breaker values. */
+/**
+ * Compares v1-shaped ranking rows. The rows are turned into a ranking input (standings plus
+ * synthetic lost matches for lastLossRound) so the tie-breaker values come from the real
+ * registry functions, exactly as in getRankingParticipants.
+ */
 export const compareRankingParticipants = (
   first: RankingParticipant,
   second: RankingParticipant,
 ) => {
-  const lift = (item: RankingParticipant) => ({
-    ...item,
+  const rows = [first, second]
+  const ids = rows.map((_, index) => `row${index}`)
+  const ctx = contextFor(21)
+  const results: CountedResult[] = rows.flatMap((row, index) =>
+    row.lastLossRound > 0
+      ? [
+          {
+            roundNumber: row.lastLossRound,
+            kind: 'match' as const,
+            match: { id: `m${index}`, a: 'opponent', b: ids[index], scoreA: '', scoreB: '' },
+            result: {
+              outcome: 'a' as const,
+              winner: 'opponent',
+              loser: ids[index],
+              games: [],
+              gamesA: 0,
+              gamesB: 0,
+              pointsA: 0,
+              pointsB: 0,
+            },
+          },
+        ]
+      : [],
+  )
+  const input: RankingInput = {
+    participants: rows.map((row, index) => ({ id: ids[index], name: row.name })),
+    rounds: [],
+    standings: new Map(
+      rows.map((row, index) => [
+        ids[index],
+        {
+          participantId: ids[index],
+          wins: row.wins,
+          draws: 0,
+          losses: row.losses,
+          scored: row.scored,
+          conceded: row.conceded,
+          setsWon: row.setsWon ?? 0,
+          setsLost: row.setsLost ?? 0,
+          matchPoints: row.wins,
+        },
+      ]),
+    ),
+    results,
+    ctx,
+  }
+  const values = ctx.tieBreakers.map((id) => tieBreakers[id]!.compute(input))
+  const lift = (row: RankingParticipant, index: number) => ({
+    ...row,
     draws: 0,
-    matchPoints: item.wins,
-    tieBreakValues: [
-      item.lastLossRound === 0 ? Infinity : item.lastLossRound,
-      item.setsWon ?? 0,
-      -(item.setsLost ?? 0),
-      item.scored,
-      -item.conceded,
-    ],
+    matchPoints: row.wins,
+    tieBreakValues: values.map((map) => map.get(ids[index]) ?? 0),
   })
-  return compareRanking(lift(first), lift(second))
+  return compareRanking(lift(first, 0), lift(second, 1))
 }
 
 export const getMatchResult = (match: V1Match, winningGames: number) => {
