@@ -31,7 +31,7 @@ import {
   projectStartedAt,
 } from '../../test/project'
 import { withSeed } from '../../test/seededRandom'
-import { FIXED_START, playRound, simulate } from '../../test/simulate'
+import { FIXED_START, playFirstMatches, playRound, simulate } from '../../test/simulate'
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -78,12 +78,7 @@ describe('createRoundPlan', () => {
   it('keeps unknown placeholders while the previous round is unfinished', () => {
     const players = makePlayers(8)
     const [first] = simulate(players, 1, { seed: 2, playedRounds: 0 })
-    const partial: Round = {
-      ...first,
-      matches: first.matches.map((item, index) =>
-        index < 2 ? playRound({ ...first, matches: [item] }).matches[0] : item,
-      ),
-    }
+    const partial = playFirstMatches(first, 2)
     const plan = withSeed(2, () => createRoundPlan(players, [partial], 2))
     expect(
       projectRound({ number: 2, winningGames: 2, bye: plan.bye, matches: plan.matches }),
@@ -95,12 +90,7 @@ describe('fillUnknownRound', () => {
   it.each([8, 9])('resolves placeholders once round one is finished (%i players)', (count) => {
     const players = makePlayers(count)
     const [first] = simulate(players, 1, { seed: 4, playedRounds: 0 })
-    const partial: Round = {
-      ...first,
-      matches: first.matches.map((item, index) =>
-        index < 2 ? playRound({ ...first, matches: [item] }).matches[0] : item,
-      ),
-    }
+    const partial = playFirstMatches(first, 2)
     const early = withSeed(4, () => createRoundPlan(players, [partial], 2))
     const earlyRound: Round = {
       number: 2,
@@ -121,6 +111,12 @@ describe('rerollRound and rerollBye', () => {
     const rounds = simulate(players, 3, { seed: 9, playedRounds: 2 })
     const rerolled = withSeed(21, () => rerollRound(players, rounds, 3))
     expect(projectRound(rerolled[2])).toMatchSnapshot()
+    // Pairing after round one is deterministic (the bye is kept), so a reroll shows up in the
+    // freshly generated match ids; the previous matches must not be reused.
+    expect(rerolled[2]).not.toBe(rounds[2])
+    expect(rerolled[2].matches.map((item) => item.id)).not.toEqual(
+      rounds[2].matches.map((item) => item.id),
+    )
     expect(projectRound(rerolled[1])).toEqual(projectRound(rounds[1]))
     expect(projectRound(rerolled[0])).toEqual(projectRound(rounds[0]))
   })
@@ -356,14 +352,11 @@ describe('match results', () => {
 })
 
 describe('courts and schedule', () => {
-  const scenario = (courts: number) => {
-    const players = makePlayers(8)
-    const rounds = simulate(players, 3, { seed: 31, playedRounds: 1, startRounds: false })
-    return { rounds, courts }
-  }
+  const scenario = () =>
+    simulate(makePlayers(8), 3, { seed: 31, playedRounds: 1, startRounds: false })
 
   it.each([1, 3])('startReadyRounds with %i courts', (courts) => {
-    const { rounds } = scenario(courts)
+    const rounds = scenario()
     const started = startReadyRounds(rounds, courts, FIXED_START)
     expect(projectStartedAt(started)).toMatchSnapshot('started')
     expect(projectCourts(started)).toMatchSnapshot('courts')
@@ -371,7 +364,7 @@ describe('courts and schedule', () => {
   })
 
   it.each([1, 3])('assignCourtsToMatches with %i courts', (courts) => {
-    const { rounds } = scenario(courts)
+    const rounds = scenario()
     const started = rounds.map((item) =>
       item.number === 1 ? { ...item, startedAt: FIXED_START } : item,
     )
@@ -379,7 +372,7 @@ describe('courts and schedule', () => {
   })
 
   it('keeps already assigned courts stable', () => {
-    const { rounds } = scenario(3)
+    const rounds = scenario()
     const first = startReadyRounds(rounds, 3, FIXED_START)
     const again = startReadyRounds(first, 3, '2026-01-01T12:00:00.000Z')
     expect(projectStartedAt(again)).toEqual(projectStartedAt(first))
@@ -387,7 +380,7 @@ describe('courts and schedule', () => {
   })
 
   it.each([1, 3])('calculateExpectedMatchStarts with %i courts', (courts) => {
-    const { rounds } = scenario(courts)
+    const rounds = scenario()
     const scheduled = calculateExpectedMatchStarts(
       rounds,
       courts,
@@ -432,7 +425,7 @@ describe('courts and schedule', () => {
   })
 
   it('does not predict without a start time', () => {
-    const { rounds } = scenario(1)
+    const rounds = scenario()
     expect(
       projectPredictedStarts(calculateExpectedMatchStarts(rounds, 1, 25, 5, '')),
     ).toMatchSnapshot()
