@@ -37,3 +37,6 @@ fi
 
 echo "Running TypeScript check..."
 run_pnpm typecheck
+
+echo "Running tests..."
+run_pnpm test
