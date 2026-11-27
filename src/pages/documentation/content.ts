@@ -1,4 +1,13 @@
 import type { locale } from '../../i18n'
+import { sportsDocs } from './featureDocs/sports'
+import { tieBreakersDocs } from './featureDocs/tieBreakers'
+import { swissDocs } from './featureDocs/swiss'
+import { groupsDocs } from './featureDocs/groups'
+import { eliminationDocs } from './featureDocs/elimination'
+import { doubleEliminationDocs } from './featureDocs/doubleElimination'
+import { placementDocs } from './featureDocs/placement'
+import { teamsDocs } from './featureDocs/teams'
+import { libraryDocs } from './featureDocs/library'
 
 export type DocContent = {
   text?: string[]
@@ -1130,4 +1139,27 @@ const de: DocPage[] = [
   },
 ]
 
-export const getDocs = (language: typeof locale) => (language === 'de' ? de : en)
+const featureDocs = [
+  sportsDocs,
+  tieBreakersDocs,
+  swissDocs,
+  groupsDocs,
+  eliminationDocs,
+  doubleEliminationDocs,
+  placementDocs,
+  teamsDocs,
+  libraryDocs,
+]
+
+// Feature pages are inserted before the limitations page.
+const withFeatureDocs = (pages: DocPage[], language: 'en' | 'de') => {
+  const extra = featureDocs.flatMap((docs) => docs[language])
+  const index = pages.findIndex((page) => page.slug === 'limitations')
+  return index < 0
+    ? [...pages, ...extra]
+    : [...pages.slice(0, index), ...extra, ...pages.slice(index)]
+}
+
+const docsByLanguage = { en: withFeatureDocs(en, 'en'), de: withFeatureDocs(de, 'de') }
+
+export const getDocs = (language: typeof locale) => docsByLanguage[language]
