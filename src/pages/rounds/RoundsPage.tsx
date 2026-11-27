@@ -10,7 +10,11 @@ import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
 import { t } from '../../i18n'
 import type { Match, Participant, Round } from '../../tournamentTypes'
-import { getRunningMatchIdsByRound, isUnknownParticipantId } from '../../tournament'
+import {
+  getRunningMatchIdsByRound,
+  isUnknownParticipantId,
+  type EvaluationContext,
+} from '../../tournament'
 import { useIdleRunningMatchScroll } from '../../hooks/useIdleRunningMatchScroll'
 import {
   createRound,
@@ -33,7 +37,7 @@ type Props = {
   record: (roundIndex: number, id: string) => string
   defaultCourtCount: number
   defaultWinningGames: number
-  defaultSetPoints: number
+  ctx: EvaluationContext
   onKeyboardMoveActiveChange: (active: boolean) => void
   readOnly?: boolean
 }
@@ -67,7 +71,7 @@ export const RoundsPage = memo(function RoundsPage({
   record,
   defaultCourtCount,
   defaultWinningGames,
-  defaultSetPoints,
+  ctx,
   onKeyboardMoveActiveChange,
   readOnly = false,
 }: Props) {
@@ -82,8 +86,8 @@ export const RoundsPage = memo(function RoundsPage({
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
   const runningMatchIdsByRound = useMemo(
-    () => getRunningMatchIdsByRound(rounds, defaultCourtCount),
-    [defaultCourtCount, rounds],
+    () => getRunningMatchIdsByRound(ctx.rules, rounds, defaultCourtCount),
+    [ctx.rules, defaultCourtCount, rounds],
   )
   const currentRoundNumber = getCurrentRoundNumber(rounds, runningMatchIdsByRound)
   const firstRunningMatchId = getFirstRunningMatchId(rounds, runningMatchIdsByRound)
@@ -257,7 +261,7 @@ export const RoundsPage = memo(function RoundsPage({
         players={players}
         rounds={rounds}
         defaultCourtCount={defaultCourtCount}
-        defaultSetPoints={defaultSetPoints}
+        ctx={ctx}
         name={name}
         onClose={() => setHistoryPlayerId(null)}
       />
@@ -266,7 +270,7 @@ export const RoundsPage = memo(function RoundsPage({
         roundIndex={comparisonSelection?.roundIndex ?? null}
         players={players}
         rounds={rounds}
-        defaultSetPoints={defaultSetPoints}
+        ctx={ctx}
         name={name}
         onClose={() => setComparisonSelection(null)}
       />

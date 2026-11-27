@@ -18,6 +18,7 @@ import { PlayerHistoryDialog } from '../../shared/PlayerHistoryDialog'
 import { PlayerNameEditor } from './PlayerNameEditor'
 import { t } from '../../i18n'
 import type { Participant, Round } from '../../tournamentTypes'
+import type { EvaluationContext } from '../../tournament'
 import {
   deleteParticipant,
   reorderParticipants,
@@ -27,6 +28,10 @@ import {
 import { useAppDispatch } from '../../storeHooks'
 
 export type Stat = Participant & {
+  wins: number
+  losses: number
+  scored: number
+  conceded: number
   diff: number
   points: number
   setsWon: number
@@ -39,7 +44,7 @@ type Props = {
   sorted: Stat[]
   players: Participant[]
   defaultCourtCount: number
-  defaultSetPoints: number
+  ctx: EvaluationContext
   participantLabel: string
   rounds: Round[]
   name: (id: string) => string
@@ -68,7 +73,7 @@ export function RankingsPage({
   sorted,
   players,
   defaultCourtCount,
-  defaultSetPoints,
+  ctx,
   participantLabel,
   rounds,
   name,
@@ -337,7 +342,7 @@ export function RankingsPage({
         players={players}
         rounds={rounds}
         defaultCourtCount={defaultCourtCount}
-        defaultSetPoints={defaultSetPoints}
+        ctx={ctx}
         name={name}
         onClose={() => setHistoryPlayer(null)}
       />

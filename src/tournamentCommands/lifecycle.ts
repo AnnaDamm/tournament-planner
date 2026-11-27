@@ -1,7 +1,9 @@
+import { buildPhaseContext, getActivePhase } from '../domain/phases/phaseState'
+import { getPhaseMode } from '../domain/phases/registry'
 import {
   assignCourtsToMatches,
   calculateExpectedMatchStarts,
-  createRoundPlan,
+  createEvaluationContext,
   startRoundInRounds,
   startReadyRounds,
 } from '../tournament'
@@ -20,11 +22,17 @@ export const deleteAllTournamentData = (): TournamentCommand => (dispatch) => {
 
 export const importTournamentSnapshot =
   (snapshot: TournamentSnapshot): TournamentCommand =>
-  (dispatch) => {
+  (dispatch, getState) => {
     dispatch(
       snapshotImported({
         ...snapshot,
-        rounds: startReadyRounds(snapshot.rounds, snapshot.courtCount),
+        // An import replaces the content of the active tournament, not its identity.
+        id: getState().tournament.id,
+        rounds: startReadyRounds(
+          createEvaluationContext(snapshot).rules,
+          snapshot.rounds,
+          snapshot.courtCount,
+        ),
       }),
     )
   }
@@ -39,28 +47,35 @@ export const startScheduledRound =
     )
       return
 
-    const plan = createRoundPlan(state.players, [], 1, undefined, state.defaultSetPoints)
+    const phase = getActivePhase(state)
+    const mode = getPhaseMode(phase.mode)
+    const p = buildPhaseContext(state, phase.id)
+    if (!mode || !p) return
     const existing = state.rounds[0]
-    const firstRound = existing
+    const base: Round = existing ?? {
+      number: 1,
+      phaseId: phase.id,
+      bye: null,
+      format: phase.format ?? state.scoring.format,
+      courtCount: state.courtCount,
+      matches: [],
+    }
+    const plan = mode.planRound(p, base)
+    const firstRound: Round = existing
       ? {
           ...existing,
           bye: plan.bye,
           matches: existing.matches.length ? existing.matches : plan.matches,
           standings: plan.standings,
         }
-      : {
-          number: 1,
-          bye: plan.bye,
-          winningGames: state.defaultWinningGames,
-          courtCount: state.courtCount,
-          matches: plan.matches,
-          standings: plan.standings,
-        }
+      : { ...base, bye: plan.bye, matches: plan.matches, standings: plan.standings }
     const rounds = existing ? [firstRound, ...state.rounds.slice(1)] : [firstRound]
+    const { rules } = p.ctx
     const startedAt = new Date(startAt).toISOString()
     dispatch(
       scheduledRoundStarted({
         rounds: assignCourtsToMatches(
+          rules,
           startRoundInRounds(rounds, 1, startedAt),
           state.courtCount,
           startedAt,

@@ -1,6 +1,14 @@
-import type { Participant, Round, TournamentSnapshot } from './tournamentTypes'
-import { parseTournamentSnapshot } from './tournamentSnapshot'
-import { startReadyRounds } from './tournament'
+import { createEvaluationContext } from './domain/evaluation'
+import { startReadyRounds } from './domain/schedule/courts'
+import {
+  createEmptyTournamentSnapshot,
+  getDefaultScheduledStart,
+  parseTournamentSnapshot,
+} from './domain/snapshot'
+import type { V1Participant, V1Round } from './domain/snapshot/v1'
+import type { TournamentSnapshot } from './domain/types'
+
+export { createEmptyTournamentSnapshot }
 
 export type StateRevision = {
   updatedAt: number
@@ -8,9 +16,16 @@ export type StateRevision = {
 }
 
 export type PersistedTournamentState = {
-  storageVersion: 1
+  storageVersion: 2
   snapshot: TournamentSnapshot
   revision: StateRevision
+}
+
+/** The library index: one entry per stored tournament, one of them active. */
+export type TournamentIndex = {
+  storageVersion: 2
+  activeId: string
+  items: Array<{ id: string; name: string; updatedAt: number }>
 }
 
 const legacyStorageKeys = [
@@ -28,7 +43,10 @@ const legacyStorageKeys = [
 
 const tabId = Math.random().toString(36).slice(2)
 const storagePrefix = `${import.meta.env.BASE_URL}:`
-const snapshotStorageKey = `${storagePrefix}tournament`
+// v1 key: kept untouched as a backup after the migration (an old cached app still reads it).
+const legacySnapshotStorageKey = `${storagePrefix}tournament`
+const indexStorageKey = `${storagePrefix}tournaments`
+const snapshotStorageKey = (id: string) => `${storagePrefix}tournament:${id}`
 const channel =
   typeof BroadcastChannel === 'function'
     ? new BroadcastChannel(`tourny-storage:${import.meta.env.BASE_URL}`)
@@ -56,8 +74,8 @@ const readLegacy = <T>(key: (typeof legacyStorageKeys)[number], fallback: T): T 
   return readJson(prefixedKey, fallback)
 }
 
-const loadLegacyParticipants = () => readLegacy<Participant[]>('players', [])
-const loadLegacyRounds = () => readLegacy<Round[]>('rounds', [])
+const loadLegacyParticipants = () => readLegacy<V1Participant[]>('players', [])
+const loadLegacyRounds = () => readLegacy<V1Round[]>('rounds', [])
 const loadLegacyCourtCount = () => {
   const value = readLegacy<number>('courtCount', 1)
   return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1
@@ -89,14 +107,7 @@ const loadLegacyScheduledStart = () => {
   return typeof value === 'string' ? value : ''
 }
 
-const getDefaultScheduledStart = () => {
-  const date = new Date()
-  date.setHours(date.getHours() + 1, 0, 0, 0)
-  const pad = (value: number) => String(value).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:00`
-}
-
-const createLegacySnapshot = (): TournamentSnapshot => {
+const createLegacySnapshot = () => {
   const rounds = loadLegacyRounds()
   const scheduledStart = loadLegacyScheduledStart()
   return {
@@ -117,42 +128,61 @@ const createLegacySnapshot = (): TournamentSnapshot => {
   }
 }
 
-export const createEmptyTournamentSnapshot = (isViewer = false): TournamentSnapshot => ({
-  version: 1,
-  tournamentName: 'Tourny',
-  players: [],
-  rounds: [],
-  participantType: 'players',
-  courtCount: 1,
-  defaultWinningGames: 1,
-  defaultSetPoints: 21,
-  expectedDurationMinutes: 25,
-  breakBetweenMatchesMinutes: 5,
-  scheduledStart: isViewer ? '' : getDefaultScheduledStart(),
+const withStartedRounds = (snapshot: TournamentSnapshot): TournamentSnapshot => ({
+  ...snapshot,
+  rounds: startReadyRounds(
+    createEvaluationContext(snapshot).rules,
+    snapshot.rounds,
+    snapshot.courtCount,
+  ),
 })
 
-const parseEnvelope = (value: unknown): PersistedTournamentState | null => {
+/** Accepts v2 envelopes and (for the backup key) v1 envelopes; the snapshot is migrated. */
+const parseEnvelope = (value: unknown, version: 1 | 2): PersistedTournamentState | null => {
   if (!value || typeof value !== 'object') return null
-  const envelope = value as Partial<PersistedTournamentState>
+  const envelope = value as Partial<PersistedTournamentState> & { storageVersion?: number }
   const snapshot = parseTournamentSnapshot(envelope.snapshot)
   const revision = envelope.revision
   if (
-    envelope.storageVersion !== 1 ||
+    envelope.storageVersion !== version ||
     !snapshot ||
     !revision ||
     !Number.isFinite(revision.updatedAt) ||
     typeof revision.source !== 'string'
   )
     return null
-  return {
-    storageVersion: 1,
-    snapshot: { ...snapshot, rounds: startReadyRounds(snapshot.rounds, snapshot.courtCount) },
-    revision,
+  return { storageVersion: 2, snapshot: withStartedRounds(snapshot), revision }
+}
+
+const readIndex = (): TournamentIndex | null => {
+  const value = readJson<Partial<TournamentIndex> | null>(indexStorageKey, null)
+  if (!value || value.storageVersion !== 2 || typeof value.activeId !== 'string') return null
+  if (!Array.isArray(value.items)) return null
+  return value as TournamentIndex
+}
+
+const writeIndex = (index: TournamentIndex) => {
+  try {
+    localStorage.setItem(indexStorageKey, JSON.stringify(index))
+  } catch {
+    // Storage may be full or unavailable; the in-memory state keeps working.
   }
 }
 
-const readPersistedState = (): PersistedTournamentState | null =>
-  parseEnvelope(readJson<unknown>(snapshotStorageKey, null))
+const upsertIndexItem = (
+  index: TournamentIndex | null,
+  snapshot: TournamentSnapshot,
+): TournamentIndex => {
+  const item = { id: snapshot.id, name: snapshot.tournamentName, updatedAt: Date.now() }
+  const items = index?.items ?? []
+  return {
+    storageVersion: 2,
+    activeId: index?.activeId ?? snapshot.id,
+    items: items.some((entry) => entry.id === snapshot.id)
+      ? items.map((entry) => (entry.id === snapshot.id ? item : entry))
+      : [...items, item],
+  }
+}
 
 const removeLegacyKeys = () => {
   for (const key of legacyStorageKeys) {
@@ -163,43 +193,71 @@ const removeLegacyKeys = () => {
 
 const writeEnvelope = (value: PersistedTournamentState, broadcast: boolean) => {
   try {
-    localStorage.setItem(snapshotStorageKey, JSON.stringify(value))
+    localStorage.setItem(snapshotStorageKey(value.snapshot.id), JSON.stringify(value))
+    writeIndex(upsertIndexItem(readIndex(), value.snapshot))
   } catch {
     return
   }
-  if (broadcast) channel?.postMessage(value)
+  if (broadcast) channel?.postMessage({ tournamentId: value.snapshot.id, ...value })
+}
+
+const activate = (state: PersistedTournamentState) => {
+  const index = upsertIndexItem(readIndex(), state.snapshot)
+  writeIndex({ ...index, activeId: state.snapshot.id })
+  return state
+}
+
+const createFreshState = (snapshot: TournamentSnapshot, source: string) => {
+  const state: PersistedTournamentState = {
+    storageVersion: 2,
+    snapshot: withStartedRounds(snapshot),
+    revision: { updatedAt: Date.now(), source },
+  }
+  writeEnvelope(state, false)
+  return activate(state)
+}
+
+const migrateFromV1 = (): PersistedTournamentState => {
+  const rawV1 = localStorage.getItem(legacySnapshotStorageKey)
+  const v1State =
+    rawV1 === null ? null : parseEnvelope(readJson<unknown>(legacySnapshotStorageKey, null), 1)
+  if (v1State) return createFreshState(v1State.snapshot, 'migration')
+  if (rawV1 !== null) {
+    // The key exists but cannot be read: never overwrite it, continue with a new tournament.
+    console.error('The stored tournament could not be read; starting a new tournament.')
+    return createFreshState(createEmptyTournamentSnapshot(), 'recovery')
+  }
+
+  const legacy = parseTournamentSnapshot(createLegacySnapshot())
+  const state = createFreshState(legacy ?? createEmptyTournamentSnapshot(), 'migration')
+  removeLegacyKeys()
+  return state
 }
 
 export const loadTournamentState = (isViewer = false): PersistedTournamentState => {
   if (isViewer) {
     return {
-      storageVersion: 1,
+      storageVersion: 2,
       snapshot: createEmptyTournamentSnapshot(true),
       revision: { updatedAt: 0, source: '' },
     }
   }
 
-  const persisted = readPersistedState()
+  const index = readIndex()
+  if (!index) return migrateFromV1()
+  const raw = localStorage.getItem(snapshotStorageKey(index.activeId))
+  const persisted = parseEnvelope(readJson<unknown>(snapshotStorageKey(index.activeId), null), 2)
   if (persisted) return persisted
-
-  const parsedLegacy = parseTournamentSnapshot(createLegacySnapshot())
-  const migrated = {
-    storageVersion: 1 as const,
-    snapshot: parsedLegacy
-      ? { ...parsedLegacy, rounds: startReadyRounds(parsedLegacy.rounds, parsedLegacy.courtCount) }
-      : createEmptyTournamentSnapshot(),
-    revision: { updatedAt: Date.now(), source: 'migration' },
-  }
-  writeEnvelope(migrated, false)
-  removeLegacyKeys()
-  return migrated
+  if (raw !== null)
+    console.error('The stored tournament could not be read; starting a new tournament.')
+  return createFreshState(createEmptyTournamentSnapshot(), 'recovery')
 }
 
 export const persistTournamentState = (
   snapshot: TournamentSnapshot,
   revision: StateRevision,
   broadcast = true,
-) => writeEnvelope({ storageVersion: 1, snapshot, revision }, broadcast)
+) => writeEnvelope({ storageVersion: 2, snapshot, revision }, broadcast)
 
 export const createNextRevision = (previous: StateRevision): StateRevision => ({
   updatedAt: Math.max(Date.now(), previous.updatedAt + 1),
@@ -210,15 +268,21 @@ export const isNewerRevision = (candidate: StateRevision, current: StateRevision
   candidate.updatedAt > current.updatedAt ||
   (candidate.updatedAt === current.updatedAt && candidate.source > current.source)
 
-export const subscribeToTournamentState = (listener: (state: PersistedTournamentState) => void) => {
+/** Notifies about changes of one stored tournament; other tournaments are ignored. */
+export const subscribeToTournamentState = (
+  tournamentId: string,
+  listener: (state: PersistedTournamentState) => void,
+) => {
   const handleMessage = (event: MessageEvent<unknown>) => {
-    const state = parseEnvelope(event.data)
+    const data = event.data as { tournamentId?: string } | null
+    if (data?.tournamentId !== tournamentId) return
+    const state = parseEnvelope(event.data, 2)
     if (state && state.revision.source !== tabId) listener(state)
   }
   const handleStorage = (event: StorageEvent) => {
-    if (event.key !== snapshotStorageKey || !event.newValue) return
+    if (event.key !== snapshotStorageKey(tournamentId) || !event.newValue) return
     try {
-      const state = parseEnvelope(JSON.parse(event.newValue))
+      const state = parseEnvelope(JSON.parse(event.newValue), 2)
       if (state) listener(state)
     } catch {
       // Invalid external storage values are ignored.

@@ -1,22 +1,20 @@
+import type { ScoringRules } from './domain/scoring/types'
 import type { Participant, Round } from './tournamentTypes'
-import { hasEnteredScore, isRoundComplete, startReadyRounds } from './tournament'
+import { createId, hasEnteredScore, isRoundComplete, startReadyRounds } from './tournament'
 
-export const createParticipant = (name: string): Participant => ({
-  id: Math.random().toString(36).slice(2, 9),
-  name,
-  wins: 0,
-  losses: 0,
-  scored: 0,
-  conceded: 0,
-})
+export const createParticipant = (name: string): Participant => ({ id: createId(), name })
 
 export const toggleParticipantWithdrawal = (players: Participant[], id: string) =>
   players.map((player) => (player.id === id ? { ...player, withdrawn: !player.withdrawn } : player))
 
-export const updateRoundsForCourtCount = (rounds: Round[], courtCount: number) =>
-  startReadyRounds(rounds, courtCount)
+export const updateRoundsForCourtCount = (
+  rules: ScoringRules,
+  rounds: Round[],
+  courtCount: number,
+) => startReadyRounds(rules, rounds, courtCount)
 
 export const swapRoundPlayers = (
+  rules: ScoringRules,
   rounds: Round[],
   roundIndex: number,
   draggedId: string,
@@ -25,7 +23,7 @@ export const swapRoundPlayers = (
   if (!draggedId || draggedId === targetId) return rounds
   return rounds.map((round, index) => {
     if (index !== roundIndex) return round
-    if (isRoundComplete(round)) return round
+    if (isRoundComplete(rules, round)) return round
     if (rounds[roundIndex + 1]?.startedAt && (round.bye === draggedId || round.bye === targetId))
       return round
     const draggedMatch = round.matches.find(

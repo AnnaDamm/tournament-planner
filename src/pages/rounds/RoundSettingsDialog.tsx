@@ -26,7 +26,7 @@ export function RoundSettingsDialog({
 }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [winningGames, setWinningGames] = useState(
-    String(round?.winningGames ?? defaultWinningGames),
+    String(round?.format.winningGames ?? defaultWinningGames),
   )
   const [courtCount, setCourtCount] = useState(String(round?.courtCount ?? defaultCourtCount))
   const close = () => {

@@ -1,9 +1,16 @@
 import {
+  applyPhaseResolution,
+  buildPhaseContext,
+  fillUnknownInSnapshot,
+  getActivePhase,
+  rerollByeInSnapshot,
+  rerollRoundInSnapshot,
+} from '../domain/phases/phaseState'
+import { getPhaseMode } from '../domain/phases/registry'
+import {
   assignCourtsToMatches,
-  fillUnknownRound,
-  getMatchResult,
-  rerollBye,
-  rerollRound,
+  createEvaluationContext,
+  getRoundMatchResult,
   startReadyRounds,
   startRoundInRounds,
 } from '../tournament'
@@ -18,75 +25,64 @@ import {
   roundStarted,
   roundUnknownParticipantsFilled,
 } from '../tournamentSlice'
-import type { Match, Participant, Round } from '../tournamentTypes'
+import type { RootState } from '../store'
+import type { Match, Round } from '../tournamentTypes'
 import { swapRoundPlayers } from '../tournamentActions'
 import type { TournamentCommand } from './types'
 
-const updateRoundSettings = (
+type State = RootState['tournament']
+
+/** Lets phases resolve dependent matches (no-op for Swiss), then starts rounds that became ready. */
+const finishRoundChange = (
+  state: State,
   rounds: Round[],
+  courtCount = state.courtCount,
+  startedAt?: string,
+) => {
+  const resolved = applyPhaseResolution({ ...state, rounds })
+  return startReadyRounds(
+    createEvaluationContext(state).rules,
+    resolved.rounds,
+    courtCount,
+    startedAt,
+  )
+}
+
+const updateRoundSettings = (
+  state: State,
   number: number,
   winningGames: number,
   courtCount: number,
-  defaultCourtCount: number,
 ) =>
-  startReadyRounds(
-    rounds.map((round) =>
-      round.number === number ? { ...round, winningGames, courtCount } : round,
+  finishRoundChange(
+    state,
+    state.rounds.map((round) =>
+      round.number === number
+        ? { ...round, format: { ...round.format, winningGames }, courtCount }
+        : round,
     ),
-    defaultCourtCount,
   )
 
-const deleteRoundAndStartReadyRounds = (rounds: Round[], number: number, courtCount: number) =>
-  startReadyRounds(
-    rounds
+const deleteRoundAndStartReadyRounds = (state: State, number: number) =>
+  finishRoundChange(
+    state,
+    state.rounds
       .filter((round) => round.number !== number)
       .map((round) => (round.number > number ? { ...round, number: round.number - 1 } : round)),
-    courtCount,
   )
-
-const rerollRoundAndStartReadyRounds = (
-  players: Participant[],
-  rounds: Round[],
-  number: number,
-  courtCount: number,
-  defaultSetPoints: number,
-) => startReadyRounds(rerollRound(players, rounds, number, defaultSetPoints), courtCount)
-
-const rerollByeAndStartReadyRounds = (
-  players: Participant[],
-  rounds: Round[],
-  number: number,
-  courtCount: number,
-  defaultSetPoints: number,
-) => startReadyRounds(rerollBye(players, rounds, number, defaultSetPoints), courtCount)
-
-const fillRoundAndStartReadyRounds = (
-  rounds: Round[],
-  number: number,
-  players: Participant[],
-  courtCount: number,
-  defaultSetPoints: number,
-) => {
-  const index = rounds.findIndex((round) => round.number === number)
-  if (index < 0) return rounds
-  const filled = fillUnknownRound(rounds[index], players, rounds.slice(0, index), defaultSetPoints)
-  return startReadyRounds(
-    rounds.map((round, roundIndex) => (roundIndex === index ? filled : round)),
-    courtCount,
-  )
-}
 
 export const createRound = (): TournamentCommand => (dispatch, getState) => {
   const state = getState().tournament
   if (state.players.filter((player) => !player.withdrawn).length < 2) return
-  const previousRound = state.rounds.at(-1)
+  const phase = getActivePhase(state)
+  const mode = getPhaseMode(phase.mode)
+  const p = buildPhaseContext(state, phase.id)
+  const created = p && mode?.createRound?.(p, state.rounds.length + 1)
+  if (!created) return
   dispatch(
     roundCreated({
-      number: state.rounds.length + 1,
-      bye: null,
-      winningGames: previousRound?.winningGames ?? state.defaultWinningGames,
-      courtCount: previousRound?.courtCount ?? state.courtCount,
-      matches: [],
+      ...created,
+      courtCount: state.rounds.at(-1)?.courtCount ?? state.courtCount,
     }),
   )
 }
@@ -97,7 +93,11 @@ export const startRound =
     const state = getState().tournament
     dispatch(
       roundStarted(
-        assignCourtsToMatches(startRoundInRounds(state.rounds, number), state.courtCount),
+        assignCourtsToMatches(
+          createEvaluationContext(state).rules,
+          startRoundInRounds(state.rounds, number),
+          state.courtCount,
+        ),
       ),
     )
   }
@@ -107,20 +107,22 @@ export const updateRoundMatches =
   (dispatch, getState) => {
     const state = getState().tournament
     const previousMatches = state.rounds[index]?.matches ?? []
+    const ctx = createEvaluationContext(state)
+    const round = state.rounds[index]
     const completedMatch = matches.some((match) => {
       const previousMatch = previousMatches.find((item) => item.id === match.id)
-      const winningGames = Math.max(1, state.rounds[index]?.winningGames || 1)
       return (
-        getMatchResult(match, winningGames) && !getMatchResult(previousMatch ?? match, winningGames)
+        round &&
+        getRoundMatchResult(ctx, round, match) &&
+        !getRoundMatchResult(ctx, round, previousMatch ?? match)
       )
     })
     const nextStart = new Date(
       Date.now() + (completedMatch ? state.breakBetweenMatchesMinutes * 60_000 : 0),
     ).toISOString()
-    const rounds = startReadyRounds(
-      state.rounds.map((round, roundIndex) =>
-        roundIndex === index ? { ...round, matches } : round,
-      ),
+    const rounds = finishRoundChange(
+      state,
+      state.rounds.map((item, roundIndex) => (roundIndex === index ? { ...item, matches } : item)),
       state.courtCount,
       nextStart,
     )
@@ -142,18 +144,14 @@ export const setRoundSettings =
   (number: number, winningGames: number, courtCount: number): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(
-      roundSettingsChanged(
-        updateRoundSettings(state.rounds, number, winningGames, courtCount, state.courtCount),
-      ),
-    )
+    dispatch(roundSettingsChanged(updateRoundSettings(state, number, winningGames, courtCount)))
   }
 
 export const deleteRound =
   (number: number): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(roundDeleted(deleteRoundAndStartReadyRounds(state.rounds, number, state.courtCount)))
+    dispatch(roundDeleted(deleteRoundAndStartReadyRounds(state, number)))
   }
 
 export const fillUnknown =
@@ -162,13 +160,7 @@ export const fillUnknown =
     const state = getState().tournament
     dispatch(
       roundUnknownParticipantsFilled(
-        fillRoundAndStartReadyRounds(
-          state.rounds,
-          number,
-          state.players,
-          state.courtCount,
-          state.defaultSetPoints,
-        ),
+        finishRoundChange(state, fillUnknownInSnapshot(state, number)),
       ),
     )
   }
@@ -177,39 +169,29 @@ export const reroll =
   (number: number): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(
-      roundRerolled(
-        rerollRoundAndStartReadyRounds(
-          state.players,
-          state.rounds,
-          number,
-          state.courtCount,
-          state.defaultSetPoints,
-        ),
-      ),
-    )
+    dispatch(roundRerolled(finishRoundChange(state, rerollRoundInSnapshot(state, number))))
   }
 
 export const rerollByeCommand =
   (number: number): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(
-      roundByeRerolled(
-        rerollByeAndStartReadyRounds(
-          state.players,
-          state.rounds,
-          number,
-          state.courtCount,
-          state.defaultSetPoints,
-        ),
-      ),
-    )
+    dispatch(roundByeRerolled(finishRoundChange(state, rerollByeInSnapshot(state, number))))
   }
 
 export const swapPlayers =
   (roundIndex: number, draggedId: string, targetId: string): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    dispatch(roundPlayersSwapped(swapRoundPlayers(state.rounds, roundIndex, draggedId, targetId)))
+    dispatch(
+      roundPlayersSwapped(
+        swapRoundPlayers(
+          createEvaluationContext(state).rules,
+          state.rounds,
+          roundIndex,
+          draggedId,
+          targetId,
+        ),
+      ),
+    )
   }
