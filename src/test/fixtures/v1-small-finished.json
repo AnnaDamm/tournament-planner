@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "defaultSetPoints": 21,
+  "expectedDurationMinutes": 25,
+  "breakBetweenMatchesMinutes": 5,
+  "scheduledStart": "2026-01-01T10:00",
+  "tournamentName": "Small Cup",
+  "participantType": "players",
+  "courtCount": 1,
+  "defaultWinningGames": 2,
+  "players": [
+    {
+      "id": "p1",
+      "name": "Player A",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p2",
+      "name": "Player B",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p3",
+      "name": "Player C",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p4",
+      "name": "Player D",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    }
+  ],
+  "rounds": [
+    {
+      "number": 1,
+      "winningGames": 2,
+      "bye": null,
+      "matches": [
+        {
+          "id": "1-0-4vssbc",
+          "a": "p1",
+          "b": "p3",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            }
+          ]
+        },
+        {
+          "id": "1-1-rj6llb",
+          "a": "p2",
+          "b": "p4",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "21",
+              "b": "9"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            }
+          ]
+        }
+      ],
+      "standings": [
+        {
+          "id": "p1",
+          "name": "Player A",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p1",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p2",
+          "name": "Player B",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p2",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p3",
+          "name": "Player C",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p3",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p4",
+          "name": "Player D",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p4",
+          "setsWon": 0,
+          "setsLost": 0
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "number": 2,
+      "winningGames": 2,
+      "bye": null,
+      "matches": [
+        {
+          "id": "2-0-jgmmd6",
+          "a": "p2",
+          "b": "p1",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            }
+          ]
+        },
+        {
+          "id": "2-1-n5cknp",
+          "a": "p3",
+          "b": "p4",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "21",
+              "b": "19"
+            },
+            {
+              "a": "9",
+              "b": "21"
+            },
+            {
+              "a": "10",
+              "b": "21"
+            }
+          ]
+        }
+      ],
+      "standings": [
+        {
+          "id": "p1",
+          "name": "Player A",
+          "wins": 1,
+          "losses": 0,
+          "scored": 61,
+          "conceded": 38,
+          "participantId": "p1",
+          "setsWon": 2,
+          "setsLost": 1
+        },
+        {
+          "id": "p2",
+          "name": "Player B",
+          "wins": 1,
+          "losses": 0,
+          "scored": 42,
+          "conceded": 19,
+          "participantId": "p2",
+          "setsWon": 2,
+          "setsLost": 0
+        },
+        {
+          "id": "p3",
+          "name": "Player C",
+          "wins": 0,
+          "losses": 1,
+          "scored": 38,
+          "conceded": 61,
+          "participantId": "p3",
+          "setsWon": 1,
+          "setsLost": 2
+        },
+        {
+          "id": "p4",
+          "name": "Player D",
+          "wins": 0,
+          "losses": 1,
+          "scored": 19,
+          "conceded": 42,
+          "participantId": "p4",
+          "setsWon": 0,
+          "setsLost": 2
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "number": 3,
+      "winningGames": 2,
+      "bye": null,
+      "matches": [
+        {
+          "id": "3-0-dtroja",
+          "a": "p2",
+          "b": "p3",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "21",
+              "b": "19"
+            },
+            {
+              "a": "8",
+              "b": "21"
+            },
+            {
+              "a": "9",
+              "b": "21"
+            }
+          ]
+        },
+        {
+          "id": "3-1-oyl9dj",
+          "a": "p1",
+          "b": "p4",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "21",
+              "b": "9"
+            },
+            {
+              "a": "21",
+              "b": "10"
+            }
+          ]
+        }
+      ],
+      "standings": [
+        {
+          "id": "p1",
+          "name": "Player A",
+          "wins": 1,
+          "losses": 1,
+          "scored": 78,
+          "conceded": 80,
+          "participantId": "p1",
+          "setsWon": 2,
+          "setsLost": 3
+        },
+        {
+          "id": "p2",
+          "name": "Player B",
+          "wins": 2,
+          "losses": 0,
+          "scored": 84,
+          "conceded": 36,
+          "participantId": "p2",
+          "setsWon": 4,
+          "setsLost": 0
+        },
+        {
+          "id": "p3",
+          "name": "Player C",
+          "wins": 0,
+          "losses": 2,
+          "scored": 78,
+          "conceded": 122,
+          "participantId": "p3",
+          "setsWon": 2,
+          "setsLost": 4
+        },
+        {
+          "id": "p4",
+          "name": "Player D",
+          "wins": 1,
+          "losses": 1,
+          "scored": 80,
+          "conceded": 82,
+          "participantId": "p4",
+          "setsWon": 2,
+          "setsLost": 3
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z"
+    }
+  ]
+}
