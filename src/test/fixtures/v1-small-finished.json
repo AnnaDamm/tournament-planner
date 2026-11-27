@@ -1,9 +1,9 @@
 {
   "version": 1,
   "defaultSetPoints": 21,
-  "expectedDurationMinutes": 25,
-  "breakBetweenMatchesMinutes": 5,
   "scheduledStart": "2026-01-01T10:00",
+  "breakBetweenMatchesMinutes": 5,
+  "expectedDurationMinutes": 25,
   "tournamentName": "Small Cup",
   "participantType": "players",
   "courtCount": 1,
@@ -49,7 +49,7 @@
       "bye": null,
       "matches": [
         {
-          "id": "1-0-4vssbc",
+          "id": "1-0-mkorf9",
           "a": "p1",
           "b": "p3",
           "scoreA": "",
@@ -70,7 +70,7 @@
           ]
         },
         {
-          "id": "1-1-rj6llb",
+          "id": "1-1-03jmyl",
           "a": "p2",
           "b": "p4",
           "scoreA": "",
@@ -141,7 +141,7 @@
       "bye": null,
       "matches": [
         {
-          "id": "2-0-jgmmd6",
+          "id": "2-0-izkkhj",
           "a": "p2",
           "b": "p1",
           "scoreA": "",
@@ -158,7 +158,7 @@
           ]
         },
         {
-          "id": "2-1-n5cknp",
+          "id": "2-1-zbfwwg",
           "a": "p3",
           "b": "p4",
           "scoreA": "",
@@ -233,7 +233,7 @@
       "bye": null,
       "matches": [
         {
-          "id": "3-0-dtroja",
+          "id": "3-0-yv0n0f",
           "a": "p2",
           "b": "p3",
           "scoreA": "",
@@ -254,7 +254,7 @@
           ]
         },
         {
-          "id": "3-1-oyl9dj",
+          "id": "3-1-a4b5xv",
           "a": "p1",
           "b": "p4",
           "scoreA": "",

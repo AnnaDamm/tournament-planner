@@ -17,6 +17,7 @@ import {
   sortStats,
   startReadyRounds,
   type Participant,
+  type RankingParticipant,
   type Round,
 } from '../../test/legacyApi'
 import { makePlayers, match, player, round } from '../../test/fixtures'
@@ -24,6 +25,7 @@ import {
   projectCourts,
   projectPredictedStarts,
   projectRanking,
+  projectRoundStandings,
   projectRound,
   projectRounds,
   projectStartedAt,
@@ -52,6 +54,7 @@ describe('createRoundPlan', () => {
   it.each([4, 5, 8, 9])('plans five rounds for %i players', (count) => {
     const rounds = simulate(makePlayers(count), 5, { seed: 7 })
     expect(projectRounds(rounds)).toMatchSnapshot()
+    expect(projectRoundStandings(rounds)).toMatchSnapshot('stored standings')
   })
 
   it.each([1, 3])('plans with winningGames %i', (winningGames) => {
@@ -118,14 +121,15 @@ describe('rerollRound and rerollBye', () => {
     const rounds = simulate(players, 3, { seed: 9, playedRounds: 2 })
     const rerolled = withSeed(21, () => rerollRound(players, rounds, 3))
     expect(projectRound(rerolled[2])).toMatchSnapshot()
-    expect(rerolled[1]).toBe(rounds[1])
+    expect(projectRound(rerolled[1])).toEqual(projectRound(rounds[1]))
+    expect(projectRound(rerolled[0])).toEqual(projectRound(rounds[0]))
   })
 
   it('does not reroll a round with entered scores', () => {
     const players = makePlayers(8)
     const rounds = simulate(players, 2, { seed: 9 })
-    expect(rerollRound(players, rounds, 2)).toBe(rounds)
-    expect(rerollRound(players, rounds, 99)).toBe(rounds)
+    expect(projectRounds(rerollRound(players, rounds, 2))).toEqual(projectRounds(rounds))
+    expect(projectRounds(rerollRound(players, rounds, 99))).toEqual(projectRounds(rounds))
   })
 
   it('rerolls the bye of an odd field', () => {
@@ -139,7 +143,7 @@ describe('rerollRound and rerollBye', () => {
   it('does not reroll the bye for an even field', () => {
     const players = makePlayers(4)
     const rounds = simulate(players, 2, { seed: 13, playedRounds: 1 })
-    expect(rerollBye(players, rounds, 2)).toBe(rounds)
+    expect(projectRounds(rerollBye(players, rounds, 2))).toEqual(projectRounds(rounds))
   })
 })
 
@@ -230,6 +234,72 @@ describe('standings and ranking', () => {
     )
     expect(result).toMatchSnapshot()
   })
+  it('credits a fractional default set point count to the bye with Math.floor', () => {
+    const players = makePlayers(5)
+    const rounds = simulate(players, 3, { seed: 17, playedRounds: 2, setPoints: 15 })
+    expect(projectRanking(calculateStandings(players, rounds, 15.9))).toMatchSnapshot('standings')
+    expect(
+      calculateStandingsBeforeRounds(players, rounds, 15.9).map(projectRanking),
+    ).toMatchSnapshot('before rounds')
+    expect(rankingOf(players, rounds, 15.9)).toMatchSnapshot('ranking')
+  })
+
+  it('simulates rounds with different winningGames', () => {
+    const players = makePlayers(6)
+    const rounds = simulate(players, 3, { seed: 19, winningGamesByRound: [1, 3, 2] })
+    expect(rounds.map((item) => item.winningGames)).toEqual([1, 3, 2])
+    expect(projectRounds(rounds)).toMatchSnapshot('rounds')
+    expect(projectRanking(calculateStandings(players, rounds))).toMatchSnapshot('standings')
+    expect(rankingOf(players, rounds)).toMatchSnapshot('ranking')
+    expect(projectRoundStandings(rounds)).toMatchSnapshot('stored standings')
+  })
+
+  describe('tie-breakers after the last loss', () => {
+    const base = {
+      wins: 2,
+      losses: 1,
+      setsWon: 4,
+      setsLost: 2,
+      scored: 80,
+      conceded: 50,
+      lastLossRound: 1,
+    }
+    const rp = (id: string, name: string, extra: Partial<RankingParticipant> = {}) =>
+      ({ ...player(id, name), ...base, ...extra }) as RankingParticipant
+
+    // Each pair differs in exactly one field; "better" must always sort first.
+    const cases: Array<[string, Partial<RankingParticipant>, Partial<RankingParticipant>]> = [
+      ['wins', { wins: 3 }, {}],
+      ['lastLossRound: none beats a loss', { lastLossRound: 0 }, {}],
+      ['lastLossRound: later loss beats earlier', { lastLossRound: 3 }, { lastLossRound: 2 }],
+      ['setsWon', { setsWon: 5 }, {}],
+      ['setsLost', { setsLost: 1 }, {}],
+      ['scored', { scored: 81 }, {}],
+      ['conceded', { conceded: 49 }, {}],
+    ]
+
+    it.each(cases)('%s', (_name, better, worse) => {
+      // Names are reversed so a name fallback would produce the opposite order.
+      const winner = rp('good', 'Zed', better)
+      const loser = rp('bad', 'Abe', worse)
+      expect({
+        goodVsBad: Math.sign(compareRankingParticipants(winner, loser)),
+        badVsGood: Math.sign(compareRankingParticipants(loser, winner)),
+        sorted: [loser, winner].sort(compareRankingParticipants).map((item) => item.id),
+      }).toMatchSnapshot()
+    })
+
+    it('falls back to the name on a full tie', () => {
+      const first = rp('x', 'Abe')
+      const second = rp('y', 'Zed')
+      expect({
+        firstVsSecond: Math.sign(compareRankingParticipants(first, second)),
+        secondVsFirst: Math.sign(compareRankingParticipants(second, first)),
+        sorted: [second, first].sort(compareRankingParticipants).map((item) => item.id),
+        identical: compareRankingParticipants(first, { ...first }),
+      }).toMatchSnapshot()
+    })
+  })
 })
 
 describe('match results', () => {
@@ -311,7 +381,9 @@ describe('courts and schedule', () => {
   it('keeps already assigned courts stable', () => {
     const { rounds } = scenario(3)
     const first = startReadyRounds(rounds, 3, FIXED_START)
-    expect(startReadyRounds(first, 3, '2026-01-01T12:00:00.000Z')).toBe(first)
+    const again = startReadyRounds(first, 3, '2026-01-01T12:00:00.000Z')
+    expect(projectStartedAt(again)).toEqual(projectStartedAt(first))
+    expect(projectCourts(again)).toEqual(projectCourts(first))
   })
 
   it.each([1, 3])('calculateExpectedMatchStarts with %i courts', (courts) => {
@@ -326,6 +398,37 @@ describe('courts and schedule', () => {
     )
     expect(projectPredictedStarts(scheduled)).toMatchSnapshot()
     expect(scheduled.map((item) => item.predictedStart ?? null)).toMatchSnapshot('rounds')
+  })
+
+  describe('partially scored matches get courts first', () => {
+    // Round one is started with one set entered in its last match; the other matches are unscored.
+    const partial = () => {
+      const players = makePlayers(8)
+      const [first, second] = simulate(players, 2, {
+        seed: 31,
+        playedRounds: 0,
+        startRounds: false,
+      })
+      const last = first.matches.length - 1
+      const withSet: Round = {
+        ...first,
+        startedAt: FIXED_START,
+        matches: first.matches.map((item, index) =>
+          index === last ? { ...item, sets: [{ a: '21', b: '15' }] } : item,
+        ),
+      }
+      return [withSet, second]
+    }
+
+    it.each([1, 3])('assignCourtsToMatches with %i courts', (courts) => {
+      expect(projectCourts(assignCourtsToMatches(partial(), courts, FIXED_START))).toMatchSnapshot()
+    })
+
+    it.each([1, 3])('startReadyRounds with %i courts', (courts) => {
+      const started = startReadyRounds(partial(), courts, FIXED_START)
+      expect(projectStartedAt(started)).toMatchSnapshot('started')
+      expect(projectCourts(started)).toMatchSnapshot('courts')
+    })
   })
 
   it('does not predict without a start time', () => {

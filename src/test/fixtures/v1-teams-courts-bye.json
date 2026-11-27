@@ -1,9 +1,9 @@
 {
   "version": 1,
   "defaultSetPoints": 21,
-  "expectedDurationMinutes": 30,
-  "breakBetweenMatchesMinutes": 5,
   "scheduledStart": "2026-01-01T10:00",
+  "breakBetweenMatchesMinutes": 5,
+  "expectedDurationMinutes": 30,
   "tournamentName": "Team Cup",
   "participantType": "teams",
   "courtCount": 3,
@@ -70,12 +70,12 @@
     {
       "number": 1,
       "winningGames": 3,
-      "bye": "t3",
+      "bye": "t5",
       "matches": [
         {
-          "id": "1-0-y2t5hu",
+          "id": "1-0-rth3yr",
           "a": "t1",
-          "b": "t5",
+          "b": "t4",
           "scoreA": "",
           "scoreB": "",
           "sets": [
@@ -99,7 +99,7 @@
           "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "1-1-4sxvxz",
+          "id": "1-1-7wt9gu",
           "a": "t2",
           "b": "t6",
           "scoreA": "",
@@ -129,8 +129,8 @@
           "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "1-2-vt61ii",
-          "a": "t4",
+          "id": "1-2-mfn14c",
+          "a": "t3",
           "b": "t7",
           "scoreA": "",
           "scoreB": "",
@@ -236,10 +236,10 @@
     {
       "number": 2,
       "winningGames": 3,
-      "bye": "t4",
+      "bye": "t3",
       "matches": [
         {
-          "id": "2-0-bo7h7i",
+          "id": "2-0-32c5sz",
           "a": "t7",
           "b": "t1",
           "scoreA": "",
@@ -266,12 +266,12 @@
               "b": "10"
             }
           ],
-          "predictedStart": "2026-01-01T10:35:00.000Z"
+          "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "2-1-7k0rjk",
+          "id": "2-1-lbg1ph",
           "a": "t2",
-          "b": "t3",
+          "b": "t5",
           "scoreA": "",
           "scoreB": "",
           "sets": [
@@ -288,12 +288,12 @@
               "b": "21"
             }
           ],
-          "predictedStart": "2026-01-01T10:35:00.000Z"
+          "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "2-2-h51asn",
+          "id": "2-2-px9394",
           "a": "t6",
-          "b": "t5",
+          "b": "t4",
           "scoreA": "",
           "scoreB": "",
           "sets": [
@@ -314,7 +314,7 @@
               "b": "12"
             }
           ],
-          "predictedStart": "2026-01-01T10:35:00.000Z"
+          "predictedStart": "2026-01-01T10:00:00.000Z"
         }
       ],
       "standings": [
@@ -344,34 +344,34 @@
           "id": "t3",
           "name": "Team Cobras",
           "wins": 0,
-          "losses": 0,
-          "scored": 0,
-          "conceded": 0,
+          "losses": 1,
+          "scored": 33,
+          "conceded": 63,
           "participantId": "t3",
           "setsWon": 0,
-          "setsLost": 0
+          "setsLost": 3
         },
         {
           "id": "t4",
           "name": "Team Dragons",
           "wins": 0,
           "losses": 1,
-          "scored": 33,
-          "conceded": 63,
+          "scored": 48,
+          "conceded": 82,
           "participantId": "t4",
-          "setsWon": 0,
+          "setsWon": 1,
           "setsLost": 3
         },
         {
           "id": "t5",
           "name": "Team Eagles",
           "wins": 0,
-          "losses": 1,
-          "scored": 48,
-          "conceded": 82,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
           "participantId": "t5",
-          "setsWon": 1,
-          "setsLost": 3
+          "setsWon": 0,
+          "setsLost": 0
         },
         {
           "id": "t6",
@@ -396,17 +396,18 @@
           "setsLost": 0
         }
       ],
-      "predictedStart": "2026-01-01T10:35:00.000Z"
+      "startedAt": "2026-01-01T10:00:00.000Z",
+      "predictedStart": "2026-01-01T10:00:00.000Z"
     },
     {
       "number": 3,
       "winningGames": 3,
-      "bye": "t5",
+      "bye": "t4",
       "matches": [
         {
-          "id": "3-0-0ytagi",
+          "id": "3-0-ghpb5x",
           "a": "t7",
-          "b": "t3",
+          "b": "t5",
           "scoreA": "",
           "scoreB": "",
           "court": 1,
@@ -414,7 +415,7 @@
           "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "3-1-qp26uc",
+          "id": "3-1-wlood0",
           "a": "t1",
           "b": "t2",
           "scoreA": "",
@@ -424,9 +425,9 @@
           "predictedStart": "2026-01-01T10:00:00.000Z"
         },
         {
-          "id": "3-2-5c26vs",
+          "id": "3-2-89c8km",
           "a": "t6",
-          "b": "t4",
+          "b": "t3",
           "scoreA": "",
           "scoreB": "",
           "court": 3,
@@ -460,35 +461,35 @@
         {
           "id": "t3",
           "name": "Team Cobras",
-          "wins": 1,
-          "losses": 0,
-          "scored": 63,
-          "conceded": 30,
+          "wins": 0,
+          "losses": 1,
+          "scored": 33,
+          "conceded": 63,
           "participantId": "t3",
-          "setsWon": 3,
-          "setsLost": 0
+          "setsWon": 0,
+          "setsLost": 3
         },
         {
           "id": "t4",
           "name": "Team Dragons",
           "wins": 0,
-          "losses": 1,
-          "scored": 33,
-          "conceded": 63,
+          "losses": 2,
+          "scored": 102,
+          "conceded": 164,
           "participantId": "t4",
-          "setsWon": 0,
-          "setsLost": 3
+          "setsWon": 2,
+          "setsLost": 6
         },
         {
           "id": "t5",
           "name": "Team Eagles",
-          "wins": 0,
-          "losses": 2,
-          "scored": 102,
-          "conceded": 164,
+          "wins": 1,
+          "losses": 0,
+          "scored": 63,
+          "conceded": 30,
           "participantId": "t5",
-          "setsWon": 2,
-          "setsLost": 6
+          "setsWon": 3,
+          "setsLost": 0
         },
         {
           "id": "t6",

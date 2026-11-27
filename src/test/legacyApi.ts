@@ -19,4 +19,5 @@ export {
 } from '../tournament'
 export { sortStats } from '../tournamentStats'
 export { parseTournamentSnapshot } from '../tournamentSnapshot'
+export type { RankingParticipant } from '../tournament'
 export type { Match, Participant, Round, TournamentSnapshot } from '../tournamentTypes'

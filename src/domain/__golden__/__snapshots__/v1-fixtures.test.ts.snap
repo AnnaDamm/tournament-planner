@@ -1,0 +1,686 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`v1 fixtures > v1-mid-unknowns.json projections > courts 1`] = `
+{
+  "1:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "1:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "1:2": {
+    "court": 1,
+    "startedAt": "2026-01-01T10:00:00.000Z",
+  },
+  "1:3": {
+    "court": 2,
+    "startedAt": "2026-01-01T10:00:00.000Z",
+  },
+  "2:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:2": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:3": {
+    "court": null,
+    "startedAt": null,
+  },
+}
+`;
+
+exports[`v1 fixtures > v1-mid-unknowns.json projections > ranking 1`] = `
+[
+  {
+    "conceded": 38,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 38,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 0,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p8",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 61,
+    "id": "p5",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 61,
+    "id": "p6",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-mid-unknowns.json projections > rounds 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p5",
+      ],
+      [
+        "p2",
+        "p6",
+      ],
+      [
+        "p3",
+        "p7",
+      ],
+      [
+        "p4",
+        "p8",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p1",
+        "p2",
+      ],
+      [
+        "p5",
+        "p6",
+      ],
+      [
+        "?",
+        "?",
+      ],
+      [
+        "?",
+        "?",
+      ],
+    ],
+    "unknown": [
+      "2:a",
+      "2:b",
+      "3:a",
+      "3:b",
+    ],
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-mid-unknowns.json projections > standings 1`] = `
+[
+  {
+    "conceded": 38,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 38,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 0,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 61,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 61,
+    "id": "p6",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p8",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-small-finished.json projections > courts 1`] = `
+{
+  "1:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "1:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "3:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "3:1": {
+    "court": null,
+    "startedAt": null,
+  },
+}
+`;
+
+exports[`v1 fixtures > v1-small-finished.json projections > ranking 1`] = `
+[
+  {
+    "conceded": 97,
+    "id": "p2",
+    "lastLossRound": 3,
+    "losses": 1,
+    "scored": 122,
+    "setsLost": 2,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 99,
+    "id": "p1",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 120,
+    "setsLost": 3,
+    "setsWon": 4,
+    "wins": 2,
+  },
+  {
+    "conceded": 124,
+    "id": "p4",
+    "lastLossRound": 3,
+    "losses": 2,
+    "scored": 99,
+    "setsLost": 5,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 160,
+    "id": "p3",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 139,
+    "setsLost": 5,
+    "setsWon": 4,
+    "wins": 1,
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-small-finished.json projections > rounds 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p3",
+      ],
+      [
+        "p2",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p2",
+        "p1",
+      ],
+      [
+        "p3",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p2",
+        "p3",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-small-finished.json projections > standings 1`] = `
+[
+  {
+    "conceded": 99,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 120,
+    "setsLost": 3,
+    "setsWon": 4,
+    "wins": 2,
+  },
+  {
+    "conceded": 97,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 122,
+    "setsLost": 2,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 160,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 139,
+    "setsLost": 5,
+    "setsWon": 4,
+    "wins": 1,
+  },
+  {
+    "conceded": 124,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 99,
+    "setsLost": 5,
+    "setsWon": 2,
+    "wins": 1,
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-teams-courts-bye.json projections > courts 1`] = `
+{
+  "1:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "1:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "1:2": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:0": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:1": {
+    "court": null,
+    "startedAt": null,
+  },
+  "2:2": {
+    "court": null,
+    "startedAt": null,
+  },
+  "3:0": {
+    "court": 1,
+    "startedAt": "2026-01-01T10:00:00.000Z",
+  },
+  "3:1": {
+    "court": 2,
+    "startedAt": "2026-01-01T10:00:00.000Z",
+  },
+  "3:2": {
+    "court": 3,
+    "startedAt": "2026-01-01T10:00:00.000Z",
+  },
+}
+`;
+
+exports[`v1 fixtures > v1-teams-courts-bye.json projections > ranking 1`] = `
+[
+  {
+    "conceded": 30,
+    "id": "t5",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 126,
+    "setsLost": 0,
+    "setsWon": 6,
+    "wins": 2,
+  },
+  {
+    "conceded": 102,
+    "id": "t7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 6,
+    "wins": 2,
+  },
+  {
+    "conceded": 149,
+    "id": "t1",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 151,
+    "setsLost": 4,
+    "setsWon": 5,
+    "wins": 1,
+  },
+  {
+    "conceded": 135,
+    "id": "t2",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 131,
+    "setsLost": 5,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 155,
+    "id": "t6",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 154,
+    "setsLost": 4,
+    "setsWon": 5,
+    "wins": 1,
+  },
+  {
+    "conceded": 63,
+    "id": "t3",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 96,
+    "setsLost": 3,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 164,
+    "id": "t4",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 102,
+    "setsLost": 6,
+    "setsWon": 2,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-teams-courts-bye.json projections > rounds 1`] = `
+[
+  {
+    "bye": "t5",
+    "number": 1,
+    "pairs": [
+      [
+        "t1",
+        "t4",
+      ],
+      [
+        "t2",
+        "t6",
+      ],
+      [
+        "t3",
+        "t7",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "t3",
+    "number": 2,
+    "pairs": [
+      [
+        "t7",
+        "t1",
+      ],
+      [
+        "t2",
+        "t5",
+      ],
+      [
+        "t6",
+        "t4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "t4",
+    "number": 3,
+    "pairs": [
+      [
+        "t7",
+        "t5",
+      ],
+      [
+        "t1",
+        "t2",
+      ],
+      [
+        "t6",
+        "t3",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`v1 fixtures > v1-teams-courts-bye.json projections > standings 1`] = `
+[
+  {
+    "conceded": 149,
+    "id": "t1",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 151,
+    "setsLost": 4,
+    "setsWon": 5,
+    "wins": 1,
+  },
+  {
+    "conceded": 135,
+    "id": "t2",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 131,
+    "setsLost": 5,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 63,
+    "id": "t3",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 96,
+    "setsLost": 3,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 164,
+    "id": "t4",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 102,
+    "setsLost": 6,
+    "setsWon": 2,
+    "wins": 0,
+  },
+  {
+    "conceded": 30,
+    "id": "t5",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 126,
+    "setsLost": 0,
+    "setsWon": 6,
+    "wins": 2,
+  },
+  {
+    "conceded": 155,
+    "id": "t6",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 154,
+    "setsLost": 4,
+    "setsWon": 5,
+    "wins": 1,
+  },
+  {
+    "conceded": 102,
+    "id": "t7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 6,
+    "wins": 2,
+  },
+]
+`;

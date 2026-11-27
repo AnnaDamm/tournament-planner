@@ -6,6 +6,8 @@ export const FIXED_START = '2026-01-01T10:00:00.000Z'
 export type SimulationOptions = {
   seed?: number
   winningGames?: number
+  /** Overrides winningGames per round (index 0 = round one). */
+  winningGamesByRound?: number[]
   setPoints?: number
   /** Number of rounds that receive scores; later rounds stay planned but unplayed. */
   playedRounds?: number
@@ -47,13 +49,14 @@ export const simulate = (
 ) => {
   const { seed = 1, winningGames = 2, setPoints = 21, startRounds = true } = options
   const playedRounds = options.playedRounds ?? roundCount
+  const gamesOf = (number: number) => options.winningGamesByRound?.[number - 1] ?? winningGames
   return withSeed(seed, () => {
     const rounds: Round[] = []
     for (let number = 1; number <= roundCount; number += 1) {
       const plan = createRoundPlan(players, rounds, number, undefined, setPoints)
       const planned: Round = {
         number,
-        winningGames,
+        winningGames: gamesOf(number),
         bye: plan.bye,
         matches: plan.matches,
         standings: plan.standings,

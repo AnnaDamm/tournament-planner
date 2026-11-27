@@ -1,6 +1,7 @@
 import { isUnknownParticipantId, type Match, type Participant, type Round } from './legacyApi'
 
-type RankingLike = Participant & {
+type RankingLike = Pick<Participant, 'wins' | 'losses' | 'scored' | 'conceded'> & {
+  id?: string
   setsWon?: number
   setsLost?: number
   lastLossRound?: number
@@ -36,13 +37,24 @@ export const projectRanking = (ranking: RankingLike[]) =>
     lastLossRound: item.lastLossRound ?? 0,
   }))
 
+/** Court and match start time per match. */
 export const projectCourts = (rounds: Round[]) =>
   Object.fromEntries(
     rounds.flatMap((item) =>
       item.matches.map(
-        (entry: Match, index) => [`${item.number}:${index}`, entry.court ?? null] as const,
+        (entry: Match, index) =>
+          [
+            `${item.number}:${index}`,
+            { court: entry.court ?? null, startedAt: entry.startedAt ?? null },
+          ] as const,
       ),
     ),
+  )
+
+/** Per-round standings stored on the rounds (as written by the planner). */
+export const projectRoundStandings = (rounds: Round[]) =>
+  Object.fromEntries(
+    rounds.map((item) => [item.number, projectRanking(item.standings ?? [])] as const),
   )
 
 export const projectPredictedStarts = (rounds: Round[]) =>
