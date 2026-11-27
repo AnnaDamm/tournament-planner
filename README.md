@@ -111,10 +111,10 @@ docker compose up --build
 Open [http://localhost:5173](http://localhost:5173). The production-like LAN server remains
 available through `./scripts/start`.
 
-For direct host development, if Node.js and pnpm are installed:
+For direct host development, if Node.js is installed:
 
 ```bash
-corepack enable
+npm install --global pnpm
 pnpm install
 pnpm dev
 ```
