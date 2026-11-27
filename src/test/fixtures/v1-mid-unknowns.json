@@ -1,0 +1,372 @@
+{
+  "version": 1,
+  "defaultSetPoints": 21,
+  "expectedDurationMinutes": 25,
+  "breakBetweenMatchesMinutes": 5,
+  "scheduledStart": "2026-01-01T10:00",
+  "tournamentName": "Mid Cup",
+  "participantType": "players",
+  "courtCount": 2,
+  "defaultWinningGames": 2,
+  "players": [
+    {
+      "id": "p1",
+      "name": "Player A",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p2",
+      "name": "Player B",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p3",
+      "name": "Player C",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p4",
+      "name": "Player D",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p5",
+      "name": "Player E",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p6",
+      "name": "Player F",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p7",
+      "name": "Player G",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    },
+    {
+      "id": "p8",
+      "name": "Player H",
+      "wins": 0,
+      "losses": 0,
+      "scored": 0,
+      "conceded": 0
+    }
+  ],
+  "rounds": [
+    {
+      "number": 1,
+      "winningGames": 2,
+      "bye": null,
+      "matches": [
+        {
+          "id": "1-0-orsmwb",
+          "a": "p1",
+          "b": "p5",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "1-1-jkziws",
+          "a": "p2",
+          "b": "p6",
+          "scoreA": "",
+          "scoreB": "",
+          "sets": [
+            {
+              "a": "19",
+              "b": "21"
+            },
+            {
+              "a": "21",
+              "b": "8"
+            },
+            {
+              "a": "21",
+              "b": "9"
+            }
+          ],
+          "predictedStart": "2026-01-01T10:00:00.000Z"
+        },
+        {
+          "id": "1-2-r7rgef",
+          "a": "p3",
+          "b": "p7",
+          "scoreA": "",
+          "scoreB": "",
+          "court": 1,
+          "startedAt": "2026-01-01T10:00:00.000Z",
+          "predictedStart": "2026-01-01T10:30:00.000Z"
+        },
+        {
+          "id": "1-3-ziibes",
+          "a": "p4",
+          "b": "p8",
+          "scoreA": "",
+          "scoreB": "",
+          "court": 2,
+          "startedAt": "2026-01-01T10:00:00.000Z",
+          "predictedStart": "2026-01-01T10:30:00.000Z"
+        }
+      ],
+      "standings": [
+        {
+          "id": "p1",
+          "name": "Player A",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p1",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p2",
+          "name": "Player B",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p2",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p3",
+          "name": "Player C",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p3",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p4",
+          "name": "Player D",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p4",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p5",
+          "name": "Player E",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p5",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p6",
+          "name": "Player F",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p6",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p7",
+          "name": "Player G",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p7",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p8",
+          "name": "Player H",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p8",
+          "setsWon": 0,
+          "setsLost": 0
+        }
+      ],
+      "startedAt": "2026-01-01T10:00:00.000Z",
+      "predictedStart": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "number": 2,
+      "winningGames": 2,
+      "bye": null,
+      "matches": [
+        {
+          "id": "2-0-orsmwb",
+          "a": "p1",
+          "b": "p2",
+          "scoreA": "",
+          "scoreB": "",
+          "predictedStart": "2026-01-01T11:00:00.000Z"
+        },
+        {
+          "id": "2-1-jkziws",
+          "a": "p5",
+          "b": "p6",
+          "scoreA": "",
+          "scoreB": "",
+          "predictedStart": "2026-01-01T11:00:00.000Z"
+        },
+        {
+          "id": "2-2-r7rgef",
+          "a": "__unknown__:2:0",
+          "b": "__unknown__:2:1",
+          "scoreA": "",
+          "scoreB": "",
+          "predictedStart": "2026-01-01T11:30:00.000Z"
+        },
+        {
+          "id": "2-3-ziibes",
+          "a": "__unknown__:2:2",
+          "b": "__unknown__:2:3",
+          "scoreA": "",
+          "scoreB": "",
+          "predictedStart": "2026-01-01T11:30:00.000Z"
+        }
+      ],
+      "standings": [
+        {
+          "id": "p1",
+          "name": "Player A",
+          "wins": 1,
+          "losses": 0,
+          "scored": 61,
+          "conceded": 38,
+          "participantId": "p1",
+          "setsWon": 2,
+          "setsLost": 1
+        },
+        {
+          "id": "p2",
+          "name": "Player B",
+          "wins": 1,
+          "losses": 0,
+          "scored": 61,
+          "conceded": 38,
+          "participantId": "p2",
+          "setsWon": 2,
+          "setsLost": 1
+        },
+        {
+          "id": "p3",
+          "name": "Player C",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p3",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p4",
+          "name": "Player D",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p4",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p5",
+          "name": "Player E",
+          "wins": 0,
+          "losses": 1,
+          "scored": 38,
+          "conceded": 61,
+          "participantId": "p5",
+          "setsWon": 1,
+          "setsLost": 2
+        },
+        {
+          "id": "p6",
+          "name": "Player F",
+          "wins": 0,
+          "losses": 1,
+          "scored": 38,
+          "conceded": 61,
+          "participantId": "p6",
+          "setsWon": 1,
+          "setsLost": 2
+        },
+        {
+          "id": "p7",
+          "name": "Player G",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p7",
+          "setsWon": 0,
+          "setsLost": 0
+        },
+        {
+          "id": "p8",
+          "name": "Player H",
+          "wins": 0,
+          "losses": 0,
+          "scored": 0,
+          "conceded": 0,
+          "participantId": "p8",
+          "setsWon": 0,
+          "setsLost": 0
+        }
+      ],
+      "predictedStart": "2026-01-01T11:00:00.000Z"
+    }
+  ]
+}

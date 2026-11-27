@@ -1,0 +1,3253 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`courts and schedule > assignCourtsToMatches with 1 courts 1`] = `
+{
+  "1:0": null,
+  "1:1": null,
+  "1:2": null,
+  "1:3": null,
+  "2:0": null,
+  "2:1": null,
+  "2:2": null,
+  "2:3": null,
+  "3:0": null,
+  "3:1": null,
+  "3:2": null,
+  "3:3": null,
+}
+`;
+
+exports[`courts and schedule > assignCourtsToMatches with 3 courts 1`] = `
+{
+  "1:0": null,
+  "1:1": null,
+  "1:2": null,
+  "1:3": null,
+  "2:0": null,
+  "2:1": null,
+  "2:2": null,
+  "2:3": null,
+  "3:0": null,
+  "3:1": null,
+  "3:2": null,
+  "3:3": null,
+}
+`;
+
+exports[`courts and schedule > calculateExpectedMatchStarts with 1 courts > rounds 1`] = `
+[
+  "2026-01-01T10:00:00.000Z",
+  "2026-01-01T12:00:00.000Z",
+  "2026-01-01T14:00:00.000Z",
+]
+`;
+
+exports[`courts and schedule > calculateExpectedMatchStarts with 1 courts 1`] = `
+{
+  "1:0": "2026-01-01T10:00:00.000Z",
+  "1:1": "2026-01-01T10:30:00.000Z",
+  "1:2": "2026-01-01T11:00:00.000Z",
+  "1:3": "2026-01-01T11:30:00.000Z",
+  "2:0": "2026-01-01T12:00:00.000Z",
+  "2:1": "2026-01-01T12:30:00.000Z",
+  "2:2": "2026-01-01T13:00:00.000Z",
+  "2:3": "2026-01-01T13:30:00.000Z",
+  "3:0": "2026-01-01T14:00:00.000Z",
+  "3:1": "2026-01-01T14:30:00.000Z",
+  "3:2": "2026-01-01T15:00:00.000Z",
+  "3:3": "2026-01-01T15:30:00.000Z",
+}
+`;
+
+exports[`courts and schedule > calculateExpectedMatchStarts with 3 courts > rounds 1`] = `
+[
+  "2026-01-01T10:00:00.000Z",
+  "2026-01-01T11:00:00.000Z",
+  "2026-01-01T12:00:00.000Z",
+]
+`;
+
+exports[`courts and schedule > calculateExpectedMatchStarts with 3 courts 1`] = `
+{
+  "1:0": "2026-01-01T10:00:00.000Z",
+  "1:1": "2026-01-01T10:00:00.000Z",
+  "1:2": "2026-01-01T10:00:00.000Z",
+  "1:3": "2026-01-01T10:30:00.000Z",
+  "2:0": "2026-01-01T11:00:00.000Z",
+  "2:1": "2026-01-01T11:00:00.000Z",
+  "2:2": "2026-01-01T11:00:00.000Z",
+  "2:3": "2026-01-01T11:30:00.000Z",
+  "3:0": "2026-01-01T12:00:00.000Z",
+  "3:1": "2026-01-01T12:00:00.000Z",
+  "3:2": "2026-01-01T12:00:00.000Z",
+  "3:3": "2026-01-01T12:30:00.000Z",
+}
+`;
+
+exports[`courts and schedule > does not predict without a start time 1`] = `
+{
+  "1:0": null,
+  "1:1": null,
+  "1:2": null,
+  "1:3": null,
+  "2:0": null,
+  "2:1": null,
+  "2:2": null,
+  "2:3": null,
+  "3:0": null,
+  "3:1": null,
+  "3:2": null,
+  "3:3": null,
+}
+`;
+
+exports[`courts and schedule > getCurrentRoundNumber for empty, running and finished tournaments 1`] = `
+{
+  "empty": 0,
+  "finished": 2,
+  "half": 2,
+}
+`;
+
+exports[`courts and schedule > startReadyRounds with 1 courts > courts 1`] = `
+{
+  "1:0": null,
+  "1:1": null,
+  "1:2": null,
+  "1:3": null,
+  "2:0": 1,
+  "2:1": null,
+  "2:2": null,
+  "2:3": null,
+  "3:0": null,
+  "3:1": null,
+  "3:2": null,
+  "3:3": null,
+}
+`;
+
+exports[`courts and schedule > startReadyRounds with 1 courts > current round 1`] = `2`;
+
+exports[`courts and schedule > startReadyRounds with 1 courts > started 1`] = `
+{
+  "1": "2026-01-01T10:00:00.000Z",
+  "2": "2026-01-01T10:00:00.000Z",
+  "3": null,
+}
+`;
+
+exports[`courts and schedule > startReadyRounds with 3 courts > courts 1`] = `
+{
+  "1:0": null,
+  "1:1": null,
+  "1:2": null,
+  "1:3": null,
+  "2:0": 1,
+  "2:1": 2,
+  "2:2": 3,
+  "2:3": null,
+  "3:0": null,
+  "3:1": null,
+  "3:2": null,
+  "3:3": null,
+}
+`;
+
+exports[`courts and schedule > startReadyRounds with 3 courts > current round 1`] = `2`;
+
+exports[`courts and schedule > startReadyRounds with 3 courts > started 1`] = `
+{
+  "1": "2026-01-01T10:00:00.000Z",
+  "2": "2026-01-01T10:00:00.000Z",
+  "3": null,
+}
+`;
+
+exports[`createRoundPlan > honours a preferred bye in round one 1`] = `
+{
+  "bye": "p3",
+  "number": 1,
+  "pairs": [
+    [
+      "p1",
+      "p4",
+    ],
+    [
+      "p2",
+      "p5",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`createRoundPlan > keeps unknown placeholders while the previous round is unfinished 1`] = `
+{
+  "bye": null,
+  "number": 2,
+  "pairs": [
+    [
+      "p1",
+      "p2",
+    ],
+    [
+      "p5",
+      "p6",
+    ],
+    [
+      "?",
+      "?",
+    ],
+    [
+      "?",
+      "?",
+    ],
+  ],
+  "unknown": [
+    "2:a",
+    "2:b",
+    "3:a",
+    "3:b",
+  ],
+}
+`;
+
+exports[`createRoundPlan > plans five rounds for 4 players 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p3",
+      ],
+      [
+        "p2",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p2",
+        "p1",
+      ],
+      [
+        "p3",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p2",
+        "p3",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 4,
+    "pairs": [
+      [
+        "p4",
+        "p2",
+      ],
+      [
+        "p3",
+        "p1",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 5,
+    "pairs": [
+      [
+        "p2",
+        "p3",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans five rounds for 5 players 1`] = `
+[
+  {
+    "bye": "p1",
+    "number": 1,
+    "pairs": [
+      [
+        "p2",
+        "p4",
+      ],
+      [
+        "p3",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p5",
+    "number": 2,
+    "pairs": [
+      [
+        "p3",
+        "p2",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p4",
+    "number": 3,
+    "pairs": [
+      [
+        "p3",
+        "p1",
+      ],
+      [
+        "p2",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p2",
+    "number": 4,
+    "pairs": [
+      [
+        "p3",
+        "p4",
+      ],
+      [
+        "p1",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p3",
+    "number": 5,
+    "pairs": [
+      [
+        "p1",
+        "p2",
+      ],
+      [
+        "p4",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans five rounds for 8 players 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p5",
+      ],
+      [
+        "p2",
+        "p6",
+      ],
+      [
+        "p3",
+        "p7",
+      ],
+      [
+        "p4",
+        "p8",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p2",
+        "p4",
+      ],
+      [
+        "p1",
+        "p7",
+      ],
+      [
+        "p3",
+        "p5",
+      ],
+      [
+        "p8",
+        "p6",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p2",
+        "p7",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+      [
+        "p3",
+        "p8",
+      ],
+      [
+        "p6",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 4,
+    "pairs": [
+      [
+        "p7",
+        "p2",
+      ],
+      [
+        "p1",
+        "p3",
+      ],
+      [
+        "p8",
+        "p5",
+      ],
+      [
+        "p4",
+        "p6",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 5,
+    "pairs": [
+      [
+        "p7",
+        "p1",
+      ],
+      [
+        "p3",
+        "p6",
+      ],
+      [
+        "p2",
+        "p8",
+      ],
+      [
+        "p4",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans five rounds for 9 players 1`] = `
+[
+  {
+    "bye": "p1",
+    "number": 1,
+    "pairs": [
+      [
+        "p2",
+        "p6",
+      ],
+      [
+        "p3",
+        "p7",
+      ],
+      [
+        "p4",
+        "p8",
+      ],
+      [
+        "p5",
+        "p9",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p7",
+    "number": 2,
+    "pairs": [
+      [
+        "p3",
+        "p5",
+      ],
+      [
+        "p2",
+        "p8",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+      [
+        "p6",
+        "p9",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p4",
+    "number": 3,
+    "pairs": [
+      [
+        "p1",
+        "p3",
+      ],
+      [
+        "p8",
+        "p5",
+      ],
+      [
+        "p2",
+        "p9",
+      ],
+      [
+        "p6",
+        "p7",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p9",
+    "number": 4,
+    "pairs": [
+      [
+        "p3",
+        "p8",
+      ],
+      [
+        "p1",
+        "p2",
+      ],
+      [
+        "p7",
+        "p5",
+      ],
+      [
+        "p6",
+        "p4",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": "p5",
+    "number": 5,
+    "pairs": [
+      [
+        "p3",
+        "p2",
+      ],
+      [
+        "p8",
+        "p7",
+      ],
+      [
+        "p1",
+        "p6",
+      ],
+      [
+        "p4",
+        "p9",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans with winningGames 1 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p5",
+      ],
+      [
+        "p2",
+        "p6",
+      ],
+      [
+        "p3",
+        "p7",
+      ],
+      [
+        "p4",
+        "p8",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p1",
+        "p2",
+      ],
+      [
+        "p7",
+        "p4",
+      ],
+      [
+        "p8",
+        "p3",
+      ],
+      [
+        "p6",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p1",
+        "p4",
+      ],
+      [
+        "p7",
+        "p2",
+      ],
+      [
+        "p8",
+        "p6",
+      ],
+      [
+        "p3",
+        "p5",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 4,
+    "pairs": [
+      [
+        "p4",
+        "p6",
+      ],
+      [
+        "p1",
+        "p7",
+      ],
+      [
+        "p8",
+        "p5",
+      ],
+      [
+        "p2",
+        "p3",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans with winningGames 3 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p5",
+      ],
+      [
+        "p2",
+        "p6",
+      ],
+      [
+        "p3",
+        "p7",
+      ],
+      [
+        "p4",
+        "p8",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p7",
+        "p1",
+      ],
+      [
+        "p4",
+        "p2",
+      ],
+      [
+        "p6",
+        "p8",
+      ],
+      [
+        "p5",
+        "p3",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p2",
+        "p7",
+      ],
+      [
+        "p1",
+        "p4",
+      ],
+      [
+        "p6",
+        "p5",
+      ],
+      [
+        "p3",
+        "p8",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 4,
+    "pairs": [
+      [
+        "p7",
+        "p6",
+      ],
+      [
+        "p2",
+        "p1",
+      ],
+      [
+        "p5",
+        "p8",
+      ],
+      [
+        "p4",
+        "p3",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`createRoundPlan > plans without a withdrawn player 1`] = `
+[
+  {
+    "bye": null,
+    "number": 1,
+    "pairs": [
+      [
+        "p1",
+        "p6",
+      ],
+      [
+        "p2",
+        "p7",
+      ],
+      [
+        "p3",
+        "p8",
+      ],
+      [
+        "p5",
+        "p9",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 2,
+    "pairs": [
+      [
+        "p2",
+        "p5",
+      ],
+      [
+        "p1",
+        "p8",
+      ],
+      [
+        "p3",
+        "p6",
+      ],
+      [
+        "p9",
+        "p7",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 3,
+    "pairs": [
+      [
+        "p2",
+        "p8",
+      ],
+      [
+        "p1",
+        "p5",
+      ],
+      [
+        "p3",
+        "p9",
+      ],
+      [
+        "p7",
+        "p6",
+      ],
+    ],
+    "unknown": [],
+  },
+  {
+    "bye": null,
+    "number": 4,
+    "pairs": [
+      [
+        "p8",
+        "p2",
+      ],
+      [
+        "p1",
+        "p3",
+      ],
+      [
+        "p9",
+        "p6",
+      ],
+      [
+        "p5",
+        "p7",
+      ],
+    ],
+    "unknown": [],
+  },
+]
+`;
+
+exports[`fillUnknownRound > resolves placeholders once round one is finished (8 players) > after 1`] = `
+{
+  "bye": null,
+  "number": 2,
+  "pairs": [
+    [
+      "p1",
+      "p2",
+    ],
+    [
+      "p4",
+      "p7",
+    ],
+    [
+      "p3",
+      "p8",
+    ],
+    [
+      "p5",
+      "p6",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`fillUnknownRound > resolves placeholders once round one is finished (8 players) > before 1`] = `
+{
+  "bye": null,
+  "number": 2,
+  "pairs": [
+    [
+      "p1",
+      "p2",
+    ],
+    [
+      "p5",
+      "p6",
+    ],
+    [
+      "?",
+      "?",
+    ],
+    [
+      "?",
+      "?",
+    ],
+  ],
+  "unknown": [
+    "2:a",
+    "2:b",
+    "3:a",
+    "3:b",
+  ],
+}
+`;
+
+exports[`fillUnknownRound > resolves placeholders once round one is finished (9 players) > after 1`] = `
+{
+  "bye": "p8",
+  "number": 2,
+  "pairs": [
+    [
+      "p1",
+      "p2",
+    ],
+    [
+      "p4",
+      "p7",
+    ],
+    [
+      "p9",
+      "p5",
+    ],
+    [
+      "p6",
+      "p3",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`fillUnknownRound > resolves placeholders once round one is finished (9 players) > before 1`] = `
+{
+  "bye": null,
+  "number": 2,
+  "pairs": [
+    [
+      "p1",
+      "p2",
+    ],
+    [
+      "p9",
+      "p5",
+    ],
+    [
+      "p6",
+      "?",
+    ],
+    [
+      "?",
+      "?",
+    ],
+  ],
+  "unknown": [
+    "2:b",
+    "3:a",
+    "3:b",
+  ],
+}
+`;
+
+exports[`match results > getMatchResult with winningGames 1 1`] = `
+{
+  "empty": null,
+  "equalSet": null,
+  "extraSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "5",
+        "b": "21",
+      },
+    ],
+    "winner": "a",
+  },
+  "incomplete": null,
+  "negative": null,
+  "oneSet": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+    ],
+    "winner": "a",
+  },
+  "threeSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "15",
+        "b": "21",
+      },
+      {
+        "a": "11",
+        "b": "21",
+      },
+    ],
+    "winner": "a",
+  },
+  "twoSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "21",
+        "b": "12",
+      },
+    ],
+    "winner": "a",
+  },
+  "unfinishedBo3": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "10",
+        "b": "21",
+      },
+    ],
+    "winner": "a",
+  },
+}
+`;
+
+exports[`match results > getMatchResult with winningGames 2 1`] = `
+{
+  "empty": null,
+  "equalSet": null,
+  "extraSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "5",
+        "b": "21",
+      },
+    ],
+    "winner": "a",
+  },
+  "incomplete": null,
+  "negative": null,
+  "oneSet": null,
+  "threeSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "15",
+        "b": "21",
+      },
+      {
+        "a": "11",
+        "b": "21",
+      },
+    ],
+    "winner": "b",
+  },
+  "twoSets": {
+    "sets": [
+      {
+        "a": "21",
+        "b": "10",
+      },
+      {
+        "a": "21",
+        "b": "12",
+      },
+    ],
+    "winner": "a",
+  },
+  "unfinishedBo3": null,
+}
+`;
+
+exports[`match results > getMatchResult with winningGames 3 1`] = `
+{
+  "empty": null,
+  "equalSet": null,
+  "extraSets": null,
+  "incomplete": null,
+  "negative": null,
+  "oneSet": null,
+  "threeSets": null,
+  "twoSets": null,
+  "unfinishedBo3": null,
+}
+`;
+
+exports[`match results > getVisibleSetCount with winningGames 1 1`] = `
+{
+  "empty": 1,
+  "equalSet": 1,
+  "extraSets": 1,
+  "incomplete": 1,
+  "negative": 1,
+  "oneSet": 1,
+  "threeSets": 1,
+  "twoSets": 1,
+  "unfinishedBo3": 1,
+}
+`;
+
+exports[`match results > getVisibleSetCount with winningGames 2 1`] = `
+{
+  "empty": 2,
+  "equalSet": 2,
+  "extraSets": 2,
+  "incomplete": 2,
+  "negative": 2,
+  "oneSet": 2,
+  "threeSets": 3,
+  "twoSets": 2,
+  "unfinishedBo3": 3,
+}
+`;
+
+exports[`match results > getVisibleSetCount with winningGames 3 1`] = `
+{
+  "empty": 3,
+  "equalSet": 3,
+  "extraSets": 4,
+  "incomplete": 3,
+  "negative": 3,
+  "oneSet": 3,
+  "threeSets": 4,
+  "twoSets": 3,
+  "unfinishedBo3": 3,
+}
+`;
+
+exports[`match results > reads the legacy single score fields 1`] = `
+{
+  "sets": [
+    {
+      "a": "21",
+      "b": "15",
+    },
+  ],
+  "winner": "a",
+}
+`;
+
+exports[`parseTournamentSnapshot > keeps explicit optional values 1`] = `
+{
+  "breakBetweenMatchesMinutes": 0,
+  "courtCount": 2,
+  "defaultSetPoints": 15,
+  "defaultWinningGames": 99,
+  "expectedDurationMinutes": 30,
+  "participantType": "players",
+  "players": [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "losses": 0,
+      "name": "Ann",
+      "scored": 0,
+      "wins": 0,
+    },
+  ],
+  "rounds": [
+    {
+      "matches": [
+        {
+          "a": "p1",
+          "b": "p2",
+          "id": "m1",
+          "scoreA": "",
+          "scoreB": "",
+        },
+      ],
+      "number": 1,
+      "winningGames": 2,
+    },
+  ],
+  "scheduledStart": "2026-01-01T10:00",
+  "tournamentName": "Cup",
+  "version": 1,
+}
+`;
+
+exports[`parseTournamentSnapshot > parses a valid snapshot and applies defaults 1`] = `
+{
+  "breakBetweenMatchesMinutes": 5,
+  "courtCount": 2,
+  "defaultSetPoints": 21,
+  "defaultWinningGames": 99,
+  "expectedDurationMinutes": 25,
+  "participantType": "players",
+  "players": [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "losses": 0,
+      "name": "Ann",
+      "scored": 0,
+      "wins": 0,
+    },
+  ],
+  "rounds": [
+    {
+      "matches": [
+        {
+          "a": "p1",
+          "b": "p2",
+          "id": "m1",
+          "scoreA": "",
+          "scoreB": "",
+        },
+      ],
+      "number": 1,
+      "winningGames": 2,
+    },
+  ],
+  "scheduledStart": "",
+  "tournamentName": "Cup",
+  "version": 1,
+}
+`;
+
+exports[`rerollRound and rerollBye > rerolls the bye of an odd field > after 1`] = `
+{
+  "bye": "p1",
+  "number": 3,
+  "pairs": [
+    [
+      "p2",
+      "p3",
+    ],
+    [
+      "p4",
+      "p5",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`rerollRound and rerollBye > rerolls the bye of an odd field > before 1`] = `
+{
+  "bye": "p4",
+  "number": 3,
+  "pairs": [
+    [
+      "p2",
+      "p3",
+    ],
+    [
+      "p1",
+      "p5",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`rerollRound and rerollBye > rerolls the last unscored round (8 players) 1`] = `
+{
+  "bye": null,
+  "number": 3,
+  "pairs": [
+    [
+      "p2",
+      "p7",
+    ],
+    [
+      "p1",
+      "p4",
+    ],
+    [
+      "p3",
+      "p8",
+    ],
+    [
+      "p6",
+      "p5",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`rerollRound and rerollBye > rerolls the last unscored round (9 players) 1`] = `
+{
+  "bye": "p4",
+  "number": 3,
+  "pairs": [
+    [
+      "p2",
+      "p3",
+    ],
+    [
+      "p8",
+      "p5",
+    ],
+    [
+      "p1",
+      "p9",
+    ],
+    [
+      "p6",
+      "p7",
+    ],
+  ],
+  "unknown": [],
+}
+`;
+
+exports[`standings and ranking > 4 players, bo3 > before rounds 1`] = `
+[
+  [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 38,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 61,
+      "setsLost": 1,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 19,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 42,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 61,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 38,
+      "setsLost": 2,
+      "setsWon": 1,
+      "wins": 0,
+    },
+    {
+      "conceded": 42,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 19,
+      "setsLost": 2,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 80,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 78,
+      "setsLost": 3,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 36,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 84,
+      "setsLost": 0,
+      "setsWon": 4,
+      "wins": 2,
+    },
+    {
+      "conceded": 122,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 78,
+      "setsLost": 4,
+      "setsWon": 2,
+      "wins": 0,
+    },
+    {
+      "conceded": 82,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 80,
+      "setsLost": 3,
+      "setsWon": 2,
+      "wins": 1,
+    },
+  ],
+  [
+    {
+      "conceded": 99,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 120,
+      "setsLost": 3,
+      "setsWon": 4,
+      "wins": 2,
+    },
+    {
+      "conceded": 97,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 122,
+      "setsLost": 2,
+      "setsWon": 5,
+      "wins": 2,
+    },
+    {
+      "conceded": 160,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 139,
+      "setsLost": 5,
+      "setsWon": 4,
+      "wins": 1,
+    },
+    {
+      "conceded": 124,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 99,
+      "setsLost": 5,
+      "setsWon": 2,
+      "wins": 1,
+    },
+  ],
+]
+`;
+
+exports[`standings and ranking > 4 players, bo3 > ranking 1`] = `
+[
+  {
+    "conceded": 114,
+    "id": "p2",
+    "lastLossRound": 3,
+    "losses": 1,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 7,
+    "wins": 3,
+  },
+  {
+    "conceded": 141,
+    "id": "p1",
+    "lastLossRound": 4,
+    "losses": 2,
+    "scored": 137,
+    "setsLost": 5,
+    "setsWon": 4,
+    "wins": 2,
+  },
+  {
+    "conceded": 200,
+    "id": "p3",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 200,
+    "setsLost": 6,
+    "setsWon": 6,
+    "wins": 2,
+  },
+  {
+    "conceded": 185,
+    "id": "p4",
+    "lastLossRound": 4,
+    "losses": 3,
+    "scored": 139,
+    "setsLost": 7,
+    "setsWon": 3,
+    "wins": 1,
+  },
+]
+`;
+
+exports[`standings and ranking > 4 players, bo3 > standings 1`] = `
+[
+  {
+    "conceded": 141,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 137,
+    "setsLost": 5,
+    "setsWon": 4,
+    "wins": 2,
+  },
+  {
+    "conceded": 114,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 7,
+    "wins": 3,
+  },
+  {
+    "conceded": 200,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 200,
+    "setsLost": 6,
+    "setsWon": 6,
+    "wins": 2,
+  },
+  {
+    "conceded": 185,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 3,
+    "scored": 139,
+    "setsLost": 7,
+    "setsWon": 3,
+    "wins": 1,
+  },
+]
+`;
+
+exports[`standings and ranking > 5 players with byes, bo5 > before rounds 1`] = `
+[
+  [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 48,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 82,
+      "setsLost": 1,
+      "setsWon": 3,
+      "wins": 1,
+    },
+    {
+      "conceded": 72,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 101,
+      "setsLost": 2,
+      "setsWon": 3,
+      "wins": 1,
+    },
+    {
+      "conceded": 82,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 48,
+      "setsLost": 3,
+      "setsWon": 1,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 63,
+      "setsLost": 0,
+      "setsWon": 3,
+      "wins": 1,
+    },
+    {
+      "conceded": 101,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 72,
+      "setsLost": 3,
+      "setsWon": 2,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 117,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 183,
+      "setsLost": 3,
+      "setsWon": 6,
+      "wins": 2,
+    },
+    {
+      "conceded": 173,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 170,
+      "setsLost": 5,
+      "setsWon": 5,
+      "wins": 1,
+    },
+    {
+      "conceded": 82,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 111,
+      "setsLost": 3,
+      "setsWon": 4,
+      "wins": 1,
+    },
+    {
+      "conceded": 63,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 93,
+      "setsLost": 3,
+      "setsWon": 3,
+      "wins": 1,
+    },
+    {
+      "conceded": 131,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 135,
+      "setsLost": 3,
+      "setsWon": 5,
+      "wins": 1,
+    },
+  ],
+  [
+    {
+      "conceded": 180,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 210,
+      "setsLost": 6,
+      "setsWon": 6,
+      "wins": 2,
+    },
+    {
+      "conceded": 224,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 252,
+      "setsLost": 6,
+      "setsWon": 8,
+      "wins": 2,
+    },
+    {
+      "conceded": 164,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 162,
+      "setsLost": 6,
+      "setsWon": 5,
+      "wins": 1,
+    },
+    {
+      "conceded": 90,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 156,
+      "setsLost": 3,
+      "setsWon": 6,
+      "wins": 2,
+    },
+    {
+      "conceded": 131,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 198,
+      "setsLost": 3,
+      "setsWon": 8,
+      "wins": 2,
+    },
+  ],
+  [
+    {
+      "conceded": 228,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 292,
+      "setsLost": 7,
+      "setsWon": 9,
+      "wins": 3,
+    },
+    {
+      "conceded": 224,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 315,
+      "setsLost": 6,
+      "setsWon": 11,
+      "wins": 3,
+    },
+    {
+      "conceded": 265,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 3,
+      "scored": 234,
+      "setsLost": 9,
+      "setsWon": 7,
+      "wins": 1,
+    },
+    {
+      "conceded": 162,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 257,
+      "setsLost": 5,
+      "setsWon": 9,
+      "wins": 3,
+    },
+    {
+      "conceded": 213,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 246,
+      "setsLost": 6,
+      "setsWon": 9,
+      "wins": 2,
+    },
+  ],
+]
+`;
+
+exports[`standings and ranking > 5 players with byes, bo5 > ranking 1`] = `
+[
+  {
+    "conceded": 231,
+    "id": "p4",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 358,
+    "setsLost": 7,
+    "setsWon": 12,
+    "wins": 4,
+  },
+  {
+    "conceded": 325,
+    "id": "p2",
+    "lastLossRound": 5,
+    "losses": 2,
+    "scored": 384,
+    "setsLost": 9,
+    "setsWon": 13,
+    "wins": 3,
+  },
+  {
+    "conceded": 228,
+    "id": "p1",
+    "lastLossRound": 3,
+    "losses": 1,
+    "scored": 292,
+    "setsLost": 7,
+    "setsWon": 9,
+    "wins": 3,
+  },
+  {
+    "conceded": 276,
+    "id": "p5",
+    "lastLossRound": 5,
+    "losses": 3,
+    "scored": 276,
+    "setsLost": 9,
+    "setsWon": 9,
+    "wins": 2,
+  },
+  {
+    "conceded": 295,
+    "id": "p3",
+    "lastLossRound": 4,
+    "losses": 3,
+    "scored": 297,
+    "setsLost": 9,
+    "setsWon": 10,
+    "wins": 2,
+  },
+]
+`;
+
+exports[`standings and ranking > 5 players with byes, bo5 > standings 1`] = `
+[
+  {
+    "conceded": 228,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 292,
+    "setsLost": 7,
+    "setsWon": 9,
+    "wins": 3,
+  },
+  {
+    "conceded": 325,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 384,
+    "setsLost": 9,
+    "setsWon": 13,
+    "wins": 3,
+  },
+  {
+    "conceded": 295,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 3,
+    "scored": 297,
+    "setsLost": 9,
+    "setsWon": 10,
+    "wins": 2,
+  },
+  {
+    "conceded": 231,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 358,
+    "setsLost": 7,
+    "setsWon": 12,
+    "wins": 4,
+  },
+  {
+    "conceded": 276,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 3,
+    "scored": 276,
+    "setsLost": 9,
+    "setsWon": 9,
+    "wins": 2,
+  },
+]
+`;
+
+exports[`standings and ranking > 8 players with a withdrawn player > before rounds 1`] = `
+[
+  [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 38,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 61,
+      "setsLost": 1,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 19,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 42,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 61,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 42,
+      "setsLost": 2,
+      "setsWon": 1,
+      "wins": 0,
+    },
+    {
+      "conceded": 61,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 38,
+      "setsLost": 2,
+      "setsWon": 1,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 42,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 42,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 19,
+      "setsLost": 2,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 42,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 61,
+      "setsLost": 1,
+      "setsWon": 2,
+      "wins": 1,
+    },
+  ],
+  [
+    {
+      "conceded": 80,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 78,
+      "setsLost": 3,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 36,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 84,
+      "setsLost": 0,
+      "setsWon": 4,
+      "wins": 2,
+    },
+    {
+      "conceded": 82,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 84,
+      "setsLost": 2,
+      "setsWon": 3,
+      "wins": 1,
+    },
+    {
+      "conceded": 103,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 59,
+      "setsLost": 4,
+      "setsWon": 1,
+      "wins": 0,
+    },
+    {
+      "conceded": 40,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 103,
+      "setsLost": 1,
+      "setsWon": 4,
+      "wins": 2,
+    },
+    {
+      "conceded": 42,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 61,
+      "setsLost": 2,
+      "setsWon": 2,
+      "wins": 1,
+    },
+    {
+      "conceded": 103,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 101,
+      "setsLost": 3,
+      "setsWon": 3,
+      "wins": 1,
+    },
+  ],
+]
+`;
+
+exports[`standings and ranking > 8 players with a withdrawn player > ranking 1`] = `
+[
+  {
+    "conceded": 78,
+    "id": "p6",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 6,
+    "wins": 3,
+  },
+  {
+    "conceded": 97,
+    "id": "p3",
+    "lastLossRound": 3,
+    "losses": 1,
+    "scored": 122,
+    "setsLost": 2,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 122,
+    "id": "p8",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 143,
+    "setsLost": 3,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 124,
+    "id": "p4",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 145,
+    "setsLost": 3,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 103,
+    "id": "p7",
+    "lastLossRound": 3,
+    "losses": 2,
+    "scored": 103,
+    "setsLost": 4,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 122,
+    "id": "p1",
+    "lastLossRound": 3,
+    "losses": 2,
+    "scored": 97,
+    "setsLost": 5,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 0,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 103,
+    "id": "p5",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 59,
+    "setsLost": 4,
+    "setsWon": 1,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > 8 players with a withdrawn player > standings 1`] = `
+[
+  {
+    "conceded": 122,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 97,
+    "setsLost": 5,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 0,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 97,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 122,
+    "setsLost": 2,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 124,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 145,
+    "setsLost": 3,
+    "setsWon": 5,
+    "wins": 2,
+  },
+  {
+    "conceded": 103,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 59,
+    "setsLost": 4,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 78,
+    "id": "p6",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 164,
+    "setsLost": 2,
+    "setsWon": 6,
+    "wins": 3,
+  },
+  {
+    "conceded": 103,
+    "id": "p7",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 103,
+    "setsLost": 4,
+    "setsWon": 3,
+    "wins": 1,
+  },
+  {
+    "conceded": 122,
+    "id": "p8",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 143,
+    "setsLost": 3,
+    "setsWon": 5,
+    "wins": 2,
+  },
+]
+`;
+
+exports[`standings and ranking > 9 players, single game, 15 points > before rounds 1`] = `
+[
+  [
+    {
+      "conceded": 0,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p9",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 0,
+      "setsLost": 0,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 8,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 21,
+      "setsLost": 0,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 9,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 21,
+      "setsLost": 0,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 21,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 10,
+      "setsLost": 1,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 11,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 21,
+      "setsLost": 0,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 21,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 8,
+      "setsLost": 1,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 21,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 9,
+      "setsLost": 1,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 0,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 15,
+      "setsLost": 0,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 10,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 21,
+      "setsLost": 0,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 21,
+      "id": "p9",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 11,
+      "setsLost": 1,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+  [
+    {
+      "conceded": 16,
+      "id": "p1",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 42,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 2,
+    },
+    {
+      "conceded": 30,
+      "id": "p2",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 29,
+      "setsLost": 1,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 32,
+      "id": "p3",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 31,
+      "setsLost": 1,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 20,
+      "id": "p4",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 42,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 2,
+    },
+    {
+      "conceded": 21,
+      "id": "p5",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 23,
+      "setsLost": 1,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 42,
+      "id": "p6",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 20,
+      "setsLost": 2,
+      "setsWon": 0,
+      "wins": 0,
+    },
+    {
+      "conceded": 10,
+      "id": "p7",
+      "lastLossRound": 0,
+      "losses": 0,
+      "scored": 36,
+      "setsLost": 0,
+      "setsWon": 2,
+      "wins": 2,
+    },
+    {
+      "conceded": 31,
+      "id": "p8",
+      "lastLossRound": 0,
+      "losses": 1,
+      "scored": 30,
+      "setsLost": 1,
+      "setsWon": 1,
+      "wins": 1,
+    },
+    {
+      "conceded": 42,
+      "id": "p9",
+      "lastLossRound": 0,
+      "losses": 2,
+      "scored": 21,
+      "setsLost": 2,
+      "setsWon": 0,
+      "wins": 0,
+    },
+  ],
+]
+`;
+
+exports[`standings and ranking > 9 players, single game, 15 points > ranking 1`] = `
+[
+  {
+    "conceded": 28,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 63,
+    "setsLost": 0,
+    "setsWon": 3,
+    "wins": 3,
+  },
+  {
+    "conceded": 19,
+    "id": "p7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 57,
+    "setsLost": 0,
+    "setsWon": 3,
+    "wins": 3,
+  },
+  {
+    "conceded": 37,
+    "id": "p1",
+    "lastLossRound": 3,
+    "losses": 1,
+    "scored": 50,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 40,
+    "id": "p2",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 50,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 32,
+    "id": "p5",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 44,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 53,
+    "id": "p3",
+    "lastLossRound": 3,
+    "losses": 2,
+    "scored": 41,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 1,
+  },
+  {
+    "conceded": 52,
+    "id": "p8",
+    "lastLossRound": 3,
+    "losses": 2,
+    "scored": 39,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 1,
+  },
+  {
+    "conceded": 63,
+    "id": "p9",
+    "lastLossRound": 3,
+    "losses": 3,
+    "scored": 32,
+    "setsLost": 3,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 42,
+    "id": "p6",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 20,
+    "setsLost": 2,
+    "setsWon": 0,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > 9 players, single game, 15 points > standings 1`] = `
+[
+  {
+    "conceded": 37,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 50,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 40,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 50,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 53,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 41,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 1,
+  },
+  {
+    "conceded": 28,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 63,
+    "setsLost": 0,
+    "setsWon": 3,
+    "wins": 3,
+  },
+  {
+    "conceded": 32,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 44,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 2,
+  },
+  {
+    "conceded": 42,
+    "id": "p6",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 20,
+    "setsLost": 2,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 19,
+    "id": "p7",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 57,
+    "setsLost": 0,
+    "setsWon": 3,
+    "wins": 3,
+  },
+  {
+    "conceded": 52,
+    "id": "p8",
+    "lastLossRound": 0,
+    "losses": 2,
+    "scored": 39,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 1,
+  },
+  {
+    "conceded": 63,
+    "id": "p9",
+    "lastLossRound": 0,
+    "losses": 3,
+    "scored": 32,
+    "setsLost": 3,
+    "setsWon": 0,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > breaks ties by last loss, sets, points and name 1`] = `
+[
+  {
+    "conceded": 65,
+    "id": "c",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 103,
+    "setsLost": 1,
+    "setsWon": 4,
+    "wins": 2,
+  },
+  {
+    "conceded": 64,
+    "id": "a",
+    "lastLossRound": 2,
+    "losses": 1,
+    "scored": 62,
+    "setsLost": 2,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 42,
+    "id": "b",
+    "lastLossRound": 1,
+    "losses": 1,
+    "scored": 64,
+    "setsLost": 2,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 103,
+    "id": "d",
+    "lastLossRound": 2,
+    "losses": 2,
+    "scored": 45,
+    "setsLost": 4,
+    "setsWon": 1,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > credits a bye only once the next round has started > started 1`] = `
+[
+  {
+    "conceded": 38,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 19,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 42,
+    "setsLost": 0,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 61,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 42,
+    "setsLost": 0,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 42,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 19,
+    "setsLost": 2,
+    "setsWon": 0,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > credits a bye only once the next round has started > unstarted 1`] = `
+[
+  {
+    "conceded": 38,
+    "id": "p1",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 61,
+    "setsLost": 1,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 19,
+    "id": "p2",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 42,
+    "setsLost": 0,
+    "setsWon": 2,
+    "wins": 1,
+  },
+  {
+    "conceded": 61,
+    "id": "p3",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 38,
+    "setsLost": 2,
+    "setsWon": 1,
+    "wins": 0,
+  },
+  {
+    "conceded": 0,
+    "id": "p4",
+    "lastLossRound": 0,
+    "losses": 0,
+    "scored": 0,
+    "setsLost": 0,
+    "setsWon": 0,
+    "wins": 0,
+  },
+  {
+    "conceded": 42,
+    "id": "p5",
+    "lastLossRound": 0,
+    "losses": 1,
+    "scored": 19,
+    "setsLost": 2,
+    "setsWon": 0,
+    "wins": 0,
+  },
+]
+`;
+
+exports[`standings and ranking > sorts statistics by every key in both directions 1`] = `
+{
+  "conceded:asc": [
+    "p2",
+    "p1",
+    "p3",
+    "p6",
+    "p4",
+    "p5",
+  ],
+  "conceded:desc": [
+    "p5",
+    "p4",
+    "p6",
+    "p3",
+    "p1",
+    "p2",
+  ],
+  "diff:asc": [
+    "p5",
+    "p3",
+    "p4",
+    "p1",
+    "p6",
+    "p2",
+  ],
+  "diff:desc": [
+    "p2",
+    "p1",
+    "p6",
+    "p4",
+    "p3",
+    "p5",
+  ],
+  "losses:asc": [
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+    "p3",
+    "p5",
+  ],
+  "losses:desc": [
+    "p5",
+    "p3",
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+  ],
+  "name:asc": [
+    "p1",
+    "p2",
+    "p3",
+    "p4",
+    "p5",
+    "p6",
+  ],
+  "name:desc": [
+    "p6",
+    "p5",
+    "p4",
+    "p3",
+    "p2",
+    "p1",
+  ],
+  "played:asc": [
+    "p1",
+    "p2",
+    "p3",
+    "p4",
+    "p5",
+    "p6",
+  ],
+  "played:desc": [
+    "p1",
+    "p2",
+    "p3",
+    "p4",
+    "p5",
+    "p6",
+  ],
+  "points:asc": [
+    "p5",
+    "p3",
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+  ],
+  "points:desc": [
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+    "p3",
+    "p5",
+  ],
+  "position:asc": [
+    "p2",
+    "p6",
+    "p1",
+    "p4",
+    "p3",
+    "p5",
+  ],
+  "position:desc": [
+    "p2",
+    "p6",
+    "p1",
+    "p4",
+    "p3",
+    "p5",
+  ],
+  "scored:asc": [
+    "p5",
+    "p3",
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+  ],
+  "scored:desc": [
+    "p6",
+    "p4",
+    "p2",
+    "p1",
+    "p3",
+    "p5",
+  ],
+  "setsLost:asc": [
+    "p2",
+    "p1",
+    "p3",
+    "p4",
+    "p6",
+    "p5",
+  ],
+  "setsLost:desc": [
+    "p5",
+    "p3",
+    "p4",
+    "p6",
+    "p1",
+    "p2",
+  ],
+  "setsWon:asc": [
+    "p5",
+    "p3",
+    "p1",
+    "p2",
+    "p4",
+    "p6",
+  ],
+  "setsWon:desc": [
+    "p2",
+    "p4",
+    "p6",
+    "p1",
+    "p3",
+    "p5",
+  ],
+  "wins:asc": [
+    "p5",
+    "p3",
+    "p2",
+    "p6",
+    "p1",
+    "p4",
+  ],
+  "wins:desc": [
+    "p2",
+    "p6",
+    "p1",
+    "p4",
+    "p3",
+    "p5",
+  ],
+}
+`;
