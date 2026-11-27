@@ -383,7 +383,10 @@ const en: DocPage[] = [
         subsections: [
           {
             title: 'Features',
-            items: ['Link the footer version to the version history documentation.'],
+            items: [
+              'Link the footer version to the version history documentation.',
+              'Store tournaments in a versioned format (v2) with automatic migration of existing data.',
+            ],
           },
           {
             title: 'Bugfixes',
@@ -938,7 +941,10 @@ const de: DocPage[] = [
         subsections: [
           {
             title: 'Funktionen',
-            items: ['Footer-Version mit der Versionshistorie verknüpft.'],
+            items: [
+              'Footer-Version mit der Versionshistorie verknüpft.',
+              'Turniere werden in einem versionierten Format (v2) gespeichert; bestehende Daten werden automatisch migriert.',
+            ],
           },
           {
             title: 'Fehlerbehebungen',
