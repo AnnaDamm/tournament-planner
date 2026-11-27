@@ -53,7 +53,8 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
   - Architecture, planning, code review and improvement suggestions: the most capable model available (currently Opus).
   - Implementation of a planned and scoped work package: a cheaper coding model (currently Sonnet).
   - Trivial mechanical tasks such as lookups or bulk renames: the smallest model (currently Haiku).
-- Every implementation PR is reviewed by a higher-tier agent; its findings are applied by an implementation agent and reviewed again until no blocking findings remain.
+- Every implementation PR is reviewed by two independent higher-tier review agents that use **different models** (for example Opus and Fable), so their blind spots do not overlap. Their findings are applied by an implementation agent and the PR is reviewed again until no blocking findings remain.
+- A PR may be merged only after both reviewers approve, CI is green and, for UI changes, the change has been tested in the browser.
 - Watch for merge conflicts between parallel PRs (especially `CHANGELOG.md`, the documentation page, i18n files and registries); merge in dependency order and rebase the remaining branches.
 - Browser tests with an automated browser (for example the Chrome DevTools MCP) must use an isolated browser context per test run and must not touch the owner's existing tabs.
 - Podman is an acceptable substitute for Docker in all commands above (for example through a `docker` → `podman` shim).
