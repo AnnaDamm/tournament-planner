@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { Participant, Round } from '../tournamentTypes'
+import type { EvaluationContext } from '../tournament'
 import {
   calculateStandingsBeforeRounds,
   compareRankingParticipants,
@@ -10,36 +11,32 @@ import { sortStats } from '../tournamentStats'
 export function useTournamentDerivedState(
   players: Participant[],
   rounds: Round[],
-  defaultSetPoints: number,
+  ctx: EvaluationContext,
   sort: string,
   desc: boolean,
 ) {
   const standingsBeforeRounds = useMemo(
-    () => calculateStandingsBeforeRounds(players, rounds, defaultSetPoints),
-    [defaultSetPoints, players, rounds],
+    () => calculateStandingsBeforeRounds(players, rounds, ctx),
+    [ctx, players, rounds],
   )
   const stats = useMemo(
     () =>
-      getRankingParticipants(players, rounds, defaultSetPoints).map((player) => ({
+      getRankingParticipants(players, rounds, ctx).map((player) => ({
         ...player,
-        played: player.wins + player.losses,
+        played: player.wins + player.draws + player.losses,
         diff: player.scored - player.conceded,
         points: player.scored,
       })),
-    [defaultSetPoints, players, rounds],
+    [ctx, players, rounds],
   )
   const participantOrderByRound = useMemo(
     () =>
       rounds.map((_, roundIndex) => {
-        const ranking = getRankingParticipants(
-          players,
-          rounds.slice(0, roundIndex),
-          defaultSetPoints,
-        )
+        const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex), ctx)
         if (roundIndex > 0) ranking.sort(compareRankingParticipants)
         return ranking.map((player) => player.id)
       }),
-    [defaultSetPoints, players, rounds],
+    [ctx, players, rounds],
   )
   const positions = useMemo(
     () =>

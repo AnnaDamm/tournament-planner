@@ -36,8 +36,8 @@ const createDraft = (settings: TournamentSettings): SettingsDraft => ({
   tournamentName: settings.tournamentName,
   participantType: settings.participantType,
   courtCount: String(settings.courtCount),
-  defaultWinningGames: String(settings.defaultWinningGames),
-  defaultSetPoints: String(settings.defaultSetPoints),
+  defaultWinningGames: String(settings.scoring.format.winningGames),
+  defaultSetPoints: String(settings.scoring.format.gamePoints ?? 21),
   scheduledStart: settings.scheduledStart,
   expectedDurationMinutes: String(settings.expectedDurationMinutes),
   breakBetweenMatchesMinutes: String(settings.breakBetweenMatchesMinutes),
@@ -82,11 +82,18 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
     event.preventDefault()
     dispatch(
       saveTournamentSettings({
+        ...settings,
         tournamentName: draft.tournamentName.trim() || 'Tourny',
         participantType: draft.participantType,
         courtCount: clampPositiveInteger(Number(draft.courtCount)),
-        defaultWinningGames: clampWinningGames(Number(draft.defaultWinningGames)),
-        defaultSetPoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
+        scoring: {
+          ...settings.scoring,
+          format: {
+            ...settings.scoring.format,
+            winningGames: clampWinningGames(Number(draft.defaultWinningGames)),
+            gamePoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
+          },
+        },
         scheduledStart: draft.scheduledStart,
         expectedDurationMinutes: clampDuration(Number(draft.expectedDurationMinutes)),
         breakBetweenMatchesMinutes: clampBreak(Number(draft.breakBetweenMatchesMinutes)),

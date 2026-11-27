@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { Participant, Round, TournamentSettings, TournamentSnapshot } from './tournamentTypes'
-import { createEmptyTournamentSnapshot } from './storage'
+import { createEmptyTournamentSnapshot } from './domain/snapshot'
 
 export type SettingsSavedPayload = {
   settings: TournamentSettings
@@ -80,6 +80,9 @@ const tournamentSlice = createSlice({
     tournamentCleared: (state) => {
       state.players = []
       state.rounds = []
+      state.phases = state.phases.map(
+        ({ entrants: _entrants, startedAt: _startedAt, ...phase }) => phase,
+      )
     },
     scheduledRoundStarted: (state, action: PayloadAction<ScheduledRoundStartedPayload>) => {
       state.rounds = action.payload.rounds

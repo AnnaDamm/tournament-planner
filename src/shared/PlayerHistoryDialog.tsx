@@ -6,8 +6,9 @@ import { X } from 'lucide-react'
 import { t } from '../i18n'
 import {
   compareRankingParticipants,
-  getMatchResult,
   getMatchSets,
+  getRoundMatchResult,
+  type EvaluationContext,
   getRankingParticipants,
   getRunningMatchIdsByRound,
   isByeCounted,
@@ -19,7 +20,7 @@ type Props = {
   players: Participant[]
   rounds: Round[]
   defaultCourtCount: number
-  defaultSetPoints: number
+  ctx: EvaluationContext
   name: (id: string) => string
   onClose: () => void
 }
@@ -45,13 +46,13 @@ const getSetScore = (playerId: string, match: Round['matches'][number]) =>
   )
 
 const getByeSetScore = (round: Round) => ({
-  own: Math.max(1, round.winningGames || 1),
+  own: Math.max(1, round.format.winningGames || 1),
   opponent: 0,
 })
 
-const getByePlayerScores = (round: Round, defaultSetPoints: number) =>
-  Array.from({ length: Math.max(1, round.winningGames || 1) }, () => ({
-    own: defaultSetPoints,
+const getByePlayerScores = (round: Round, ctx: EvaluationContext) =>
+  Array.from({ length: Math.max(1, round.format.winningGames || 1) }, () => ({
+    own: ctx.defaultFormat.gamePoints ?? 21,
     opponent: 0,
   }))
 
@@ -60,7 +61,7 @@ export function PlayerHistoryDialog({
   players,
   rounds,
   defaultCourtCount,
-  defaultSetPoints,
+  ctx,
   name,
   onClose,
 }: Props) {
@@ -87,16 +88,16 @@ export function PlayerHistoryDialog({
           ? [...roundsThroughCurrent, { ...nextRound, bye: null, matches: [] }]
           : roundsThroughCurrent
         return new Map(
-          getRankingParticipants(players, rankingRounds, defaultSetPoints)
+          getRankingParticipants(players, rankingRounds, ctx)
             .sort(compareRankingParticipants)
             .map((participant, position) => [participant.id, position + 1]),
         )
       }),
-    [defaultSetPoints, players, rounds],
+    [ctx, players, rounds],
   )
   const runningMatchIdsByRound = useMemo(
-    () => getRunningMatchIdsByRound(rounds, defaultCourtCount),
-    [defaultCourtCount, rounds],
+    () => getRunningMatchIdsByRound(ctx.rules, rounds, defaultCourtCount),
+    [ctx.rules, defaultCourtCount, rounds],
   )
   const playedRoundIndexes = player
     ? rounds.flatMap((round, roundIndex) =>
@@ -114,7 +115,7 @@ export function PlayerHistoryDialog({
         const match = round.matches.find(
           (candidate) => candidate.a === player.id || candidate.b === player.id,
         )
-        const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
+        const result = match ? getRoundMatchResult(ctx, round, match) : null
         const won = result?.winner === player.id
         const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
         const isBye = isByeCounted(round, rounds[roundIndex + 1]) && round.bye === player.id
@@ -134,7 +135,7 @@ export function PlayerHistoryDialog({
             opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
             sets: isBye ? getByeSetScore(round) : !match ? null : getSetScore(player.id, match),
             score: isBye
-              ? getByePlayerScores(round, defaultSetPoints)
+              ? getByePlayerScores(round, ctx)
               : !match
                 ? []
                 : getPlayerScores(player.id, match),

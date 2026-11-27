@@ -1,5 +1,6 @@
 import type { RootState } from '../store'
-import { hasEnteredScore, rerollRound } from '../tournament'
+import { rerollRoundInSnapshot } from '../domain/phases/phaseState'
+import { hasEnteredScore } from '../tournament'
 import {
   participantDeleted,
   participantRenamed,
@@ -15,7 +16,7 @@ const updateParticipantOrder = (ordered: Participant[], state: RootState['tourna
   players: ordered,
   rounds: state.rounds.some((round) => round.matches.some((match) => hasEnteredScore(match)))
     ? state.rounds
-    : rerollRound(ordered, state.rounds, 1, state.defaultSetPoints),
+    : rerollRoundInSnapshot({ ...state, players: ordered }, 1),
 })
 
 export const addParticipants =

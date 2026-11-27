@@ -6,7 +6,8 @@ import { X } from 'lucide-react'
 import { t } from '../../i18n'
 import {
   compareRankingParticipants,
-  getMatchResult,
+  getRoundMatchResult,
+  type EvaluationContext,
   getRankingParticipants,
 } from '../../tournament'
 import type { Match, Participant, Round } from '../../tournamentTypes'
@@ -18,7 +19,7 @@ type Props = {
   roundIndex: number | null
   players: Participant[]
   rounds: Round[]
-  defaultSetPoints: number
+  ctx: EvaluationContext
   name: (id: string) => string
   onClose: () => void
 }
@@ -53,10 +54,8 @@ const emptyDirectStats = (): DirectStats => ({
   conceded: 0,
 })
 
-const getStats = (players: Participant[], rounds: Round[], defaultSetPoints: number) => {
-  const ranking = getRankingParticipants(players, rounds, defaultSetPoints).sort(
-    compareRankingParticipants,
-  )
+const getStats = (players: Participant[], rounds: Round[], ctx: EvaluationContext) => {
+  const ranking = getRankingParticipants(players, rounds, ctx).sort(compareRankingParticipants)
   return new Map<string, ComparisonPlayer>(
     ranking.map((player, position) => [
       player.id,
@@ -66,7 +65,7 @@ const getStats = (players: Participant[], rounds: Round[], defaultSetPoints: num
         position: position + 1,
         wins: player.wins,
         losses: player.losses,
-        played: player.wins + player.losses,
+        played: player.wins + player.draws + player.losses,
         setsWon: player.setsWon,
         setsLost: player.setsLost,
         scored: player.scored,
@@ -80,6 +79,7 @@ const isMatchBetween = (match: Match, firstId: string, secondId: string) =>
   (match.a === firstId && match.b === secondId) || (match.a === secondId && match.b === firstId)
 
 const getDirectStats = (
+  ctx: EvaluationContext,
   firstId: string,
   secondId: string,
   rounds: Round[],
@@ -89,7 +89,7 @@ const getDirectStats = (
     round.matches
       .filter((match) => isMatchBetween(match, firstId, secondId))
       .forEach((match) => {
-        const result = getMatchResult(match, Math.max(1, round.winningGames || 1))
+        const result = getRoundMatchResult(ctx, round, match)
         if (!result) return
         const first = stats[0]
         const second = stats[1]
@@ -102,7 +102,7 @@ const getDirectStats = (
           first.losses += 1
           second.wins += 1
         }
-        result.sets.forEach((set) => {
+        result.games.forEach((set) => {
           const pointsA = Number(set.a)
           const pointsB = Number(set.b)
           if (match.a === firstId) {
@@ -143,7 +143,7 @@ export function PlayerComparisonDialog({
   roundIndex,
   players,
   rounds,
-  defaultSetPoints,
+  ctx,
   name,
   onClose,
 }: Props) {
@@ -155,13 +155,10 @@ export function PlayerComparisonDialog({
     () => (roundIndex === null ? rounds : rounds.slice(0, roundIndex)),
     [roundIndex, rounds],
   )
-  const currentStats = useMemo(
-    () => getStats(players, rounds, defaultSetPoints),
-    [defaultSetPoints, players, rounds],
-  )
+  const currentStats = useMemo(() => getStats(players, rounds, ctx), [ctx, players, rounds])
   const previousStats = useMemo(
-    () => getStats(players, roundsBeforeSelected, defaultSetPoints),
-    [defaultSetPoints, players, roundsBeforeSelected],
+    () => getStats(players, roundsBeforeSelected, ctx),
+    [ctx, players, roundsBeforeSelected],
   )
   const comparison = useMemo(() => {
     if (!playerIds) return null
@@ -170,8 +167,8 @@ export function PlayerComparisonDialog({
     const first = stats.get(playerIds[0])
     const second = stats.get(playerIds[1])
     if (!first || !second) return null
-    return { first, second, direct: getDirectStats(first.id, second.id, comparisonRounds) }
-  }, [currentStats, playerIds, previousStats, rounds, roundsBeforeSelected, view])
+    return { first, second, direct: getDirectStats(ctx, first.id, second.id, comparisonRounds) }
+  }, [ctx, currentStats, playerIds, previousStats, rounds, roundsBeforeSelected, view])
 
   useEffect(() => {
     const dialog = dialogRef.current

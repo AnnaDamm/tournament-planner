@@ -31,7 +31,7 @@ export function useTournamentPersistence({ store, initialRevision, writable }: P
       revisionRef.current = revision
       persistTournamentState(nextSnapshot, revision)
     })
-    const unsubscribeExternal = subscribeToTournamentState((incoming) => {
+    const unsubscribeExternal = subscribeToTournamentState(previousSnapshot.id, (incoming) => {
       if (!isNewerRevision(incoming.revision, revisionRef.current)) return
       revisionRef.current = incoming.revision
       applyingRemoteRef.current = true

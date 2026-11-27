@@ -1,4 +1,6 @@
-import type { Match, Participant, Round, SetScore } from '../tournamentTypes'
+import type { Match, Participant, Round } from './legacyApi'
+
+type SetScore = { a: string; b: string }
 
 export const player = (id: string, name = id, extra: Partial<Participant> = {}): Participant => ({
   id,

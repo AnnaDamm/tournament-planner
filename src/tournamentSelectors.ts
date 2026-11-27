@@ -4,9 +4,10 @@ import {
   calculateExpectedMatchStarts,
   calculateStandingsBeforeRounds,
   compareRankingParticipants,
+  createEvaluationContext,
   getCurrentRoundNumber,
-  getMatchResult,
   getRankingParticipants,
+  getRoundMatchResult,
   getRunningMatchIdsByRound,
   isUnknownParticipantId,
 } from './tournament'
@@ -19,8 +20,19 @@ export const selectRounds = (state: RootState) => state.tournament.rounds
 export const selectTournamentName = (state: RootState) => state.tournament.tournamentName
 export const selectParticipantType = (state: RootState) => state.tournament.participantType
 export const selectCourtCount = (state: RootState) => state.tournament.courtCount
-export const selectDefaultWinningGames = (state: RootState) => state.tournament.defaultWinningGames
-export const selectDefaultSetPoints = (state: RootState) => state.tournament.defaultSetPoints
+export const selectScoring = (state: RootState) => state.tournament.scoring
+export const selectTieBreakers = (state: RootState) => state.tournament.tieBreakers
+export const selectTeams = (state: RootState) => state.tournament.teams
+export const selectPhases = (state: RootState) => state.tournament.phases
+export const selectDefaultWinningGames = (state: RootState) =>
+  state.tournament.scoring.format.winningGames
+export const selectDefaultSetPoints = (state: RootState) =>
+  state.tournament.scoring.format.gamePoints ?? 21
+
+export const selectEvaluationContext = createSelector(
+  [selectScoring, selectTieBreakers, selectPhases],
+  (scoring, tieBreakers, phases) => createEvaluationContext({ scoring, tieBreakers, phases }),
+)
 export const selectExpectedDurationMinutes = (state: RootState) =>
   state.tournament.expectedDurationMinutes
 export const selectBreakBetweenMatchesMinutes = (state: RootState) =>
@@ -32,55 +44,60 @@ export const selectTournamentSettings = createSelector(
     selectTournamentName,
     selectParticipantType,
     selectCourtCount,
-    selectDefaultWinningGames,
-    selectDefaultSetPoints,
     selectExpectedDurationMinutes,
     selectBreakBetweenMatchesMinutes,
     selectScheduledStart,
+    selectScoring,
+    selectTieBreakers,
+    selectTeams,
+    selectPhases,
   ],
   (
     tournamentName,
     participantType,
     courtCount,
-    defaultWinningGames,
-    defaultSetPoints,
     expectedDurationMinutes,
     breakBetweenMatchesMinutes,
     scheduledStart,
+    scoring,
+    tieBreakers,
+    teams,
+    phases,
   ): TournamentSettings => ({
     tournamentName,
     participantType,
     courtCount,
-    defaultWinningGames,
-    defaultSetPoints,
     expectedDurationMinutes,
     breakBetweenMatchesMinutes,
     scheduledStart,
+    scoring,
+    tieBreakers,
+    teams,
+    phases,
   }),
 )
 
 export const selectStandingsBeforeRounds = createSelector(
-  [selectPlayers, selectRounds, selectDefaultSetPoints],
-  (players, rounds, defaultSetPoints) =>
-    calculateStandingsBeforeRounds(players, rounds, defaultSetPoints),
+  [selectPlayers, selectRounds, selectEvaluationContext],
+  (players, rounds, ctx) => calculateStandingsBeforeRounds(players, rounds, ctx),
 )
 
 export const selectRankingStats = createSelector(
-  [selectPlayers, selectRounds, selectDefaultSetPoints],
-  (players, rounds, defaultSetPoints) =>
-    getRankingParticipants(players, rounds, defaultSetPoints).map((player) => ({
+  [selectPlayers, selectRounds, selectEvaluationContext],
+  (players, rounds, ctx) =>
+    getRankingParticipants(players, rounds, ctx).map((player) => ({
       ...player,
-      played: player.wins + player.losses,
+      played: player.wins + player.draws + player.losses,
       diff: player.scored - player.conceded,
       points: player.scored,
     })),
 )
 
 export const selectParticipantOrderByRound = createSelector(
-  [selectPlayers, selectRounds, selectDefaultSetPoints],
-  (players, rounds, defaultSetPoints) =>
+  [selectPlayers, selectRounds, selectEvaluationContext],
+  (players, rounds, ctx) =>
     rounds.map((_, roundIndex) => {
-      const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex), defaultSetPoints)
+      const ranking = getRankingParticipants(players, rounds.slice(0, roundIndex), ctx)
       if (roundIndex > 0) ranking.sort(compareRankingParticipants)
       return ranking.map((player) => player.id)
     }),
@@ -160,17 +177,18 @@ export const selectParticipantTargets = createSelector([selectPlayers], (players
 )
 
 export const selectNextMatchTargets = createSelector(
-  [selectPlayers, selectRounds, selectCourtCount],
-  (players, rounds, courtCount) => {
+  [selectPlayers, selectRounds, selectCourtCount, selectEvaluationContext],
+  (players, rounds, courtCount, ctx) => {
     const runningMatchIds = new Set(
-      [...getRunningMatchIdsByRound(rounds, courtCount).values()].flatMap((ids) => [...ids]),
+      [...getRunningMatchIdsByRound(ctx.rules, rounds, courtCount).values()].flatMap((ids) => [
+        ...ids,
+      ]),
     )
     const targetsByParticipant = new Map(players.map((player) => [player.id, [] as string[]]))
 
     rounds.forEach((round) => {
-      const winningGames = Math.max(1, round.winningGames || 1)
       round.matches.forEach((match) => {
-        if (getMatchResult(match, winningGames) || runningMatchIds.has(match.id)) return
+        if (getRoundMatchResult(ctx, round, match) || runningMatchIds.has(match.id)) return
         targetsByParticipant.get(match.a)?.push(match.id)
         targetsByParticipant.get(match.b)?.push(match.id)
       })
@@ -186,8 +204,8 @@ export const selectNextMatchTargets = createSelector(
 )
 
 export const selectCurrentRoundNumber = createSelector(
-  [selectRounds, selectCourtCount],
-  (rounds, courtCount) => getCurrentRoundNumber(rounds, courtCount),
+  [selectRounds, selectCourtCount, selectEvaluationContext],
+  (rounds, courtCount, ctx) => getCurrentRoundNumber(ctx.rules, rounds, courtCount),
 )
 
 export const selectRoundCount = createSelector([selectRounds], (rounds) => rounds.length)

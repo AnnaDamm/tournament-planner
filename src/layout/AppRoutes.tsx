@@ -4,11 +4,11 @@ import type { LocalMasterConfig } from '../liveSharing'
 import { t } from '../i18n'
 import { downloadTournament } from '../tournamentExport'
 import { parseTournamentSnapshot } from '../tournamentSnapshot'
-import { hasEnteredScore, getMatchResult, isUnknownParticipantId } from '../tournament'
+import { getRoundMatchResult, hasEnteredScore, isUnknownParticipantId } from '../tournament'
 import {
   selectCourtCount,
-  selectDefaultSetPoints,
   selectDefaultWinningGames,
+  selectEvaluationContext,
   selectParticipantOrderByRound,
   selectParticipantType,
   selectPlayers,
@@ -48,7 +48,7 @@ export function AppRoutes({
   const rounds = useAppSelector(selectRounds)
   const scheduledRounds = useAppSelector(selectScheduledRounds)
   const participantOrderByRound = useAppSelector(selectParticipantOrderByRound)
-  const defaultSetPoints = useAppSelector(selectDefaultSetPoints)
+  const ctx = useAppSelector(selectEvaluationContext)
   const defaultWinningGames = useAppSelector(selectDefaultWinningGames)
   const courtCount = useAppSelector(selectCourtCount)
   const participantType = useAppSelector(selectParticipantType)
@@ -70,13 +70,13 @@ export function AppRoutes({
 
       const round = rounds[roundIndex]
       const match = round?.matches.find((item) => item.a === id || item.b === id)
-      const result = match ? getMatchResult(match, Math.max(1, round.winningGames || 1)) : null
+      const result = match ? getRoundMatchResult(ctx, round, match) : null
       const isBye = round?.bye === id
       const nextWins = result?.winner === id || isBye ? player.wins + 1 : player.wins
 
       return result || isBye ? `${player.wins} → ${nextWins}` : String(player.wins)
     },
-    [rounds, standingsBeforeRounds],
+    [ctx, rounds, standingsBeforeRounds],
   )
   const toggleSort = useCallback(
     (key: string) => {
@@ -117,7 +117,7 @@ export function AppRoutes({
             sorted={sorted}
             players={players}
             defaultCourtCount={courtCount}
-            defaultSetPoints={defaultSetPoints}
+            ctx={ctx}
             participantLabel={participantLabel}
             rounds={scheduledRounds}
             name={name}
@@ -154,7 +154,7 @@ export function AppRoutes({
             record={record}
             defaultCourtCount={courtCount}
             defaultWinningGames={defaultWinningGames}
-            defaultSetPoints={defaultSetPoints}
+            ctx={ctx}
             onKeyboardMoveActiveChange={onKeyboardMoveActiveChange}
             readOnly={readOnly}
           />

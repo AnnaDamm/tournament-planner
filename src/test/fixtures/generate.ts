@@ -9,15 +9,18 @@ import {
 } from '../legacyApi'
 import { player } from '../fixtures'
 import { withSeed } from '../seededRandom'
-import { FIXED_START, playRound, simulate } from '../simulate'
+import { FIXED_START, playFirstMatches, simulate } from '../simulate'
 
 /**
  * Builds the v1 snapshot fixtures (v1-*.json) deterministically from the test builders.
  *
- * Regenerate (only when the fixtures must change on purpose) with
+ * The committed JSON files are frozen v1 exports and the source of truth for the
+ * migration tests. NEVER regenerate them to make a failing test green: a failure means
+ * the code changed behaviour or compatibility, not the fixtures. Regenerate only when a
+ * fixture must change on purpose (new scenario), with
  *   REGENERATE_FIXTURES=1 pnpm exec vitest run src/test/fixtures
- * (inside the build-stage container, see AGENTS.md). Without the variable
- * generate.test.ts only verifies that the committed files match this output.
+ * (inside the build-stage container, see AGENTS.md). generate.test.ts verifies only the
+ * structure of the committed files, never that they equal this generator's output.
  */
 const settings = {
   version: 1 as const,
@@ -68,12 +71,7 @@ const midUnknowns = (): TournamentSnapshot => {
     'p',
   )
   const [first] = simulate(field, 1, { seed: 2, playedRounds: 0, startRounds: false })
-  const partial: Round = {
-    ...first,
-    matches: first.matches.map((item, index) =>
-      index < 2 ? playRound({ ...first, matches: [item] }).matches[0] : item,
-    ),
-  }
+  const partial = playFirstMatches(first, 2)
   const plan = withSeed(2, () => createRoundPlan(field, [partial], 2))
   const second: Round = {
     number: 2,

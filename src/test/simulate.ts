@@ -41,6 +41,14 @@ export const playRound = (round: Round) => ({
   ),
 })
 
+/** Scores the first `count` matches of a round and leaves the others unplayed. */
+export const playFirstMatches = (round: Round, count: number): Round => ({
+  ...round,
+  matches: round.matches.map((item, index) =>
+    index < count ? playRound({ ...round, matches: [item] }).matches[0] : item,
+  ),
+})
+
 /** Plans (and scores) rounds with a seeded random source so the result is reproducible. */
 export const simulate = (
   players: Participant[],

@@ -8,12 +8,9 @@ import { RoundBye } from './RoundBye'
 import { RoundMatchesHeader } from './RoundMatchesHeader'
 import { RoundActions } from './RoundActions'
 import { t } from '../../i18n'
-import {
-  getMaxSetCount,
-  getVisibleSetCount,
-  isRoundComplete,
-  sortMatchesByParticipantOrder,
-} from '../../tournament'
+import { getMatchFormat, isRoundComplete, sortMatchesByParticipantOrder } from '../../tournament'
+import { selectEvaluationContext } from '../../tournamentSelectors'
+import { useAppSelector } from '../../storeHooks'
 import type { Match, Round } from '../../tournamentTypes'
 
 type Props = {
@@ -65,7 +62,8 @@ export const RoundSection = memo(function RoundSection({
   onKeyboardSwap,
   readOnly,
 }: Props) {
-  const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(round)
+  const { rules } = useAppSelector(selectEvaluationContext)
+  const canReorderBye = !readOnly && !nextRoundStarted && !isRoundComplete(rules, round)
   const isCurrentRound = runningMatchIds.size > 0
   const keyboardMoveActive = keyboardMove !== null
   const isKeyboardMoveRound = keyboardMove?.roundIndex === roundIndex
@@ -74,9 +72,14 @@ export const RoundSection = memo(function RoundSection({
     () => sortMatchesByParticipantOrder(round.matches, participantOrder),
     [participantOrder, round.matches],
   )
-  const maxSetCount = getMaxSetCount(round.winningGames)
+  const maxSetCount = rules.getMaxGameCount(round.format)
   const setCount = readOnly
-    ? Math.max(1, ...orderedMatches.map((match) => getVisibleSetCount(match, round.winningGames)))
+    ? Math.max(
+        1,
+        ...orderedMatches.map((match) =>
+          rules.getVisibleGameCount(match, getMatchFormat(round, match)),
+        ),
+      )
     : maxSetCount
   const getRecord = useCallback((id: string) => record(roundIndex, id), [record, roundIndex])
   const handleCompare = useCallback(
@@ -199,7 +202,8 @@ export const RoundSection = memo(function RoundSection({
               onPlayerClick={onPlayerClick}
               onCompare={handleCompare}
               onUpdate={handleUpdate}
-              winningGames={round.winningGames ?? 1}
+              rules={rules}
+              format={getMatchFormat(round, match)}
               setCount={setCount}
               isRunning={runningMatchIds.has(match.id)}
               onSwap={handleSwapPlayers}

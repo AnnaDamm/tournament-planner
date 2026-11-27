@@ -3,14 +3,10 @@ import sharedStyles from '../../styles/shared.module.css'
 import { classNames } from '../../styles/classNames'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
-import type { Match, SetScore } from '../../tournamentTypes'
+import type { Match, MatchFormat, SetScore } from '../../tournamentTypes'
+import type { ScoringRules } from '../../domain/scoring/types'
 import { t } from '../../i18n'
-import {
-  getMatchResult,
-  getVisibleSetCount,
-  hasEnteredScore,
-  isUnknownParticipantId,
-} from '../../tournament'
+import { hasEnteredScore, isUnknownParticipantId } from '../../tournament'
 import { SetScores } from './SetScores'
 
 type Props = {
@@ -27,7 +23,8 @@ type Props = {
   selectedParticipantId?: string | null
   onKeyboardSwap: (participantId: string) => void
   keyboardMoveActive?: boolean
-  winningGames: number
+  rules: ScoringRules
+  format: MatchFormat
   setCount: number
   isRunning?: boolean
   readOnly?: boolean
@@ -91,7 +88,8 @@ export const MatchRow = memo(function MatchRow({
   selectedParticipantId = null,
   onKeyboardSwap,
   keyboardMoveActive = false,
-  winningGames,
+  rules,
+  format,
   setCount,
   isRunning = false,
   readOnly = false,
@@ -108,8 +106,8 @@ export const MatchRow = memo(function MatchRow({
     setDraftSets(initialSets)
     draftSetsRef.current = initialSets
   }, [initialSets])
-  const targetWins = Math.max(1, Math.min(99, Number(winningGames) || 1))
-  const matchResult = getMatchResult(match, targetWins)
+  const targetWins = Math.max(1, Math.min(99, Number(format.winningGames) || 1))
+  const matchResult = rules.getResult(match, format)
   const canReorder = !readOnly && !hasEnteredScore(match)
   const canKeyboardDropA =
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.a
@@ -127,7 +125,7 @@ export const MatchRow = memo(function MatchRow({
       { a: 0, b: 0 },
     )
   }, [draftSets, winnerAt])
-  const visibleSetCount = getVisibleSetCount(match, targetWins)
+  const visibleSetCount = rules.getVisibleGameCount(match, format)
   const updateSet = (setIndex: number, side: 'a' | 'b', value: string) => {
     const safeValue =
       value === '' ? '' : String(Math.max(0, Number.isFinite(Number(value)) ? Number(value) : 0))
