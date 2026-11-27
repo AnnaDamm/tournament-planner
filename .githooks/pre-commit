@@ -26,7 +26,7 @@ changed_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(c
 
 if [ -n "$changed_files" ]; then
   echo "Checking Prettier formatting on staged files..."
-  run_pnpm exec prettier --check $changed_files
+  run_pnpm exec prettier --check --no-error-on-unmatched-pattern $changed_files
 
   echo "Running Oxlint on staged files..."
   lint_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$' || true)

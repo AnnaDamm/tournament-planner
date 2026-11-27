@@ -45,6 +45,19 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
 - Always run the repository's pre-commit hooks at the end of the task as the
   final quality checks.
 
+## Agent workflow
+
+- Work on every branch/PR in its own Git worktree (for example `../tourny-worktrees/<name>`), so that parallel agents never share a working tree.
+- Split larger milestones into work packages with clear file ownership before starting parallel agents. Shared foundations (data model, interfaces, registries, test setup) land first as separate base PRs; feature PRs build on them so no two agents do the same work.
+- Choose the model by task:
+  - Architecture, planning, code review and improvement suggestions: the most capable model available (currently Opus).
+  - Implementation of a planned and scoped work package: a cheaper coding model (currently Sonnet).
+  - Trivial mechanical tasks such as lookups or bulk renames: the smallest model (currently Haiku).
+- Every implementation PR is reviewed by a higher-tier agent; its findings are applied by an implementation agent and reviewed again until no blocking findings remain.
+- Watch for merge conflicts between parallel PRs (especially `CHANGELOG.md`, the documentation page, i18n files and registries); merge in dependency order and rebase the remaining branches.
+- Browser tests with an automated browser (for example the Chrome DevTools MCP) must use an isolated browser context per test run and must not touch the owner's existing tabs.
+- Podman is an acceptable substitute for Docker in all commands above (for example through a `docker` → `podman` shim).
+
 ## Release consistency
 
 - Every new version tag must update `package.json`, the version history on the documentation page, and `CHANGELOG.md` together.
