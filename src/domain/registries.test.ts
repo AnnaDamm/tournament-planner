@@ -16,7 +16,7 @@ import { playRound } from '../test/simulate'
 describe('registries', () => {
   it('provides swiss, sets rules, the "other" sport and the legacy tie-breakers', () => {
     expect(getPhaseMode('swiss')?.id).toBe('swiss')
-    expect(getPhaseMode('singleElimination')).toBeUndefined()
+    expect(getPhaseMode('singleElimination')?.id).toBe('singleElimination')
     expect(getScoringRules('sets').id).toBe('sets')
     expect(getScoringRules('countdown').id).toBe('sets') // unregistered rules fall back
     expect(getSport('other').rules).toBe('sets')

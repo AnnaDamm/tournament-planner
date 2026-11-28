@@ -61,6 +61,8 @@ export type PhaseMode<C> = {
   fillUnknown?(p: PhaseContext<C>, round: Round): Round
   rerollBye?(p: PhaseContext<C>, round: Round): Round
   resolveRounds?(p: PhaseContext<C>): Round[] // after any result change: fill sources (KO advancement)
+  /** True when resolving would change a participant of a match that already has scores. */
+  hasResolveConflict?(p: PhaseContext<C>): boolean
   isComplete(p: PhaseContext<C>): boolean
   getPlacements(p: PhaseContext<C>): Placement[] // table + transitions
 }

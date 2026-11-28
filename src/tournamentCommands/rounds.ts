@@ -3,6 +3,7 @@ import {
   buildPhaseContext,
   fillUnknownInSnapshot,
   getActivePhase,
+  hasResolutionConflict,
   rerollByeInSnapshot,
   rerollRoundInSnapshot,
 } from '../domain/phases/phaseState'
@@ -133,10 +134,23 @@ export const startRound =
     )
   }
 
+/**
+ * True when the new match data would change the participants of a later match that already has
+ * scores (knockout advancement): the follow-up match has to be cleared first.
+ */
+export const isRoundUpdateBlocked = (state: State, index: number, matches: Match[]) =>
+  hasResolutionConflict({
+    ...state,
+    rounds: state.rounds.map((item, roundIndex) =>
+      roundIndex === index ? { ...item, matches } : item,
+    ),
+  })
+
 export const updateRoundMatches =
   (index: number, matches: Match[]): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
+    if (isRoundUpdateBlocked(state, index, matches)) return
     const previousMatches = state.rounds[index]?.matches ?? []
     const ctx = createEvaluationContext(state)
     const round = state.rounds[index]

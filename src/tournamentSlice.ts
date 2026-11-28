@@ -92,6 +92,9 @@ const tournamentSlice = createSlice({
       state.phases = action.payload.phases
       state.rounds = action.payload.rounds
     },
+    firstPhaseStarted: (state, action: PayloadAction<Round[]>) => {
+      state.rounds = action.payload
+    },
     tournamentCleared: (state) => {
       state.players = []
       state.rounds = []
@@ -128,6 +131,7 @@ export const {
   roundByeRerolled,
   roundPlayersSwapped,
   nextPhaseStarted,
+  firstPhaseStarted,
   tournamentCleared,
   scheduledRoundStarted,
   predictedStartsUpdated,
