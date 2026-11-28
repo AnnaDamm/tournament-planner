@@ -4,6 +4,7 @@ import type { MessageKey } from '../../i18n'
 const terms = (overrides: Partial<Record<TermKey, MessageKey>>): Sport['terms'] => ({
   gamesHeader: 'sets',
   gameScore: 'setScore',
+  gamesPlural: 'sportsSetsPlural',
   winningGames: 'winningGames',
   winningGamesHelp: 'defaultWinningGamesHelp',
   defaultWinningGames: 'defaultWinningGames',
@@ -56,6 +57,7 @@ export const football: Sport = {
   terms: terms({
     gamesHeader: 'sportsGoals',
     gameScore: 'sportsGoalsScore',
+    gamesPlural: 'sportsGoalsPlural',
   }),
   editable: [],
 }
@@ -68,6 +70,7 @@ export const esports: Sport = {
   terms: terms({
     gamesHeader: 'sportsMaps',
     gameScore: 'sportsMapScore',
+    gamesPlural: 'sportsMapsPlural',
     winningGames: 'sportsWinningMaps',
     winningGamesHelp: 'sportsDefaultWinningMapsHelp',
     defaultWinningGames: 'sportsDefaultWinningMaps',
@@ -84,6 +87,7 @@ export const snooker: Sport = {
   terms: terms({
     gamesHeader: 'sportsFrames',
     gameScore: 'sportsFrameScore',
+    gamesPlural: 'sportsFramesPlural',
     winningGames: 'sportsWinningFrames',
     winningGamesHelp: 'sportsDefaultWinningFramesHelp',
     defaultWinningGames: 'sportsDefaultWinningFrames',
@@ -100,6 +104,7 @@ export const darts: Sport = {
   terms: terms({
     gamesHeader: 'sportsLegs',
     gameScore: 'sportsLegScore',
+    gamesPlural: 'sportsLegsPlural',
     winningGames: 'sportsWinningLegs',
     winningGamesHelp: 'sportsDefaultWinningLegsHelp',
     defaultWinningGames: 'sportsDefaultWinningLegs',

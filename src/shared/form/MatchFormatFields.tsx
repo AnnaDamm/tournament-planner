@@ -37,7 +37,7 @@ export function MatchFormatFields({
   const has = (key: keyof MatchFormat) =>
     rules.entry !== 'outcome' && rules.entry !== 'single' && sport.editable.includes(key)
   const supportsFixed = rules.supportsFixedGames && has('fixedGames')
-  const games = term('gamesHeader').toLocaleLowerCase()
+  const games = term('gamesPlural')
   const field = (
     key: 'winningGames' | 'gamePoints',
     label: string,

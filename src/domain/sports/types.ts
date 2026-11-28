@@ -8,6 +8,7 @@ export type SportId =
 export type TermKey =
   | 'gamesHeader'
   | 'gameScore'
+  | 'gamesPlural'
   | 'winningGames'
   | 'winningGamesHelp'
   | 'defaultWinningGames'
