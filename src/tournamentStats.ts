@@ -4,6 +4,7 @@ export type SortableStat = ReturnType<typeof getRankingParticipants>[number] & {
   played: number
   diff: number
   points: number
+  tieBreakerValues?: Record<string, number>
 }
 
 export type SortValue = (row: SortableStat) => number | string

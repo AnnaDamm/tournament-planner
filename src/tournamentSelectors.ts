@@ -150,6 +150,9 @@ export const selectRankingStats = createSelector([selectPhaseScope], (scope) =>
     played: player.wins + player.draws + player.losses,
     diff: player.scored - player.conceded,
     points: player.scored,
+    tieBreakerValues: Object.fromEntries(
+      scope.ctx.tieBreakers.map((id, index) => [id, player.tieBreakValues[index]]),
+    ),
   })),
 )
 

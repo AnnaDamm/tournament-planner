@@ -8,6 +8,7 @@
 - Configure several tournament phases with participant transitions.
 - Set the match format per round and per match.
 - Link the footer version to the version history documentation.
+- Configure the tie-breakers of the ranking per tournament and per phase, and add Buchholz, Median Buchholz and opponents' performance.
 
 ### Bugfixes
 

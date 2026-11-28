@@ -199,11 +199,11 @@ export const parseV2Snapshot = (value: Record<string, unknown>): TournamentSnaps
   if (rounds.some((round) => !round || !phases.some((phase) => phase.id === round.phaseId)))
     return null
 
-  const tieBreakers = isStringArray(value.tieBreakers)
-    ? value.tieBreakers.filter((id): id is TieBreakerId =>
-        tieBreakerIds.includes(id as TieBreakerId),
-      )
-    : []
+  // A valid empty list is a real configuration (ranking by match points, then name).
+  const rawTieBreakers = isStringArray(value.tieBreakers) ? value.tieBreakers : null
+  const knownTieBreakers = (rawTieBreakers ?? []).filter((id): id is TieBreakerId =>
+    tieBreakerIds.includes(id as TieBreakerId),
+  )
   return {
     version: 2,
     id: typeof value.id === 'string' && value.id ? value.id : createId(),
@@ -218,7 +218,10 @@ export const parseV2Snapshot = (value: Record<string, unknown>): TournamentSnaps
       : 5,
     scheduledStart: typeof value.scheduledStart === 'string' ? value.scheduledStart : '',
     scoring,
-    tieBreakers: tieBreakers.length > 0 ? tieBreakers : [...DEFAULT_TIE_BREAKERS],
+    tieBreakers:
+      rawTieBreakers && (knownTieBreakers.length > 0 || rawTieBreakers.length === 0)
+        ? knownTieBreakers
+        : [...DEFAULT_TIE_BREAKERS],
     teams: parseTeamSettings(value.teams),
     phases,
     players: players as Participant[],

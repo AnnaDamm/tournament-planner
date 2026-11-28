@@ -2,6 +2,7 @@ import { GeneralSection } from './GeneralSection'
 import { PhasesSection } from './PhasesSection'
 import { ScheduleSection } from './ScheduleSection'
 import { ScoringSection } from './ScoringSection'
+import { TieBreakersSection } from './TieBreakersSection'
 import type { SettingsSection } from './types'
 
 export type { SettingsSection, SettingsSectionProps } from './types'
@@ -13,4 +14,5 @@ export const settingsSections: SettingsSection[] = [
   { id: 'schedule', order: 20, Component: ScheduleSection },
   { id: 'scoring', order: 30, Component: ScoringSection },
   { id: 'phases', order: 40, Component: PhasesSection },
+  { id: 'tieBreakers', order: 50, Component: TieBreakersSection },
 ]

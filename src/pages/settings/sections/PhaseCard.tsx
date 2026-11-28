@@ -9,14 +9,17 @@ import type { SportId } from '../../../domain/sports/types'
 import type { Phase, PhaseModeId, PhaseTransition } from '../../../domain/types'
 import { MatchFormatFields } from '../../../shared/form/MatchFormatFields'
 import { NumberField } from '../../../shared/form/NumberField'
+import { DEFAULT_TIE_BREAKERS } from '../../../domain/ranking/registry'
 import { phaseViews } from '../../phaseViews/registry'
 import { getPhaseName } from '../../phaseViews/phaseName'
+import { TieBreakerListEditor } from './TieBreakerListEditor'
 
 type Props = {
   phase: Phase
   index: number
   sportId: SportId
   defaultFormat: NonNullable<Phase['format']>
+  tieBreakers: NonNullable<Phase['tieBreakers']>
   locked: boolean
   canMoveUp: boolean
   canMoveDown: boolean
@@ -45,6 +48,7 @@ export function PhaseCard({
   index,
   sportId,
   defaultFormat,
+  tieBreakers,
   locked,
   canMoveUp,
   canMoveDown,
@@ -58,6 +62,8 @@ export function PhaseCard({
   const ConfigEditor = phaseViews[phase.mode]?.ConfigEditor
   const id = `phase-${phase.id}`
   const title = tf('phasesPhaseLabel', { number: index + 1 })
+  // Bracket phases are ranked by the bracket, not by tie-breakers.
+  const hasOwnTieBreakers = phase.mode === 'swiss' || phase.mode === 'roundRobin'
   const hasCount = phase.entry.kind === 'topN' || phase.entry.kind === 'topNPerGroup'
   const kinds = entryKinds.includes(phase.entry.kind)
     ? entryKinds
@@ -218,6 +224,34 @@ export function PhaseCard({
             onChange={(format) => onChange({ ...phase, format })}
           />
         </div>
+      )}
+      {hasOwnTieBreakers && (
+        <label htmlFor={`${id}-own-tie-breakers`} className={cn('check')}>
+          <input
+            id={`${id}-own-tie-breakers`}
+            type="checkbox"
+            checked={phase.tieBreakers !== undefined}
+            onChange={(event) => {
+              const { tieBreakers: _tieBreakers, ...rest } = phase
+              onChange(
+                event.currentTarget.checked
+                  ? {
+                      ...rest,
+                      tieBreakers: [...(tieBreakers.length ? tieBreakers : DEFAULT_TIE_BREAKERS)],
+                    }
+                  : rest,
+              )
+            }}
+          />{' '}
+          {t('tieBreakersOwn')}
+        </label>
+      )}
+      {hasOwnTieBreakers && phase.tieBreakers && (
+        <TieBreakerListEditor
+          idPrefix={`${id}-tie-breakers`}
+          value={phase.tieBreakers}
+          onChange={(next) => onChange({ ...phase, tieBreakers: next })}
+        />
       )}
     </fieldset>
   )
