@@ -1,3 +1,6 @@
+import { buchholz } from './buchholz'
+import { medianBuchholz } from './medianBuchholz'
+import { opponentPerformance } from './opponentPerformance'
 import { gamesLost, gamesWon, lastLoss, pointsConceded, pointsScored } from './defaultTieBreakers'
 import type { TieBreaker, TieBreakerId } from './types'
 
@@ -8,6 +11,9 @@ export const tieBreakers: Partial<Record<TieBreakerId, TieBreaker>> = {
   gamesLost,
   pointsScored,
   pointsConceded,
+  buchholz,
+  medianBuchholz,
+  opponentPerformance,
 }
 
 /** Exactly the ranking order of earlier versions: after the match points. */
