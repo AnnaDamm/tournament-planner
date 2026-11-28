@@ -20,6 +20,8 @@ export type RankingRow = Participant & {
   setsLost: number
   played: number
   position: number
+  /** Value of every configured tie-breaker by id (tie-breakers package). */
+  tieBreakerValues?: Record<string, number>
 }
 
 export type RankingColumnEnv = {
@@ -38,6 +40,21 @@ export type RankingColumn = {
   strong?: boolean
   visible?: (env: RankingColumnEnv) => boolean
 }
+
+const formatDecimal = (value: number) => String(Math.round(value * 100) / 100)
+const formatPercent = (value: number) => `${Math.round(value * 1000) / 10} %`
+
+const tieBreakerColumn = (
+  id: TieBreakerId,
+  labelKey: Parameters<typeof t>[0],
+  format: (value: number) => string,
+): RankingColumn => ({
+  id,
+  header: () => t(labelKey),
+  sortValue: (row) => row.tieBreakerValues?.[id] ?? 0,
+  value: (row) => format(row.tieBreakerValues?.[id] ?? 0),
+  visible: (env) => env.tieBreakers.includes(id),
+})
 
 const formatDifference = (value: number) => (value > 0 ? `+${value}` : String(value))
 
@@ -74,4 +91,7 @@ export const rankingColumns: RankingColumn[] = [
     value: (row) =>
       `${row.scored}:${row.conceded} (${formatDifference(row.scored - row.conceded)})`,
   },
+  tieBreakerColumn('buchholz', 'tieBreakersBuchholz', formatDecimal),
+  tieBreakerColumn('medianBuchholz', 'tieBreakersMedianBuchholz', formatDecimal),
+  tieBreakerColumn('opponentPerformance', 'tieBreakersOpponentPerformance', formatPercent),
 ]

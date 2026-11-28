@@ -101,6 +101,7 @@ export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
           index={index}
           sportId={draft.scoring.sport}
           defaultFormat={draft.scoring.format}
+          tieBreakers={draft.tieBreakers}
           locked={locked(phase)}
           canMoveUp={index > 0 && !locked(phase) && !locked(phases[index - 1])}
           canMoveDown={index < phases.length - 1 && !locked(phase) && !locked(phases[index + 1])}

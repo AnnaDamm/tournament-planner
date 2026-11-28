@@ -388,6 +388,7 @@ const en: DocPage[] = [
               'Configure several tournament phases with participant transitions.',
               'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
+              "Configure the tie-breakers of the ranking per tournament and per phase, and add Buchholz, Median Buchholz and opponents' performance.",
             ],
           },
           {
@@ -948,6 +949,7 @@ const de: DocPage[] = [
               'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
               'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
+              'Tie-Breaker der Rangliste pro Turnier und pro Phase einstellbar; neu: Buchholz, Median-Buchholz und Gegnerleistung.',
             ],
           },
           {
