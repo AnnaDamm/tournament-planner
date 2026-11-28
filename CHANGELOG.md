@@ -8,6 +8,9 @@
 - Configure several tournament phases with participant transitions.
 - Set the match format per round and per match.
 - Link the footer version to the version history documentation.
+- Choose a sport (volleyball, badminton, football, eSports, snooker, darts) that sets the scoring rules and terminology (sets, goals, maps, frames, legs).
+- Allow draws: football scores, a fixed number of games per match, and win/draw points in the table (with draws and table points columns).
+- Record matches without sets as win, draw or loss.
 
 ### Bugfixes
 
