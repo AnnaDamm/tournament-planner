@@ -80,6 +80,6 @@ export const phasesDe: { [Key in keyof typeof phasesEn]: string } = {
   phasesMatchSettingsHelp:
     'Überschreibt das Rundenformat nur für diese Begegnung. Möglich, bis ein Ergebnis eingetragen ist.',
   phasesResetFormat: 'Auf Rundenformat zurücksetzen',
-  phasesFixedGames: 'Feste Anzahl an {games} spielen (Unentschieden möglich)',
+  phasesFixedGames: 'Feste Anzahl {games} spielen (Unentschieden möglich)',
   phasesFixedGamesCount: 'Anzahl {games}',
 }

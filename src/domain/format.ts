@@ -19,7 +19,14 @@ export const clampFormat = (
   if (gamePoints !== undefined) result.gamePoints = clampInteger(gamePoints, 1, 1_000_000, 21)
   const fixedGames = format?.fixedGames ?? fallback.fixedGames
   if (fixedGames !== undefined) result.fixedGames = clampInteger(fixedGames, 1, 99, 1)
+  if (format?.noDraws ?? fallback.noDraws) result.noDraws = true
   return result
+}
+
+/** The format for matches that need a winner (knockout): no fixed games, no draws. */
+export const withoutDraws = (format: MatchFormat): MatchFormat => {
+  const { fixedGames: _fixedGames, ...rest } = format
+  return { ...rest, noDraws: true }
 }
 
 /** The effective format of a match: the round format with the per-match override on top. */

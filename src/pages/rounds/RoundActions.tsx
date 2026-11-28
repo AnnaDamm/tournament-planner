@@ -138,7 +138,7 @@ export function RoundActions({
         </div>
       )}
       {capabilities.manualRounds &&
-        !round.matches.some((match) => match.scoreA || match.scoreB) && (
+        !round.matches.some((match) => match.scoreA || match.scoreB || match.outcome) && (
           <button
             className={classNames(sharedStyles, styles, 'button danger')}
             type="button"

@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import { t, tf } from '../../../i18n'
 import { phaseModes } from '../../../domain/phases/registry'
 import { transitionResolvers } from '../../../domain/phases/transitions'
+import type { ScoringRuleId } from '../../../domain/scoring/types'
 import type { SportId } from '../../../domain/sports/types'
 import type { Phase, PhaseModeId, PhaseTransition } from '../../../domain/types'
 import { MatchFormatFields } from '../../../shared/form/MatchFormatFields'
@@ -16,6 +17,7 @@ type Props = {
   phase: Phase
   index: number
   sportId: SportId
+  rulesId?: ScoringRuleId
   defaultFormat: NonNullable<Phase['format']>
   locked: boolean
   canMoveUp: boolean
@@ -44,6 +46,7 @@ export function PhaseCard({
   phase,
   index,
   sportId,
+  rulesId,
   defaultFormat,
   locked,
   canMoveUp,
@@ -213,6 +216,7 @@ export function PhaseCard({
           <MatchFormatFields
             idPrefix={`${id}-format`}
             sportId={sportId}
+            rulesId={rulesId}
             format={phase.format}
             variant="dialog"
             onChange={(format) => onChange({ ...phase, format })}

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../../i18n'
 import { getMatchFormat } from '../../domain/format'
+import type { ScoringRuleId } from '../../domain/scoring/types'
 import type { SportId } from '../../domain/sports/types'
 import type { Match, MatchFormat, Round } from '../../tournamentTypes'
 import { MatchFormatFields } from '../../shared/form/MatchFormatFields'
@@ -15,12 +16,21 @@ type Props = {
   match: Match | null
   title: string
   sportId: SportId
+  rulesId?: ScoringRuleId
   /** A format saves as an override of the round format; undefined removes the override. */
   onSave: (roundNumber: number, matchId: string, format: MatchFormat | undefined) => void
   onClose: () => void
 }
 
-export function MatchSettingsDialog({ round, match, title, sportId, onSave, onClose }: Props) {
+export function MatchSettingsDialog({
+  round,
+  match,
+  title,
+  sportId,
+  rulesId,
+  onSave,
+  onClose,
+}: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [format, setFormat] = useState<MatchFormat>(
     round && match ? getMatchFormat(round, match) : { winningGames: 1 },
@@ -84,6 +94,7 @@ export function MatchSettingsDialog({ round, match, title, sportId, onSave, onCl
         <MatchFormatFields
           idPrefix="match-format"
           sportId={sportId}
+          rulesId={rulesId}
           format={format}
           variant="dialog"
           onChange={setFormat}

@@ -9,4 +9,5 @@ export const getMatchGames = (match: Match): GameScore[] =>
       : []
 
 export const hasEnteredScore = (match: Match) =>
+  match.outcome !== undefined ||
   getMatchGames(match).some((game) => game.a.trim() !== '' || game.b.trim() !== '')

@@ -1,0 +1,47 @@
+@layer components {
+  .game-winners {
+    display: grid;
+    grid-template-columns: repeat(var(--set-count), minmax(86px, 1fr));
+    grid-area: scores;
+    gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .game-winner {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .game-winner-button {
+    min-height: 30px;
+    padding: 2px 6px;
+    border: 1px solid #dfe7e0;
+    border-radius: 5px;
+    background: #fff;
+    color: #3f4d45;
+    font: 600 13px inherit;
+    cursor: pointer;
+  }
+
+  .game-winner-button:hover {
+    background: #f0f3f0;
+  }
+
+  .game-winner-button:focus-visible {
+    outline: 2px solid #26331d;
+    outline-offset: 2px;
+  }
+
+  .game-winner-button[aria-pressed='true'] {
+    border-color: #b9ea5b;
+    background: #b9ea5b;
+    color: #26331d;
+  }
+}

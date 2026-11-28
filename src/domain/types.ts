@@ -1,4 +1,5 @@
 import type { MessageKey } from '../i18n'
+import type { ScoringRuleId } from './scoring/types'
 import type { SportId } from './sports/types'
 import type { TieBreakerId } from './ranking/types'
 
@@ -25,6 +26,7 @@ export type MatchFormat = {
   winningGames: number // games needed to win (best of 2n-1); 1..99
   fixedGames?: number // play exactly N games (draw possible); overrides winningGames
   gamePoints?: number // target per game (21, 25, 501, ...); informational + bye credit default
+  noDraws?: boolean // m4/scoring-sports: a winner is required (knockout); overrides draws
 }
 
 export type Match = {
@@ -99,6 +101,7 @@ export type ScoringSettings = {
   sport: SportId
   format: MatchFormat
   matchPoints: { win: number; draw: number; loss: number } // default 1 / 0.5 / 0
+  rules?: ScoringRuleId // m4/scoring-sports: overrides the rules of the sport (only where it offers them)
 }
 
 export type TeamSettings = { mode: 'fixed' | 'drawOnce' | 'drawEachRound'; teamSize: number }

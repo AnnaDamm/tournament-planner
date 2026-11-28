@@ -1,4 +1,4 @@
-import type { GameScore, Match, MatchFormat, MatchOutcome, ParticipantId } from '../types'
+import type { I18nText, GameScore, Match, MatchFormat, MatchOutcome, ParticipantId } from '../types'
 
 export type ScoringRuleId = 'sets' | 'gamesOnly' | 'singleScore' | 'outcomeOnly' | 'countdown'
 
@@ -20,6 +20,8 @@ export type ScoringRules = {
   supportsFixedGames: boolean
   allowsDraw(format: MatchFormat): boolean
   isGameComplete(game: GameScore, format: MatchFormat): boolean
+  /** Why an entered game is invalid (shown next to the input); null when it is fine or unfinished. */
+  getGameError?(game: GameScore, format: MatchFormat): I18nText | null
   getResult(match: Match, format: MatchFormat): MatchResult | null // null = not finished
   getMaxGameCount(format: MatchFormat): number
   getVisibleGameCount(match: Match, format: MatchFormat): number

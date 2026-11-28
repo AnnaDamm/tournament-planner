@@ -104,29 +104,21 @@ const getDirectStats = (
           first.losses += 1
           second.wins += 1
         }
-        result.games.forEach((set) => {
-          const pointsA = Number(set.a)
-          const pointsB = Number(set.b)
-          if (match.a === firstId) {
-            first.scored += pointsA
-            first.conceded += pointsB
-            second.scored += pointsB
-            second.conceded += pointsA
-            first.setsWon += pointsA > pointsB ? 1 : 0
-            first.setsLost += pointsA < pointsB ? 1 : 0
-            second.setsWon += pointsB > pointsA ? 1 : 0
-            second.setsLost += pointsB < pointsA ? 1 : 0
-          } else {
-            first.scored += pointsB
-            first.conceded += pointsA
-            second.scored += pointsA
-            second.conceded += pointsB
-            first.setsWon += pointsB > pointsA ? 1 : 0
-            first.setsLost += pointsB < pointsA ? 1 : 0
-            second.setsWon += pointsA > pointsB ? 1 : 0
-            second.setsLost += pointsA < pointsB ? 1 : 0
-          }
-        })
+        const firstIsA = match.a === firstId
+        const [firstGames, secondGames] = firstIsA
+          ? [result.gamesA, result.gamesB]
+          : [result.gamesB, result.gamesA]
+        const [firstPoints, secondPoints] = firstIsA
+          ? [result.pointsA, result.pointsB]
+          : [result.pointsB, result.pointsA]
+        first.scored += firstPoints
+        first.conceded += secondPoints
+        second.scored += secondPoints
+        second.conceded += firstPoints
+        first.setsWon += firstGames
+        first.setsLost += secondGames
+        second.setsWon += secondGames
+        second.setsLost += firstGames
       })
   })
   return stats

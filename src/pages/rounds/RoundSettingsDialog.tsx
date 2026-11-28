@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../../i18n'
 import type { MatchFormat, Round } from '../../tournamentTypes'
+import type { ScoringRuleId } from '../../domain/scoring/types'
 import type { SportId } from '../../domain/sports/types'
 import { MatchFormatFields } from '../../shared/form/MatchFormatFields'
 import { NumberField } from '../../shared/form/NumberField'
@@ -13,12 +14,20 @@ type Props = {
   /** Give the component a key per round so its fields start with the values of that round. */
   round: Round | null
   sportId: SportId
+  rulesId?: ScoringRuleId
   defaultCourtCount: number
   onSave: (roundNumber: number, format: MatchFormat, courtCount: number) => void
   onClose: () => void
 }
 
-export function RoundSettingsDialog({ round, sportId, defaultCourtCount, onSave, onClose }: Props) {
+export function RoundSettingsDialog({
+  round,
+  sportId,
+  rulesId,
+  defaultCourtCount,
+  onSave,
+  onClose,
+}: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [format, setFormat] = useState<MatchFormat>(round?.format ?? { winningGames: 1 })
   const [courtCount, setCourtCount] = useState(round?.courtCount ?? defaultCourtCount)
@@ -79,6 +88,7 @@ export function RoundSettingsDialog({ round, sportId, defaultCourtCount, onSave,
         <MatchFormatFields
           idPrefix="round-format"
           sportId={sportId}
+          rulesId={rulesId}
           format={format}
           variant="dialog"
           onChange={setFormat}

@@ -47,6 +47,15 @@ const getSetScore = (playerId: string, match: Round['matches'][number]) =>
     { own: 0, opponent: 0 },
   )
 
+const getResultGames = (
+  playerId: string,
+  match: Round['matches'][number],
+  result: { gamesA: number; gamesB: number },
+) =>
+  match.a === playerId
+    ? { own: result.gamesA, opponent: result.gamesB }
+    : { own: result.gamesB, opponent: result.gamesA }
+
 const getByeSetScore = (round: Round) => ({
   own: Math.max(1, round.format.winningGames || 1),
   opponent: 0,
@@ -148,7 +157,13 @@ export function PlayerHistoryDialog({
                 ? '—'
                 : (positionsAfterRounds[roundIndex].get(player.id) ?? '—'),
             opponent: isBye ? t('bye') : opponentId ? name(opponentId) : '—',
-            sets: isBye ? getByeSetScore(round) : !match ? null : getSetScore(player.id, match),
+            sets: isBye
+              ? getByeSetScore(round)
+              : !match
+                ? null
+                : result
+                  ? getResultGames(player.id, match, result)
+                  : getSetScore(player.id, match),
             score: isBye
               ? getByePlayerScores(round, ctx)
               : !match

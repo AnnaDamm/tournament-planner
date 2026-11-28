@@ -386,6 +386,9 @@ const en: DocPage[] = [
             items: [
               'Store tournaments in a versioned format (v2) with automatic migration of existing data.',
               'Configure several tournament phases with participant transitions.',
+              'Choose a sport (volleyball, badminton, football, eSports, snooker, darts) that sets the scoring rules and terminology (sets, goals, maps, frames, legs).',
+              'Allow draws: football scores, a fixed number of games per match, and win/draw points in the table (with draws and table points columns).',
+              'Record matches without sets as win, draw or loss.',
               'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
             ],
@@ -946,6 +949,9 @@ const de: DocPage[] = [
             items: [
               'Turniere werden in einem versionierten Format (v2) gespeichert; bestehende Daten werden automatisch migriert.',
               'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
+              'Sportart wählen (Volleyball, Badminton, Fußball, eSports, Snooker, Darts), die Wertungsregeln und Begriffe festlegt (Sätze, Tore, Maps, Frames, Legs).',
+              'Unentschieden zulassen: Fußball-Ergebnisse, eine feste Anzahl Spiele pro Begegnung und Punkte für Sieg und Unentschieden in der Tabelle (mit Spalten für Unentschieden und Tabellenpunkte).',
+              'Begegnungen ohne Sätze als Sieg, Unentschieden oder Niederlage erfassen.',
               'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
             ],

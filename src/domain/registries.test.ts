@@ -18,9 +18,10 @@ describe('registries', () => {
     expect(getPhaseMode('swiss')?.id).toBe('swiss')
     expect(getPhaseMode('singleElimination')).toBeUndefined()
     expect(getScoringRules('sets').id).toBe('sets')
-    expect(getScoringRules('countdown').id).toBe('sets') // unregistered rules fall back
+    expect(getScoringRules('countdown').id).toBe('countdown')
     expect(getSport('other').rules).toBe('sets')
-    expect(getSport('darts').id).toBe('other')
+    expect(getSport('darts').rules).toBe('countdown')
+    expect(getSport('football').rules).toBe('singleScore')
     expect(DEFAULT_TIE_BREAKERS).toEqual([
       'lastLoss',
       'gamesWon',

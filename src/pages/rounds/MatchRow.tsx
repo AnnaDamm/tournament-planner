@@ -6,7 +6,10 @@ import { CalendarClock, Clock, GitCompareArrows, GripVertical, Settings2 } from 
 import type { Match, MatchFormat, SetScore } from '../../tournamentTypes'
 import type { ScoringRules } from '../../domain/scoring/types'
 import { t, tf } from '../../i18n'
+import type { MatchOutcome } from '../../domain/types'
 import { hasEnteredScore, isUnknownParticipantId } from '../../tournament'
+import { GameWinnerEntry } from './GameWinnerEntry'
+import { OutcomeEntry } from './OutcomeEntry'
 import { SetScores } from './SetScores'
 import { getSideLabel } from './sideLabel'
 
@@ -34,40 +37,17 @@ type Props = {
   readOnly?: boolean
 }
 
-const isCompleteSet = (set: SetScore) =>
-  set.a.trim() !== '' &&
-  set.b.trim() !== '' &&
-  Number.isFinite(Number(set.a)) &&
-  Number.isFinite(Number(set.b)) &&
-  Number(set.a) >= 0 &&
-  Number(set.b) >= 0 &&
-  Number(set.a) !== Number(set.b)
-
-const getSetStats = (sets: SetScore[], winningGames: number) => {
-  let winsA = 0
-  let winsB = 0
-  let winnerAt = -1
-
-  sets.forEach((set, index) => {
-    if (!isCompleteSet(set)) return
-    if (Number(set.a) > Number(set.b)) winsA += 1
-    if (Number(set.b) > Number(set.a)) winsB += 1
-    if (winnerAt === -1 && (winsA >= winningGames || winsB >= winningGames)) {
-      winnerAt = index
-    }
-  })
-
-  return { winnerAt }
-}
-
-const trimSetsAfterWinner = (sets: SetScore[], winningGames: number) => {
-  const { winnerAt } = getSetStats(sets, winningGames)
-  if (winnerAt >= 0) return sets.slice(0, winnerAt + 1)
+/** Drops the games after the deciding one; without a result, only the empty trailing games. */
+const trimGames = (games: SetScore[], match: Match, format: MatchFormat, rules: ScoringRules) => {
+  for (let count = 1; count <= games.length; count += 1) {
+    if (rules.getResult({ ...match, sets: games.slice(0, count) }, format))
+      return games.slice(0, count)
+  }
   let lastEnteredIndex = -1
-  sets.forEach((set, index) => {
-    if (set.a !== '' || set.b !== '') lastEnteredIndex = index
+  games.forEach((game, index) => {
+    if (game.a !== '' || game.b !== '') lastEnteredIndex = index
   })
-  return lastEnteredIndex >= 0 ? sets.slice(0, lastEnteredIndex + 1) : []
+  return lastEnteredIndex >= 0 ? games.slice(0, lastEnteredIndex + 1) : []
 }
 
 const formatStartTime = (value: string) => {
@@ -113,7 +93,6 @@ export const MatchRow = memo(function MatchRow({
     setDraftSets(initialSets)
     draftSetsRef.current = initialSets
   }, [initialSets])
-  const targetWins = Math.max(1, Math.min(99, Number(format.winningGames) || 1))
   const matchResult = rules.getResult(match, format)
   const canReorder = canSwap && !readOnly && !hasEnteredScore(match)
   const canEditFormat = !readOnly && !hasEnteredScore(match)
@@ -124,18 +103,19 @@ export const MatchRow = memo(function MatchRow({
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.a
   const canKeyboardDropB =
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.b
-  const { winnerAt } = useMemo(() => getSetStats(draftSets, targetWins), [draftSets, targetWins])
-  const finalScore = useMemo(() => {
-    if (winnerAt < 0) return null
-    return draftSets.slice(0, winnerAt + 1).reduce(
-      (score, set) => {
-        if (Number(set.a) > Number(set.b)) score.a += 1
-        if (Number(set.b) > Number(set.a)) score.b += 1
-        return score
-      },
-      { a: 0, b: 0 },
-    )
-  }, [draftSets, winnerAt])
+  const draftResult = useMemo(() => {
+    if (rules.entry === 'outcome') return null
+    const games = trimGames(draftSets, match, format, rules)
+    return games.length > 0 ? rules.getResult({ ...match, sets: games }, format) : null
+  }, [draftSets, format, match, rules])
+  const gameErrors = useMemo(
+    () =>
+      draftSets.map((game) => {
+        const error = rules.getGameError?.(game, format)
+        return error ? tf(error.key, error.params) : null
+      }),
+    [draftSets, format, rules],
+  )
   const visibleSetCount = rules.getVisibleGameCount(match, format)
   const updateSet = (setIndex: number, side: 'a' | 'b', value: string) => {
     const safeValue =
@@ -147,10 +127,22 @@ export const MatchRow = memo(function MatchRow({
     setDraftSets(nextSets)
     draftSetsRef.current = nextSets
   }
+  const setGame = (gameIndex: number, game: SetScore) => {
+    const nextSets = Array.from(
+      { length: Math.max(draftSets.length, gameIndex + 1) },
+      (_, index) => draftSets[index] ?? { a: '', b: '' },
+    ).map((item, index) => (index === gameIndex ? game : item))
+    setDraftSets(nextSets)
+    draftSetsRef.current = nextSets
+  }
+  const setOutcome = (outcome: MatchOutcome | undefined) => {
+    const { outcome: _previous, ...rest } = match
+    onUpdate(outcome ? { ...rest, outcome } : rest)
+  }
   const scheduleCommit = () => {
     if (commitTimer.current) clearTimeout(commitTimer.current)
     commitTimer.current = setTimeout(() => {
-      const nextSets = trimSetsAfterWinner(draftSetsRef.current, targetWins)
+      const nextSets = trimGames(draftSetsRef.current, match, format, rules)
       const firstSet = nextSets[0] ?? { a: '', b: '' }
       onUpdate({ ...match, sets: nextSets, scoreA: firstSet.a, scoreB: firstSet.b })
     }, 200)
@@ -303,12 +295,17 @@ export const MatchRow = memo(function MatchRow({
           <small className={classNames(sharedStyles, styles, 'player-record')}>{recordA}</small>
         </span>
       </span>
-      {finalScore ? (
+      {draftResult && rules.entry !== 'outcome' ? (
         <span
           className={classNames(sharedStyles, styles, 'match-score')}
-          aria-label={`${finalScore.a}:${finalScore.b}`}
+          aria-label={`${draftResult.gamesA}:${draftResult.gamesB}${draftResult.outcome === 'draw' ? `, ${t('draw')}` : ''}`}
         >
-          {finalScore.a} : {finalScore.b}
+          {draftResult.gamesA} : {draftResult.gamesB}
+          {draftResult.outcome === 'draw' && (
+            <small className={classNames(sharedStyles, styles, 'match-draw')} aria-hidden="true">
+              {t('draw')}
+            </small>
+          )}
         </span>
       ) : (
         <span className={classNames(sharedStyles, styles, 'versus')} aria-hidden="true">
@@ -390,17 +387,41 @@ export const MatchRow = memo(function MatchRow({
           <small className={classNames(sharedStyles, styles, 'player-record')}>{recordB}</small>
         </span>
       </span>
-      <SetScores
-        draftSets={draftSets}
-        visibleSetCount={visibleSetCount}
-        setCount={setCount}
-        readOnly={readOnly}
-        playerA={nameA}
-        playerB={nameB}
-        updateSet={updateSet}
-        scheduleCommit={scheduleCommit}
-        keyboardMoveActive={keyboardMoveActive}
-      />
+      {rules.entry === 'outcome' ? (
+        <OutcomeEntry
+          outcome={match.outcome}
+          allowsDraw={rules.allowsDraw(format)}
+          readOnly={readOnly}
+          playerA={nameA}
+          playerB={nameB}
+          onChange={setOutcome}
+          keyboardMoveActive={keyboardMoveActive}
+        />
+      ) : rules.id === 'gamesOnly' && !readOnly ? (
+        <GameWinnerEntry
+          draftGames={draftSets}
+          visibleGameCount={visibleSetCount}
+          gameCount={setCount}
+          playerA={nameA}
+          playerB={nameB}
+          setGame={setGame}
+          scheduleCommit={scheduleCommit}
+          keyboardMoveActive={keyboardMoveActive}
+        />
+      ) : (
+        <SetScores
+          draftSets={draftSets}
+          visibleSetCount={visibleSetCount}
+          setCount={setCount}
+          readOnly={readOnly}
+          playerA={nameA}
+          playerB={nameB}
+          gameErrors={gameErrors}
+          updateSet={updateSet}
+          scheduleCommit={scheduleCommit}
+          keyboardMoveActive={keyboardMoveActive}
+        />
+      )}
     </fieldset>
   )
 })
