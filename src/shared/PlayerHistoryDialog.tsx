@@ -13,7 +13,7 @@ import {
   type EvaluationContext,
   getRankingParticipants,
   getRunningMatchIdsByRound,
-  isByeCounted,
+  isRoundByeCounted,
 } from '../tournament'
 import type { Participant, Round } from '../tournamentTypes'
 
@@ -113,7 +113,8 @@ export function PlayerHistoryDialog({
   )
   const playedRoundIndexes = player
     ? rounds.flatMap((round, roundIndex) =>
-        (isByeCounted(round, getNextRoundInPhase(roundIndex)) && round.bye === player.id) ||
+        (isRoundByeCounted(round, getNextRoundInPhase(roundIndex), scopeFor(round.phaseId).ctx) &&
+          round.bye === player.id) ||
         round.matches.some((match) => match.a === player.id || match.b === player.id)
           ? [roundIndex]
           : [],
@@ -131,7 +132,8 @@ export function PlayerHistoryDialog({
         const won = result?.winner === player.id
         const opponentId = match ? (match.a === player.id ? match.b : match.a) : null
         const isBye =
-          isByeCounted(round, getNextRoundInPhase(roundIndex)) && round.bye === player.id
+          isRoundByeCounted(round, getNextRoundInPhase(roundIndex), scopeFor(round.phaseId).ctx) &&
+          round.bye === player.id
         const isWithdrawal = !match && !isBye && roundIndex === withdrawalRoundIndex
         if (!match && !isBye && !isWithdrawal) return []
         const isRunning = match

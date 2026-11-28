@@ -26,12 +26,34 @@ export const getPhaseEntrants = (
   )
 }
 
+/**
+ * The evaluation context of a phase. When a later phase has started, the bye in the last round
+ * of this phase counts although the round that follows belongs to the later phase.
+ */
+export const createPhaseEvaluationContext = (
+  snapshot: ScopeSnapshot,
+  phaseId: string,
+  forceFinal = false,
+): EvaluationContext => {
+  const ctx = createEvaluationContext(snapshot, phaseId)
+  const index = snapshot.phases.findIndex((phase) => phase.id === phaseId)
+  const last = snapshot.rounds.filter((round) => round.phaseId === phaseId).at(-1)
+  if (!last) return ctx
+  const later = new Set(snapshot.phases.slice(index + 1).map((phase) => phase.id))
+  const successorStarted =
+    snapshot.phases.slice(index + 1).some((phase) => phase.startedAt) ||
+    snapshot.rounds.some((round) => later.has(round.phaseId) && round.startedAt)
+  return forceFinal || (index >= 0 && successorStarted)
+    ? { ...ctx, countedByeRound: last.number }
+    : ctx
+}
+
 /** Everything that ranks and evaluates one phase on its own (entrants, rounds, context). */
 export const getPhaseScope = (snapshot: ScopeSnapshot, phaseId: string): PhaseScope => ({
   phase: snapshot.phases.find((phase) => phase.id === phaseId),
   entrants: getPhaseEntrants(snapshot, phaseId),
   rounds: snapshot.rounds.filter((round) => round.phaseId === phaseId),
-  ctx: createEvaluationContext(snapshot, phaseId),
+  ctx: createPhaseEvaluationContext(snapshot, phaseId),
 })
 
 /** A phase that has rounds or was started can no longer change its structure. */

@@ -1,4 +1,3 @@
-import { rankingColumns } from './pages/rankings/columns'
 import { compareRankingParticipants, getRankingParticipants } from './tournament'
 
 export type SortableStat = ReturnType<typeof getRankingParticipants>[number] & {
@@ -7,14 +6,11 @@ export type SortableStat = ReturnType<typeof getRankingParticipants>[number] & {
   points: number
 }
 
-type SortValue = (row: SortableStat) => number | string
+export type SortValue = (row: SortableStat) => number | string
 
-/** The value a column sorts by: its registered sortValue, otherwise the row field named like it. */
-const getSortValue = (sort: string, sortValues: Record<string, SortValue>): SortValue => {
-  const registered =
-    sortValues[sort] ?? rankingColumns.find((column) => column.id === sort)?.sortValue
-  return (registered as SortValue | undefined) ?? ((row) => Number(row[sort as keyof typeof row]))
-}
+/** The value a column sorts by: its sortValue, otherwise the row field named like the column. */
+const getSortValue = (sort: string, sortValues: Record<string, SortValue>): SortValue =>
+  sortValues[sort] ?? ((row) => Number(row[sort as keyof typeof row]))
 
 export const sortStats = (
   stats: SortableStat[],

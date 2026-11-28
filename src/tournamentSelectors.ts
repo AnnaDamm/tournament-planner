@@ -13,7 +13,13 @@ import {
 } from './tournament'
 import { getActivePhase, getStartablePhase } from './domain/phases/phaseState'
 import { getPhaseScope } from './domain/phases/scope'
-import { sortStats } from './tournamentStats'
+import { rankingColumns } from './pages/rankings/columns'
+import { sortStats, type SortValue } from './tournamentStats'
+
+/** Sort values of the ranking columns that are not fields of the ranking row. */
+const columnSortValues: Record<string, SortValue> = Object.fromEntries(
+  rankingColumns.flatMap((column) => (column.sortValue ? [[column.id, column.sortValue]] : [])),
+)
 import type { TournamentSettings } from './tournamentTypes'
 
 export const selectTournamentSnapshot = (state: RootState) => state.tournament
@@ -179,7 +185,7 @@ export const selectSortedParticipants = createSelector(
       ]),
     )
 
-    return (started ? sortStats(stats, sort, desc) : stats).map((player) => ({
+    return (started ? sortStats(stats, sort, desc, columnSortValues) : stats).map((player) => ({
       ...player,
       position: positions.get(player.id) ?? 0,
     }))

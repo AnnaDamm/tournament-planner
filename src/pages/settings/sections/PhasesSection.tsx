@@ -25,7 +25,9 @@ const createPhase = (): Phase => ({
 export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
   const rounds = useAppSelector(selectRounds)
   const [announcement, setAnnouncement] = useState('')
-  const [focusRequest, setFocusRequest] = useState<{ id: string; direction: -1 | 1 } | null>(null)
+  const [focusRequest, setFocusRequest] = useState<
+    { id: string; direction: -1 | 1 } | { id: string | null; direction: 0 } | null
+  >(null)
   const { phases } = draft
   const setPhases = (update: (phases: Phase[]) => Phase[]) =>
     setDraft((current) => ({ ...current, phases: update(current.phases) }))
@@ -34,6 +36,15 @@ export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
   useEffect(() => {
     if (!focusRequest) return
     const { id, direction } = focusRequest
+    if (direction === 0) {
+      // After a removal: the neighbouring remove button, otherwise "Add phase".
+      const remove = id && document.getElementById(`phase-${id}-remove`)
+      const target = remove && !(remove as HTMLButtonElement).disabled ? remove : null
+      ;(target ?? document.getElementById('phase-add'))?.focus()
+      // oxlint-disable-next-line react/set-state-in-effect
+      setFocusRequest(null)
+      return
+    }
     const first = document.getElementById(`phase-${id}-${direction < 0 ? 'up' : 'down'}`)
     const other = document.getElementById(`phase-${id}-${direction < 0 ? 'down' : 'up'}`)
     const target = first && !(first as HTMLButtonElement).disabled ? first : other
@@ -66,12 +77,7 @@ export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
     const index = phases.findIndex((item) => item.id === phase.id)
     const neighbour = phases[index + 1] ?? phases[index - 1]
     setPhases((current) => current.filter((item) => item.id !== phase.id))
-    // Keep the focus in the list: the neighbouring remove button, otherwise "Add phase".
-    setTimeout(() => {
-      const remaining = neighbour && document.getElementById(`phase-${neighbour.id}-remove`)
-      const next = remaining && !(remaining as HTMLButtonElement).disabled ? remaining : null
-      ;(next ?? document.getElementById('phase-add'))?.focus()
-    }, 0)
+    setFocusRequest({ id: neighbour?.id ?? null, direction: 0 })
     setAnnouncement(tf('phasesRemoved', { name: getPhaseName(phase) }))
   }
 

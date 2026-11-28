@@ -7,6 +7,7 @@ import type { ScoringRules } from '../../domain/scoring/types'
 import type { TermKey } from '../../domain/sports/types'
 import type { TieBreakerId } from '../../domain/ranking/types'
 import type { Participant, PhaseModeId } from '../../domain/types'
+import type { SortValue } from '../../tournamentStats'
 
 export type RankingRow = Participant & {
   wins: number
@@ -33,7 +34,7 @@ export type RankingColumn = {
   header: (term: (key: TermKey) => string) => string
   value: (row: RankingRow, context: { mostPlayed: number }) => ReactNode
   /** Sort key for columns that are not a field of the row; the id is used as field otherwise. */
-  sortValue?: (row: RankingRow) => number | string
+  sortValue?: SortValue
   strong?: boolean
   visible?: (env: RankingColumnEnv) => boolean
 }

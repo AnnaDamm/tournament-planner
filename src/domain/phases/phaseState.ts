@@ -1,8 +1,7 @@
-import { createEvaluationContext } from '../evaluation'
 import type { Phase, Round, TournamentSnapshot } from '../types'
 import { hasEnteredScore } from '../scoring/games'
 import { getPhaseMode } from './registry'
-import { getPhaseEntrants } from './scope'
+import { createPhaseEvaluationContext, getPhaseEntrants } from './scope'
 import { transitionResolvers } from './transitions'
 import type { PhaseContext, PhaseMode } from './types'
 
@@ -39,7 +38,7 @@ export const buildPhaseContext = (
     phaseIndex,
     entrants,
     rounds: getPhaseRounds(snapshot, phaseId),
-    ctx: createEvaluationContext(snapshot, phaseId),
+    ctx: createPhaseEvaluationContext(snapshot, phaseId),
   }
 }
 
@@ -85,7 +84,9 @@ export const startNextPhase = <T extends PhaseSnapshot>(snapshot: T): T => {
   const target = getNextPhaseToStart(snapshot)
   if (!target) return snapshot
   const { active, next, resolver, mode } = target
-  const prev = buildPhaseContext(snapshot, active.id)!
+  // Advancing ends the active phase: its last bye counts for the transition.
+  const prevBase = buildPhaseContext(snapshot, active.id)!
+  const prev = { ...prevBase, ctx: createPhaseEvaluationContext(snapshot, active.id, true) }
   const entrants = resolver(prev, getPhaseMode(active.mode)!.getPlacements(prev), next.entry)
   const phases = snapshot.phases.map((phase) =>
     phase.id === next.id ? { ...phase, entrants, startedAt: new Date().toISOString() } : phase,

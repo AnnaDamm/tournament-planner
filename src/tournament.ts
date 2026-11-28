@@ -6,6 +6,7 @@ export {
   getMatchSideIds,
   hasValidBye,
   isByeCounted,
+  isRoundByeCounted,
 } from './domain/participants'
 export { getMatchGames as getMatchSets, hasEnteredScore } from './domain/scoring/games'
 export { getRoundMatchResult, createEvaluationContext } from './domain/evaluation'

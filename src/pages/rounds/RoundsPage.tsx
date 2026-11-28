@@ -218,7 +218,11 @@ export const RoundsPage = memo(function RoundsPage({
           roundIndex={roundIndex}
           nextRoundStarted={Boolean(rounds[roundIndex + 1]?.startedAt)}
           canCalculatePairings={roundIndex === 0 || rounds[roundIndex - 1].matches.length > 0}
-          capabilities={capabilitiesByPhase.get(round.phaseId) ?? noCapabilities}
+          capabilities={
+            capabilitiesByPhase.get(round.phaseId) ??
+            capabilitiesByPhase.get(phases[0]?.id ?? '') ??
+            noCapabilities
+          }
           matchLabels={matchLabels}
           participantOrder={participantOrderByRound[roundIndex] ?? []}
           currentRoundNumber={currentRoundNumber}
@@ -261,7 +265,7 @@ export const RoundsPage = memo(function RoundsPage({
       matchLabels,
       name,
       participantOrderByRound,
-      phases.length,
+      phases,
       readOnly,
       record,
       rounds,
@@ -282,7 +286,10 @@ export const RoundsPage = memo(function RoundsPage({
     }
     return phases.flatMap<ListItem>((phase, phaseIndex) => {
       const phaseRounds = rounds.flatMap((round, roundIndex) =>
-        round.phaseId === phase.id ? [roundIndex] : [],
+        round.phaseId === phase.id ||
+        (phaseIndex === 0 && !phases.some((item) => item.id === round.phaseId))
+          ? [roundIndex]
+          : [],
       )
       if (phaseRounds.length === 0 && !phase.startedAt) return []
       const RoundsView = phaseViews[phase.mode]?.RoundsView
