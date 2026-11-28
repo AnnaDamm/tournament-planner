@@ -3,7 +3,8 @@ import { isRoundComplete } from '../../schedule/courts'
 import type { PhaseContext, PhaseMode, Placement } from '../types'
 import { parseSwissConfig, type SwissConfig } from './config'
 import { fillUnknownRound, rerollBye } from './pairing'
-import { swissVariants } from './variants'
+import { fillDanishUnknown } from './danish'
+import { getSwissPlanner } from './variants'
 import type { Round } from '../../types'
 
 type Swiss = PhaseContext<SwissConfig>
@@ -11,7 +12,7 @@ type Swiss = PhaseContext<SwissConfig>
 const previousRounds = (p: Swiss, round: Round) =>
   p.rounds.filter((item) => item.number < round.number)
 
-const getPlanner = (p: Swiss) => swissVariants[p.phase.config.variant] ?? swissVariants.standard!
+const getPlanner = (p: Swiss) => getSwissPlanner(p.phase.config)
 
 export const swissMode: PhaseMode<SwissConfig> = {
   id: 'swiss',
@@ -48,7 +49,13 @@ export const swissMode: PhaseMode<SwissConfig> = {
       p.ctx,
     )
   },
-  fillUnknown: (p, round) => fillUnknownRound(round, p.entrants, previousRounds(p, round), p.ctx),
+  fillUnknown: (p, round) =>
+    (p.phase.config.variant === 'danish' ? fillDanishUnknown : fillUnknownRound)(
+      round,
+      p.entrants,
+      previousRounds(p, round),
+      p.ctx,
+    ),
   rerollBye: (p, round) => {
     const rounds = [...previousRounds(p, round), round]
     return rerollBye(p.entrants, rounds, round.number, p.ctx).at(-1)!

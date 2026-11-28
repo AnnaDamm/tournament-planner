@@ -9,7 +9,7 @@ import type { Match, Participant, Round } from '../../types'
 
 const randomItem = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)]
 
-const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
+export const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
   const previousByeIds = new Set(previousRounds.filter(hasValidBye).map((round) => round.bye!))
   if (previousByeIds.size === 0) return randomItem(candidateIds)
 
@@ -45,7 +45,7 @@ export const sortMatchesByParticipantOrder = (matches: Match[], participantOrder
   })
 }
 
-const finalizedParticipantIds = (
+export const finalizedParticipantIds = (
   players: Participant[],
   rounds: Round[],
   ctx: EvaluationContext,
@@ -145,17 +145,38 @@ const pairByRanking = (participantIds: string[], previousRounds: Round[]) => {
 
 export type PlannedRound = { roundNumber: number; isFirstRound: boolean }
 
+/** Variant hooks of the standard planner; without them the planner behaves as before. */
+export type PairingHooks = {
+  /** Virtual match wins used for the pairing only (never for the ranking). */
+  virtualWins?: Map<string, number>
+}
+
+/** Pairs a list slide-wise: the first half against the second half. */
+const slidePairs = (ids: string[]): Array<[string, string]> => {
+  const half = ids.length / 2
+  return Array.from({ length: half }, (_, index) => [ids[index], ids[index + half]])
+}
+
 export const createRoundPlan = (
   players: Participant[],
   previousRounds: Round[],
   { roundNumber, isFirstRound }: PlannedRound,
   preferredBye: string | undefined,
   ctx: EvaluationContext,
+  hooks: PairingHooks = {},
 ) => {
+  const virtualWins = hooks.virtualWins
+  const virtualOf = (id: string) => virtualWins?.get(id) ?? 0
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds, ctx)
   const ranking = getRankingParticipants(activePlayers, previousRounds, ctx)
-  if (!isFirstRound) ranking.sort(compareRankingParticipants)
+  if (!isFirstRound) {
+    ranking.sort(compareRankingParticipants)
+    if (virtualWins)
+      ranking.sort(
+        (first, second) => second.wins + virtualOf(second.id) - (first.wins + virtualOf(first.id)),
+      )
+  }
   const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(ranking.map((standing) => [standing.id, standing]))
   const createMatches = (pairs: Array<[string, string]>) =>
@@ -198,6 +219,20 @@ export const createRoundPlan = (
     }
   }
 
+  if (isFirstRound && virtualWins) {
+    // Accelerated: the virtual groups (top half / rest) are paired among themselves.
+    const top = knownPlayers.filter((player) => virtualOf(player.id) > 0).map((player) => player.id)
+    const rest = knownPlayers
+      .filter((player) => virtualOf(player.id) <= 0)
+      .map((player) => player.id)
+    if (top.length % 2 === 1) rest.unshift(top.pop()!)
+    return {
+      standings,
+      bye,
+      matches: createMatches([...slidePairs(top), ...slidePairs(rest)]),
+    }
+  }
+
   if (isFirstRound) {
     const halfSize = knownPlayers.length / 2
     return {
@@ -212,14 +247,18 @@ export const createRoundPlan = (
     }
   }
 
-  const groups = new Map<string, { wins: number; losses: number; players: string[] }>()
+  const groups = new Map<
+    string,
+    { wins: number; draws: number; losses: number; players: string[] }
+  >()
 
   knownPlayers.forEach((player) => {
     const standing = standingsById.get(player.id)
-    const wins = standing?.wins ?? 0
+    const wins = (standing?.wins ?? 0) + virtualOf(player.id)
+    const draws = standing?.draws ?? 0
     const losses = standing?.losses ?? 0
-    const key = `${wins}:${losses}`
-    const group = groups.get(key) ?? { wins, losses, players: [] }
+    const key = `${wins}:${draws}:${losses}`
+    const group = groups.get(key) ?? { wins, draws, losses, players: [] }
     group.players.push(player.id)
     groups.set(key, group)
   })
@@ -227,7 +266,8 @@ export const createRoundPlan = (
   const pairs: Array<[string, string]> = []
   const leftovers: string[] = []
   const sortedGroups = [...groups.values()].sort(
-    (first, second) => second.wins - first.wins || second.losses - first.losses,
+    (first, second) =>
+      second.wins - first.wins || second.draws - first.draws || second.losses - first.losses,
   )
 
   sortedGroups.forEach((group, groupIndex) => {
