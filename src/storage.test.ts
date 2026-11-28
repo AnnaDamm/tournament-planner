@@ -118,6 +118,60 @@ describe('storage migration', () => {
     expect(second.snapshot.id).toBe(first.snapshot.id)
   })
 
+  it('does not activate a migrated tournament whose snapshot could not be stored', () => {
+    const data = stubLocalStorage({ [`${prefix}tournament`]: v1Envelope() })
+    const original = localStorage.setItem.bind(localStorage)
+    localStorage.setItem = (key: string, value: string) => {
+      if (key.startsWith(`${prefix}tournament:`)) throw new Error('quota')
+      original(key, value)
+    }
+    const first = loadTournamentState()
+    expect(first.snapshot.tournamentName).toBe('Small Cup')
+    expect(data.has(`${prefix}tournaments`)).toBe(false)
+
+    localStorage.setItem = original
+    const second = loadTournamentState()
+    expect(second.snapshot.tournamentName).toBe('Small Cup')
+    expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
+    expect(JSON.parse(data.get(`${prefix}tournaments`)!).activeId).toBe(second.snapshot.id)
+  })
+
+  it('keeps the legacy per-field keys when the snapshot could not be stored and migrates them later', () => {
+    const data = stubLocalStorage({
+      [`${prefix}players`]: JSON.stringify([
+        { id: 'p1', name: 'Legacy Anna', wins: 0, losses: 0, scored: 0, conceded: 0 },
+      ]),
+    })
+    const original = localStorage.setItem.bind(localStorage)
+    localStorage.setItem = (key: string, value: string) => {
+      if (key.startsWith(`${prefix}tournament:`)) throw new Error('quota')
+      original(key, value)
+    }
+    loadTournamentState()
+    expect(data.has(`${prefix}players`)).toBe(true)
+    expect(data.has(`${prefix}tournaments`)).toBe(false)
+
+    localStorage.setItem = original
+    const second = loadTournamentState()
+    expect(second.snapshot.players.map((player) => player.name)).toEqual(['Legacy Anna'])
+    expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
+  })
+
+  it('ignores malformed index entries instead of throwing on the next save', () => {
+    const data = stubLocalStorage({ [`${prefix}tournament`]: v1Envelope() })
+    const state = loadTournamentState()
+    const index = JSON.parse(data.get(`${prefix}tournaments`)!)
+    data.set(
+      `${prefix}tournaments`,
+      JSON.stringify({ ...index, items: [null, 42, { id: 1 }, ...index.items] }),
+    )
+    expect(() =>
+      persistTournamentState(state.snapshot, createNextRevision(state.revision), false),
+    ).not.toThrow()
+    const repaired = JSON.parse(data.get(`${prefix}tournaments`)!)
+    expect(repaired.items.map((item: { id: string }) => item.id)).toEqual([state.snapshot.id])
+  })
+
   it('keeps the legacy per-field keys when the index could not be written', () => {
     const data = stubLocalStorage({ [`${prefix}players`]: JSON.stringify([]) })
     const original = localStorage.setItem.bind(localStorage)

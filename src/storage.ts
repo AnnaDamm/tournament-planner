@@ -158,7 +158,16 @@ const readIndex = (): TournamentIndex | null => {
   const value = readJson<Partial<TournamentIndex> | null>(indexStorageKey, null)
   if (!value || value.storageVersion !== 2 || typeof value.activeId !== 'string') return null
   if (!Array.isArray(value.items)) return null
-  return value as TournamentIndex
+  // Drop malformed entries instead of failing later when the index is updated.
+  const items = value.items.filter(
+    (item): item is TournamentIndex['items'][number] =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof item.id === 'string' &&
+      typeof item.name === 'string' &&
+      typeof item.updatedAt === 'number',
+  )
+  return { storageVersion: 2, activeId: value.activeId, items }
 }
 
 /** Returns whether the index was actually written. */
@@ -194,14 +203,16 @@ const removeLegacyKeys = () => {
   }
 }
 
+/** Returns whether the snapshot itself was stored; the index is only updated after that. */
 const writeEnvelope = (value: PersistedTournamentState, broadcast: boolean) => {
   try {
     localStorage.setItem(snapshotStorageKey(value.snapshot.id), JSON.stringify(value))
-    writeIndex(upsertIndexItem(readIndex(), value.snapshot))
   } catch {
-    return
+    return false
   }
+  writeIndex(upsertIndexItem(readIndex(), value.snapshot))
   if (broadcast) channel?.postMessage({ tournamentId: value.snapshot.id, ...value })
+  return true
 }
 
 const activate = (state: PersistedTournamentState) => {
@@ -227,8 +238,10 @@ const createFreshState = (snapshot: TournamentSnapshot, source: string) => {
     snapshot: withStartedRounds(snapshot),
     revision: { updatedAt: Date.now(), source },
   }
-  writeEnvelope(state, false)
-  return { state, indexWritten: activate(state) }
+  // Only point the index at the tournament once its snapshot is stored; otherwise the next load
+  // would find a dangling active id instead of retrying the preserved v1 backup.
+  const stored = writeEnvelope(state, false)
+  return { state, indexWritten: stored && activate(state) }
 }
 
 /** Rebuilds a lost or unreadable index from the per-tournament keys; the newest valid one is active. */
