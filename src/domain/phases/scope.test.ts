@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { twoPhaseSnapshot } from '../../test/phases'
 import { parseTournamentSnapshot } from '../snapshot'
 import { transitionResolvers } from './transitions'
-import { getStartablePhase } from './phaseState'
+import { buildPhaseContext, getStartablePhase } from './phaseState'
 import { getPhaseEntrants, getPhaseScope, isPhaseLocked, mergePhasesOnSave } from './scope'
 
 describe('phase scope', () => {
@@ -42,7 +42,7 @@ describe('top N transition', () => {
     participantId,
     place: index + 1,
   }))
-  const prev = { entrants: [{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }] } as never
+  const prev = buildPhaseContext(twoPhaseSnapshot(), 'phase-1')!
 
   it('never yields fewer than two entrants', () => {
     const resolve = transitionResolvers.topN!
@@ -59,6 +59,21 @@ describe('top N transition', () => {
       phases: [snapshot.phases[0], { ...snapshot.phases[1], entry: { kind: 'topN', count: 1 } }],
     }
     expect(parseTournamentSnapshot(raw)?.phases[1].entry).toEqual({ kind: 'topN', count: 2 })
+  })
+
+  it('keeps a count of 1 for top N per group', () => {
+    const snapshot = twoPhaseSnapshot()
+    const raw = {
+      ...snapshot,
+      phases: [
+        snapshot.phases[0],
+        { ...snapshot.phases[1], entry: { kind: 'topNPerGroup', count: 1 } },
+      ],
+    }
+    expect(parseTournamentSnapshot(raw)?.phases[1].entry).toEqual({
+      kind: 'topNPerGroup',
+      count: 1,
+    })
   })
 })
 
