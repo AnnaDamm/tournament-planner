@@ -1,4 +1,69 @@
 // Messages of the library feature. Keys are prefixed with "library"; edit only this file for that feature.
-export const libraryEn = {} as const
+export const libraryEn = {
+  libraryNav: 'Tournaments',
+  libraryTitle: 'Tournaments',
+  libraryIntro:
+    'All tournaments saved in this browser. Only the active tournament is shown and shared.',
+  libraryListLabel: 'Saved tournaments',
+  libraryCreateLabel: 'Name of the new tournament',
+  libraryCreateButton: 'Create tournament',
+  libraryCreateError: 'The tournament could not be saved. The browser storage may be full.',
+  libraryActive: 'Active',
+  libraryUpdated: 'Last change: {date}',
+  libraryOpen: 'Open',
+  libraryOpenTitle: 'Open {name}',
+  libraryRename: 'Rename',
+  libraryRenameTitle: 'Rename {name}',
+  libraryRenameDialogTitle: 'Rename tournament',
+  libraryRenameLabel: 'Tournament name',
+  libraryExport: 'Export',
+  libraryExportTitle: 'Export {name} as JSON',
+  libraryImport: 'Import as new',
+  libraryImportTitle: 'Import a JSON file as a new tournament',
+  libraryImportError: 'This JSON file could not be imported.',
+  libraryDelete: 'Delete',
+  libraryDeleteTitle: 'Delete {name}',
+  libraryDeleteDialogTitle: 'Delete tournament?',
+  libraryDeleteDescription:
+    '"{name}" with all participants, rounds and results will be removed from this browser. This cannot be undone.',
+  libraryDeleteLastHint: 'This is the last tournament. A new empty tournament will be created.',
+  libraryDeleteConfirm: 'Delete tournament',
+  libraryOpened: 'Opened "{name}".',
+  libraryCreated: 'Created "{name}".',
+  libraryDeleted: 'Deleted "{name}".',
+} as const
 
-export const libraryDe: { [Key in keyof typeof libraryEn]: string } = {}
+export const libraryDe: { [Key in keyof typeof libraryEn]: string } = {
+  libraryNav: 'Turniere',
+  libraryTitle: 'Turniere',
+  libraryIntro:
+    'Alle in diesem Browser gespeicherten Turniere. Nur das aktive Turnier wird angezeigt und geteilt.',
+  libraryListLabel: 'Gespeicherte Turniere',
+  libraryCreateLabel: 'Name des neuen Turniers',
+  libraryCreateButton: 'Turnier anlegen',
+  libraryCreateError:
+    'Das Turnier konnte nicht gespeichert werden. Möglicherweise ist der Browser-Speicher voll.',
+  libraryActive: 'Aktiv',
+  libraryUpdated: 'Letzte Änderung: {date}',
+  libraryOpen: 'Öffnen',
+  libraryOpenTitle: '{name} öffnen',
+  libraryRename: 'Umbenennen',
+  libraryRenameTitle: '{name} umbenennen',
+  libraryRenameDialogTitle: 'Turnier umbenennen',
+  libraryRenameLabel: 'Turniername',
+  libraryExport: 'Exportieren',
+  libraryExportTitle: '{name} als JSON exportieren',
+  libraryImport: 'Als neu importieren',
+  libraryImportTitle: 'JSON-Datei als neues Turnier importieren',
+  libraryImportError: 'Diese JSON-Datei konnte nicht importiert werden.',
+  libraryDelete: 'Löschen',
+  libraryDeleteTitle: '{name} löschen',
+  libraryDeleteDialogTitle: 'Turnier löschen?',
+  libraryDeleteDescription:
+    '„{name}“ wird mit allen Teilnehmenden, Runden und Ergebnissen aus diesem Browser entfernt. Das kann nicht rückgängig gemacht werden.',
+  libraryDeleteLastHint: 'Das ist das letzte Turnier. Es wird ein neues, leeres Turnier angelegt.',
+  libraryDeleteConfirm: 'Turnier löschen',
+  libraryOpened: '„{name}“ geöffnet.',
+  libraryCreated: '„{name}“ angelegt.',
+  libraryDeleted: '„{name}“ gelöscht.',
+}

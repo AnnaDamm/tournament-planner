@@ -8,6 +8,7 @@
 - Configure several tournament phases with participant transitions.
 - Set the match format per round and per match.
 - Link the footer version to the version history documentation.
+- Manage several independent tournaments in one browser: create, switch, rename, export, import and delete them from a new tournament list.
 
 ### Bugfixes
 

@@ -388,6 +388,7 @@ const en: DocPage[] = [
               'Configure several tournament phases with participant transitions.',
               'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
+              'Manage several independent tournaments in one browser: create, switch, rename, export, import and delete them from a new tournament list.',
             ],
           },
           {
@@ -948,6 +949,7 @@ const de: DocPage[] = [
               'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
               'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
+              'Verwalte mehrere unabhängige Turniere in einem Browser: anlegen, wechseln, umbenennen, exportieren, importieren und löschen über eine neue Turnierliste.',
             ],
           },
           {
