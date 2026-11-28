@@ -59,6 +59,16 @@ describe('v1 to v2 migration', () => {
 describe('v2 parser', () => {
   const valid = () => JSON.parse(JSON.stringify(createEmptyTournamentSnapshot()))
 
+  it('keeps a valid empty tie-breaker list through a round trip', () => {
+    const parsed = parseTournamentSnapshot({ ...valid(), tieBreakers: [] })!
+    expect(parsed.tieBreakers).toEqual([])
+    expect(parseTournamentSnapshot(JSON.parse(JSON.stringify(parsed)))!.tieBreakers).toEqual([])
+    // a list of only unknown ids is invalid and falls back to the default
+    expect(
+      parseTournamentSnapshot({ ...valid(), tieBreakers: ['nope'] })!.tieBreakers,
+    ).toHaveLength(5)
+  })
+
   it('accepts an empty tournament and fills defaults for hand-edited JSON', () => {
     const {
       scoring: _scoring,

@@ -25,7 +25,7 @@ export function TieBreakerListEditor({ idPrefix, value, onChange }: Props) {
   const cn = (...values: string[]) => classNames(sharedStyles, styles, ...values)
   const [announcement, setAnnouncement] = useState('')
   const [selected, setSelected] = useState('')
-  const focusTarget = useRef<{ id: string; direction: -1 | 1 } | null>(null)
+  const focusTarget = useRef<(() => HTMLElement | null) | null>(null)
   const available = getAvailableTieBreakers(value)
   const addId = available.includes(selected as TieBreakerId) ? selected : (available[0] ?? '')
   const isDefault =
@@ -33,21 +33,24 @@ export function TieBreakerListEditor({ idPrefix, value, onChange }: Props) {
     value.every((id, index) => id === DEFAULT_TIE_BREAKERS[index])
 
   useEffect(() => {
-    // Keep keyboard focus on the moved entry; at the list edge the opposite button takes over.
-    if (!focusTarget.current) return
-    const { id, direction } = focusTarget.current
+    // Restore keyboard focus after a change; React may have re-created the buttons.
+    const find = focusTarget.current
     focusTarget.current = null
-    const first = document.getElementById(`${idPrefix}-${id}-${direction < 0 ? 'up' : 'down'}`)
-    const other = document.getElementById(`${idPrefix}-${id}-${direction < 0 ? 'down' : 'up'}`)
-    const target = first && !(first as HTMLButtonElement).disabled ? first : other
-    target?.focus()
-  }, [value, idPrefix])
+    find?.()?.focus()
+  }, [value])
+
+  const byId = (id: string) => document.getElementById(`${idPrefix}-${id}`)
+  const enabled = (element: HTMLElement | null) =>
+    element && !(element as HTMLButtonElement).disabled ? element : null
 
   const move = (index: number, direction: -1 | 1) => {
     const id = value[index]
     const next = moveTieBreaker(value, index, direction)
     const position = index + direction + 1
-    focusTarget.current = { id, direction }
+    // At the list edge the opposite button takes over.
+    focusTarget.current = () =>
+      enabled(byId(`${id}-${direction < 0 ? 'up' : 'down'}`)) ??
+      byId(`${id}-${direction < 0 ? 'down' : 'up'}`)
     setAnnouncement(
       tf('tieBreakersAnnounceMoved', { name: getLabel(id), position, total: value.length }),
     )
@@ -100,6 +103,12 @@ export function TieBreakerListEditor({ idPrefix, value, onChange }: Props) {
                     title={`${t('tieBreakersRemove')}: ${label}`}
                     onClick={() => {
                       setAnnouncement(tf('tieBreakersAnnounceRemoved', { name: label }))
+                      // The neighbour that takes the place, else the add or reset control.
+                      const neighbour = value[index + 1] ?? value[index - 1]
+                      focusTarget.current = () =>
+                        (neighbour ? byId(`${neighbour}-remove`) : null) ??
+                        enabled(byId('add')) ??
+                        enabled(byId('reset'))
                       onChange(value.filter((item) => item !== id))
                     }}
                   >
@@ -140,6 +149,8 @@ export function TieBreakerListEditor({ idPrefix, value, onChange }: Props) {
                     position: value.length + 1,
                   }),
                 )
+                // The add control disappears with the last entry: focus the new entry instead.
+                if (available.length === 1) focusTarget.current = () => byId(`${addId}-up`)
                 onChange([...value, addId as TieBreakerId])
               }}
             >

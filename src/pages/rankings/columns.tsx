@@ -50,7 +50,7 @@ const tieBreakerColumn = (
   format: (value: number) => string,
 ): RankingColumn => ({
   id,
-  header: () => t(labelKey),
+  header: () => t(labelKey).toLocaleUpperCase(),
   sortValue: (row) => row.tieBreakerValues?.[id] ?? 0,
   value: (row) => format(row.tieBreakerValues?.[id] ?? 0),
   visible: (env) => env.tieBreakers.includes(id),

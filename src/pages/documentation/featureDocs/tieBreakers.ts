@@ -19,7 +19,7 @@ export const tieBreakersDocs: { en: DocPage[]; de: DocPage[] } = {
           title: 'Configure the order',
           text: [
             'Open Tournament settings and use the Tie-breakers section. Add a tie-breaker, remove it, or move it up or down with the arrow buttons (they work with the keyboard; the new position is announced). Reset to default restores the original list. Changes apply with Save.',
-            'Each phase can have its own list: enable "Own tie-breakers for this phase" in the phase card. Without it, the tournament list applies. Swiss pairing uses the ranking and therefore the configured tie-breakers. The table shows a column for every active Buchholz-based tie-breaker.',
+            'Each phase can have its own list: enable "Own tie-breakers for this phase" in the phase card. Without it, the tournament list applies. Knockout and placement phases have no list of their own (the bracket decides there). Swiss pairing uses the ranking and therefore the configured tie-breakers. The table shows a column for every active Buchholz-based tie-breaker.',
           ],
         },
         {
@@ -27,7 +27,7 @@ export const tieBreakersDocs: { en: DocPage[]; de: DocPage[] } = {
           items: [
             'Buchholz: the sum of the match points of all opponents. A bye counts as an opponent with 0 points; a rematch counts twice.',
             'Median Buchholz: the Buchholz without the strongest and the weakest opponent. With fewer than three opponents it equals the Buchholz.',
-            "Opponents' performance: the average match-win percentage (match points divided by the points for all matches won) of all opponents. Each opponent counts with at least 33 %. Byes are ignored.",
+            "Opponents' performance: the average match-win percentage (match points divided by the points for all matches won) of all opponents. Each opponent counts with at least 33 %. Byes are ignored. Withdrawn participants are rated like everyone else as long as their matches count in the ranking being evaluated.",
             'Last loss, games won, games lost, points scored, points conceded: the criteria of the default ranking.',
           ],
         },
@@ -51,16 +51,16 @@ export const tieBreakersDocs: { en: DocPage[]; de: DocPage[] } = {
         {
           title: 'Reihenfolge einstellen',
           text: [
-            'Öffne die Turniereinstellungen und nutze den Abschnitt Tie-Breaker. Füge einen Tie-Breaker hinzu, entferne ihn oder verschiebe ihn mit den Pfeiltasten-Schaltflächen (auch per Tastatur bedienbar; die neue Position wird angesagt). Auf Standard zurücksetzen stellt die ursprüngliche Liste wieder her. Änderungen gelten nach Speichern.',
-            'Jede Phase kann eine eigene Liste haben: Aktiviere „Eigene Tie-Breaker für diese Phase“ in der Phasenkarte. Ohne diese Option gilt die Liste des Turniers. Die Swiss-Paarung nutzt die Rangliste und damit die eingestellten Tie-Breaker. Die Tabelle zeigt für jeden aktiven Buchholz-Tie-Breaker eine Spalte.',
+            'Öffne die Turniereinstellungen und nutze den Abschnitt Tie-Breaker. Füge einen Tie-Breaker hinzu, entferne ihn oder verschiebe ihn mit den Pfeil-Schaltflächen (auch per Tastatur bedienbar; die neue Position wird angesagt). Auf Standard zurücksetzen stellt die ursprüngliche Liste wieder her. Änderungen gelten nach Speichern.',
+            'Jede Phase kann eine eigene Liste haben: Aktiviere „Eigene Tie-Breaker für diese Phase“ in der Phasenkarte. Ohne diese Option gilt die Liste des Turniers. Für K.-o.- und Platzierungsphasen gibt es keine eigene Liste, dort entscheidet der Spielbaum. Die Swiss-Paarung nutzt die Rangliste und damit die eingestellten Tie-Breaker. Die Tabelle zeigt für jeden aktiven Buchholz-Tie-Breaker eine Spalte.',
           ],
         },
         {
           title: 'Verfügbare Tie-Breaker',
           items: [
-            'Buchholz: Summe der Matchpunkte aller Gegner. Ein Freilos zählt als Gegner mit 0 Punkten; ein Wiedersehen zählt doppelt.',
+            'Buchholz: Summe der Matchpunkte aller Gegner. Ein Freilos zählt als Gegner mit 0 Punkten; eine Wiederbegegnung zählt doppelt.',
             'Median-Buchholz: Buchholz ohne den stärksten und den schwächsten Gegner. Bei weniger als drei Gegnern entspricht es dem Buchholz.',
-            'Gegnerleistung: durchschnittliche Siegquote (Matchpunkte geteilt durch die Punkte für lauter Siege) aller Gegner. Jeder Gegner zählt mit mindestens 33 %. Freilose werden ignoriert.',
+            'Gegnerleistung: durchschnittliche Siegquote (Matchpunkte geteilt durch die Punkte für lauter Siege) aller Gegner. Jeder Gegner zählt mit mindestens 33 %. Freilose werden ignoriert. Zurückgezogene Teilnehmende werden wie alle anderen gewertet, solange ihre Begegnungen in der betrachteten Rangliste mitzählen.',
             'Letzte Niederlage, gewonnene Sätze, verlorene Sätze, erzielte Punkte, kassierte Punkte: die Kriterien der Standard-Rangliste.',
           ],
         },

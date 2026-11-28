@@ -62,6 +62,8 @@ export function PhaseCard({
   const ConfigEditor = phaseViews[phase.mode]?.ConfigEditor
   const id = `phase-${phase.id}`
   const title = tf('phasesPhaseLabel', { number: index + 1 })
+  // Bracket phases are ranked by the bracket, not by tie-breakers.
+  const hasOwnTieBreakers = phase.mode === 'swiss' || phase.mode === 'roundRobin'
   const hasCount = phase.entry.kind === 'topN' || phase.entry.kind === 'topNPerGroup'
   const kinds = entryKinds.includes(phase.entry.kind)
     ? entryKinds
@@ -223,26 +225,28 @@ export function PhaseCard({
           />
         </div>
       )}
-      <label htmlFor={`${id}-own-tie-breakers`} className={cn('check')}>
-        <input
-          id={`${id}-own-tie-breakers`}
-          type="checkbox"
-          checked={phase.tieBreakers !== undefined}
-          onChange={(event) => {
-            const { tieBreakers: _tieBreakers, ...rest } = phase
-            onChange(
-              event.currentTarget.checked
-                ? {
-                    ...rest,
-                    tieBreakers: [...(tieBreakers.length ? tieBreakers : DEFAULT_TIE_BREAKERS)],
-                  }
-                : rest,
-            )
-          }}
-        />{' '}
-        {t('tieBreakersOwn')}
-      </label>
-      {phase.tieBreakers && (
+      {hasOwnTieBreakers && (
+        <label htmlFor={`${id}-own-tie-breakers`} className={cn('check')}>
+          <input
+            id={`${id}-own-tie-breakers`}
+            type="checkbox"
+            checked={phase.tieBreakers !== undefined}
+            onChange={(event) => {
+              const { tieBreakers: _tieBreakers, ...rest } = phase
+              onChange(
+                event.currentTarget.checked
+                  ? {
+                      ...rest,
+                      tieBreakers: [...(tieBreakers.length ? tieBreakers : DEFAULT_TIE_BREAKERS)],
+                    }
+                  : rest,
+              )
+            }}
+          />{' '}
+          {t('tieBreakersOwn')}
+        </label>
+      )}
+      {hasOwnTieBreakers && phase.tieBreakers && (
         <TieBreakerListEditor
           idPrefix={`${id}-tie-breakers`}
           value={phase.tieBreakers}

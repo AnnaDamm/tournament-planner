@@ -124,4 +124,17 @@ describe('tie-breakers', () => {
     expect(order(DEFAULT_TIE_BREAKERS)).toEqual(['A', 'E', 'B'])
     expect(order(['buchholz'])).toEqual(['A', 'C', 'B'])
   })
+
+  it('rates withdrawn opponents like everyone else while they take part in the ranking', () => {
+    const withdrawn = players.map((item) => (item.id === 'E' ? { ...item, withdrawn: true } : item))
+    expect(values('buchholz', rounds, withdrawn)).toEqual(values('buchholz'))
+    // Left out of the evaluated participants, their matches are ignored for everybody.
+    const without = values(
+      'buchholz',
+      rounds,
+      players.filter((item) => item.id !== 'E'),
+    )
+    expect(without.A).toBe(3) // B (1) + C (2); the match against E no longer counts
+    expect(without.E).toBeUndefined()
+  })
 })
