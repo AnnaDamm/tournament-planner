@@ -8,6 +8,7 @@
 - Configure several tournament phases with participant transitions.
 - Set the match format per round and per match.
 - Link the footer version to the version history documentation.
+- Add the single elimination (knock-out) mode with byes, an optional match for third place, a format per round and placements.
 
 ### Bugfixes
 

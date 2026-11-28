@@ -26,16 +26,18 @@ import {
   createRound,
   deleteRound,
   fillUnknown,
+  isRoundUpdateBlocked,
   reroll,
   rerollByeCommand,
   setMatchFormat,
   setRoundFormat,
+  startFirstPhase,
   startNextPhase,
   startRound,
   swapPlayers,
   updateRoundMatch,
 } from '../../tournamentCommands'
-import { useAppDispatch, useAppSelector } from '../../storeHooks'
+import { useAppDispatch, useAppSelector, useAppStore } from '../../storeHooks'
 import {
   selectActivePhaseId,
   selectPhases,
@@ -90,6 +92,9 @@ export const RoundsPage = memo(function RoundsPage({
   readOnly = false,
 }: Props) {
   const dispatch = useAppDispatch()
+  const store = useAppStore()
+  const [notice, setNotice] = useState('')
+  const [resetCount, setResetCount] = useState(0)
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
   const [comparisonSelection, setComparisonSelection] = useState<ComparisonSelection | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
@@ -184,8 +189,21 @@ export const RoundsPage = memo(function RoundsPage({
     setComparisonSelection({ playerIds: [firstId, secondId], roundIndex })
   }, [])
   const handleUpdate = useCallback(
-    (roundIndex: number, match: Match) => dispatch(updateRoundMatch(roundIndex, match)),
-    [dispatch],
+    (roundIndex: number, match: Match) => {
+      const state = store.getState().tournament
+      const matches = (state.rounds[roundIndex]?.matches ?? []).map((item) =>
+        item.id === match.id ? match : item,
+      )
+      if (isRoundUpdateBlocked(state, roundIndex, matches)) {
+        // The typed scores are dropped: the inputs are rebuilt from the stored result.
+        setNotice(t('eliminationChangeBlocked'))
+        setResetCount((count) => count + 1)
+        return
+      }
+      setNotice('')
+      dispatch(updateRoundMatch(roundIndex, match))
+    },
+    [dispatch, store],
   )
   const handleSettings = useCallback((number: number) => setSettingsRoundNumber(number), [])
   const handleMatchSettings = useCallback(
@@ -213,7 +231,7 @@ export const RoundsPage = memo(function RoundsPage({
     () =>
       rounds.map((round, roundIndex) => (
         <RoundSection
-          key={round.number}
+          key={`${round.number}-${resetCount}`}
           round={round}
           roundIndex={roundIndex}
           nextRoundStarted={Boolean(rounds[roundIndex + 1]?.startedAt)}
@@ -268,6 +286,7 @@ export const RoundsPage = memo(function RoundsPage({
       phases,
       readOnly,
       record,
+      resetCount,
       rounds,
       runningMatchIdsByRound,
     ],
@@ -278,11 +297,18 @@ export const RoundsPage = memo(function RoundsPage({
   }
   const items = useMemo(() => {
     if (phases.length < 2) {
-      return renderedRounds.map<ListItem>((node, roundIndex) => ({
+      const SinglePhaseView = phases[0] && phaseViews[phases[0].mode]?.RoundsView
+      const roundItems = renderedRounds.map<ListItem>((node, roundIndex) => ({
         key: String(rounds[roundIndex].number),
         roundIndex,
         node,
       }))
+      if (!SinglePhaseView || rounds.length === 0) return roundItems
+      const viewItem: ListItem = {
+        key: 'phase-view',
+        node: <SinglePhaseView key="phase-view" phaseId={phases[0].id} />,
+      }
+      return [viewItem, ...roundItems]
     }
     return phases.flatMap<ListItem>((phase, phaseIndex) => {
       const phaseRounds = rounds.flatMap((round, roundIndex) =>
@@ -318,6 +344,12 @@ export const RoundsPage = memo(function RoundsPage({
       ]
     })
   }, [phases, renderedRounds, rounds])
+  const startView = phases[0] && phaseViews[phases[0].mode]?.start
+  const canStartFirstPhase =
+    !readOnly &&
+    startView &&
+    rounds.length === 0 &&
+    players.filter((player) => !player.withdrawn).length >= 2
   const itemStart = items.findIndex((item) => item.roundIndex === firstRunningRoundIndex)
   const itemEnd = items.map((item) => item.roundIndex).lastIndexOf(lastRunningRoundIndex)
 
@@ -328,7 +360,15 @@ export const RoundsPage = memo(function RoundsPage({
         <div className={classNames(sharedStyles, styles, 'empty')}>
           <Trophy size={30} aria-hidden="true" />
           <h2>{t('noRounds')}</h2>
-          <p>{t('firstRound')}</p>
+          <p>{startView ? t(startView.helpKey) : t('firstRound')}</p>
+          {canStartFirstPhase && (
+            <button
+              className={classNames(sharedStyles, styles, 'button primary')}
+              onClick={() => dispatch(startFirstPhase())}
+            >
+              <Plus size={16} aria-hidden="true" /> {t(startView.labelKey)}
+            </button>
+          )}
         </div>
       ) : (
         <div className={classNames(sharedStyles, styles, 'round-list')}>
@@ -370,6 +410,9 @@ export const RoundsPage = memo(function RoundsPage({
       <p className={classNames(sharedStyles, styles, 'sr-only')} aria-live="polite">
         {keyboardMove ? t('moveInstructions') : ''}
       </p>
+      <output className={classNames(sharedStyles, styles, 'setting-status')} aria-live="polite">
+        {notice}
+      </output>
       <PlayerHistoryDialog
         player={historyPlayer}
         players={players}

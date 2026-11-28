@@ -388,6 +388,7 @@ const en: DocPage[] = [
               'Configure several tournament phases with participant transitions.',
               'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
+              'Add the single elimination (knock-out) mode with byes, an optional match for third place, a format per round and placements.',
             ],
           },
           {
@@ -948,6 +949,7 @@ const de: DocPage[] = [
               'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
               'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
+              'K.-o.-Modus (einfach) mit Freilosen, optionalem Spiel um Platz 3, Format pro Runde und Platzierungen ergänzt.',
             ],
           },
           {
