@@ -78,8 +78,9 @@ export function AppRoutes({
       const match = round?.matches.find((item) => item.a === id || item.b === id)
       const result = match ? getRoundMatchResult(ctx, round, match) : null
       const isBye = round?.bye === id
-      const nextWins = result?.winner === id || isBye ? player.wins + 1 : player.wins
-
+      const won = isBye || (result?.outcome !== 'draw' && result?.winner === id)
+      const nextWins = won ? player.wins + 1 : player.wins
+      // A draw is not a win: the number of wins stays, the match still counts as played.
       return result || isBye ? `${player.wins} → ${nextWins}` : String(player.wins)
     },
     [ctx, rounds, standingsBeforeRounds],

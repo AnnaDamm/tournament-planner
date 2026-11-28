@@ -66,25 +66,26 @@ export const applyPhaseResolution = <T extends PhaseSnapshot>(snapshot: T): T =>
   return rounds === snapshot.rounds ? snapshot : { ...snapshot, rounds }
 }
 
-/** The phase that "Start next phase" would start now, if any. */
-export const getStartablePhase = (snapshot: PhaseSnapshot): Phase | undefined => {
+/** The phase after the active one when it can be started now: the active phase is complete. */
+const getNextPhaseToStart = (snapshot: PhaseSnapshot) => {
   const active = getActivePhase(snapshot)
   const next = snapshot.phases[snapshot.phases.findIndex((phase) => phase.id === active.id) + 1]
   if (!next || next.startedAt || !isPhaseComplete(snapshot, active.id)) return undefined
-  return transitionResolvers[next.entry.kind] && getPhaseMode(next.mode) ? next : undefined
+  const resolver = transitionResolvers[next.entry.kind]
+  const mode = getPhaseMode(next.mode)
+  return resolver && mode ? { active, next, resolver, mode } : undefined
 }
+
+/** The phase that "Start next phase" would start now, if any. */
+export const getStartablePhase = (snapshot: PhaseSnapshot): Phase | undefined =>
+  getNextPhaseToStart(snapshot)?.next
 
 /** Starts the phase after the active one when the active one is complete. */
 export const startNextPhase = <T extends PhaseSnapshot>(snapshot: T): T => {
-  const active = getActivePhase(snapshot)
-  const nextIndex = snapshot.phases.findIndex((phase) => phase.id === active.id) + 1
-  const next = snapshot.phases[nextIndex]
-  if (!next || !isPhaseComplete(snapshot, active.id)) return snapshot
+  const target = getNextPhaseToStart(snapshot)
+  if (!target) return snapshot
+  const { active, next, resolver, mode } = target
   const prev = buildPhaseContext(snapshot, active.id)!
-  const resolver = transitionResolvers[next.entry.kind]
-  const mode = getPhaseMode(next.mode)
-  if (!resolver || !mode) return snapshot
-
   const entrants = resolver(prev, getPhaseMode(active.mode)!.getPlacements(prev), next.entry)
   const phases = snapshot.phases.map((phase) =>
     phase.id === next.id ? { ...phase, entrants, startedAt: new Date().toISOString() } : phase,

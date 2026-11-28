@@ -40,6 +40,8 @@ type Props = {
   keyboardMove: { roundIndex: number; participantId: string } | null
   onKeyboardSwap: (roundIndex: number, participantId: string) => void
   readOnly: boolean
+  /** 2 for a single phase; 3 below a phase heading. */
+  headingLevel: 2 | 3
 }
 
 // oxlint-disable-next-line eslint/max-lines-per-function
@@ -69,7 +71,9 @@ export const RoundSection = memo(function RoundSection({
   keyboardMove,
   onKeyboardSwap,
   readOnly,
+  headingLevel,
 }: Props) {
+  const Heading = `h${headingLevel}` as 'h2' | 'h3'
   const { rules } = useAppSelector(selectEvaluationContext)
   const canReorderBye =
     capabilities.swapParticipants &&
@@ -146,7 +150,7 @@ export const RoundSection = memo(function RoundSection({
               </div>
             )}
             <div className={classNames(sharedStyles, styles, 'round-title-line')}>
-              <h2 id={`round-${round.number}-title`}>
+              <Heading id={`round-${round.number}-title`}>
                 <span className={classNames(sharedStyles, styles, 'sr-only')}>
                   {t('round')} {round.number} –
                 </span>
@@ -155,7 +159,7 @@ export const RoundSection = memo(function RoundSection({
                     {tf(round.title.key, round.title.params)}
                   </span>
                 )}
-              </h2>
+              </Heading>
               <span className={classNames(sharedStyles, styles, 'round-kicker')}>
                 <span aria-hidden="true">
                   {t('round')} {String(round.number).padStart(2, '0')}

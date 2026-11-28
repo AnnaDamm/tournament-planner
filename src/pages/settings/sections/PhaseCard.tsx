@@ -94,6 +94,7 @@ export function PhaseCard({
             <ChevronDown size={16} aria-hidden="true" />
           </button>
           <button
+            id={`${id}-remove`}
             className={cn('icon-btn')}
             type="button"
             disabled={!canRemove}

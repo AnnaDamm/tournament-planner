@@ -32,6 +32,8 @@ export type RankingColumn = {
   id: string
   header: (term: (key: TermKey) => string) => string
   value: (row: RankingRow, context: { mostPlayed: number }) => ReactNode
+  /** Sort key for columns that are not a field of the row; the id is used as field otherwise. */
+  sortValue?: (row: RankingRow) => number | string
   strong?: boolean
   visible?: (env: RankingColumnEnv) => boolean
 }

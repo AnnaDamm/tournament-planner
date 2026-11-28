@@ -119,6 +119,14 @@ const mapRoundsByPhase = <T>(
     const values = compute(scope)
     scope.rounds.forEach((round, index) => byNumber.set(round.number, values[index]))
   })
+  // Rounds of an unknown phase are evaluated like rounds of the first phase.
+  const known = new Set(parts.phases.map((phase) => phase.id))
+  const orphans = parts.rounds.filter((round) => !known.has(round.phaseId))
+  if (orphans.length > 0 && parts.phases[0]) {
+    const scope = { ...getPhaseScope(parts, parts.phases[0].id), rounds: orphans }
+    const values = compute(scope)
+    orphans.forEach((round, index) => byNumber.set(round.number, values[index]))
+  }
   return parts.rounds.map((round) => byNumber.get(round.number) as T)
 }
 

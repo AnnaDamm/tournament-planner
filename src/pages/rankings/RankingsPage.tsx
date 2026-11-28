@@ -181,15 +181,15 @@ export function RankingsPage({
           {t('phasesNotStarted')}
         </p>
       )}
-      {standingsView && phase ? (
-        createElement(standingsView, { phaseId: phase.id })
-      ) : (
-        <div
-          className={classNames(sharedStyles, styles, 'table-wrap')}
-          role={phases.length >= 2 ? 'tabpanel' : undefined}
-          id="ranking-phase-panel"
-          aria-labelledby={phase ? `ranking-phase-tab-${phase.id}` : undefined}
-        >
+      <div
+        className={classNames(sharedStyles, styles, 'table-wrap')}
+        role={phases.length >= 2 ? 'tabpanel' : undefined}
+        id="ranking-phase-panel"
+        aria-labelledby={phase ? `ranking-phase-tab-${phase.id}` : undefined}
+      >
+        {standingsView && phase ? (
+          createElement(standingsView, { phaseId: phase.id })
+        ) : (
           <table className={classNames(sharedStyles, styles, 'ranking-table')}>
             <caption className={classNames(sharedStyles, styles, 'sr-only')}>
               {t('rankingTable')}
@@ -369,8 +369,8 @@ export function RankingsPage({
               })}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
       <PlayerHistoryDialog
         player={historyPlayer}
         players={players}

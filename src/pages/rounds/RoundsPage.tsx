@@ -11,7 +11,7 @@ import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
 import { t, tf } from '../../i18n'
 import { getPhaseMode } from '../../domain/phases/registry'
-import type { PhaseCapabilities } from '../../domain/phases/types'
+import { noCapabilities } from '../../domain/phases/types'
 import { phaseViews } from '../phaseViews/registry'
 import { getPhaseName } from '../phaseViews/phaseName'
 import { getSideLabel } from './sideLabel'
@@ -69,14 +69,6 @@ const getFirstRunningMatchId = (
     .at(0)?.id
 
 const emptyRunningMatchIds = new Set<string>()
-
-const noCapabilities: PhaseCapabilities = {
-  manualRounds: false,
-  reroll: false,
-  rerollBye: false,
-  swapParticipants: false,
-  fillUnknown: false,
-}
 
 type ListItem = { key: string; roundIndex?: number; node: ReactNode }
 
@@ -247,6 +239,7 @@ export const RoundsPage = memo(function RoundsPage({
           keyboardMove={keyboardMove}
           onKeyboardSwap={handleKeyboardSwap}
           readOnly={readOnly}
+          headingLevel={phases.length >= 2 ? 3 : 2}
         />
       )),
     [
@@ -268,6 +261,7 @@ export const RoundsPage = memo(function RoundsPage({
       matchLabels,
       name,
       participantOrderByRound,
+      phases.length,
       readOnly,
       record,
       rounds,
@@ -350,7 +344,6 @@ export const RoundsPage = memo(function RoundsPage({
             className={classNames(sharedStyles, styles, 'button primary')}
             inert={keyboardMove !== null}
             onClick={() => dispatch(startNextPhase())}
-            title={tf('phasesStartNext', { name: getPhaseName(startablePhase) })}
           >
             <ArrowRight size={16} aria-hidden="true" />{' '}
             {tf('phasesStartNext', { name: getPhaseName(startablePhase) })}

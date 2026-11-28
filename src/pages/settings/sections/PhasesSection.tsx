@@ -63,7 +63,15 @@ export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
   }
 
   const remove = (phase: Phase) => {
+    const index = phases.findIndex((item) => item.id === phase.id)
+    const neighbour = phases[index + 1] ?? phases[index - 1]
     setPhases((current) => current.filter((item) => item.id !== phase.id))
+    // Keep the focus in the list: the neighbouring remove button, otherwise "Add phase".
+    setTimeout(() => {
+      const remaining = neighbour && document.getElementById(`phase-${neighbour.id}-remove`)
+      const next = remaining && !(remaining as HTMLButtonElement).disabled ? remaining : null
+      ;(next ?? document.getElementById('phase-add'))?.focus()
+    }, 0)
     setAnnouncement(tf('phasesRemoved', { name: getPhaseName(phase) }))
   }
 
@@ -99,6 +107,7 @@ export function PhasesSection({ draft, setDraft }: SettingsSectionProps) {
         />
       ))}
       <button
+        id="phase-add"
         className={classNames(sharedStyles, styles, 'button ghost')}
         type="button"
         title={t('phasesAdd')}

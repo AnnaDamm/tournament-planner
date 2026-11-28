@@ -19,6 +19,15 @@ export type PhaseCapabilities = {
   fillUnknown: boolean
 }
 
+/** Used for rounds whose phase is unknown: nothing can be edited. */
+export const noCapabilities: PhaseCapabilities = {
+  manualRounds: false,
+  reroll: false,
+  rerollBye: false,
+  swapParticipants: false,
+  fillUnknown: false,
+}
+
 export type PhaseContext<C> = {
   phase: Phase & { config: C }
   phaseIndex: number

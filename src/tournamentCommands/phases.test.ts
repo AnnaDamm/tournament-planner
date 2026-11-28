@@ -75,6 +75,17 @@ describe('phase-scoped selectors', () => {
   })
 })
 
+describe('rounds of an unknown phase', () => {
+  it('are evaluated like the first phase instead of being undefined', () => {
+    const snapshot = twoPhaseSnapshot()
+    const orphan = { ...snapshot, rounds: [{ ...snapshot.rounds[0], phaseId: 'gone' }] }
+    const store = createTournamentStore(orphan)
+    const [before] = selectStandingsBeforeRounds(store.getState())
+    expect(before).toBeDefined()
+    expect(selectParticipantOrderByRound(store.getState())[0]).toBeDefined()
+  })
+})
+
 describe('match formats', () => {
   it('prefers the match override over the round format', () => {
     const [round] = twoPhaseSnapshot().rounds
