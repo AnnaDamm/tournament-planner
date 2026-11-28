@@ -1,0 +1,140 @@
+@layer components {
+  .bracket {
+    margin: 0 0 16px;
+  }
+
+  .bracket-title {
+    margin: 0 0 8px;
+    font-size: 16px;
+  }
+
+  .bracket-rounds {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    padding-bottom: 6px;
+    overflow-x: auto;
+  }
+
+  .bracket-round {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 190px;
+  }
+
+  .round-title {
+    color: #5d6b63;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .matches {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .match {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 6px 8px 6px 32px;
+    border: 1px solid #d9e1db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+  }
+
+  .match-label {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: #8d9992;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .side {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .side-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .side-score {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+  }
+
+  .winner {
+    font-weight: 800;
+  }
+
+  .standings {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .standings th,
+  .standings td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e4e9e5;
+    text-align: left;
+  }
+
+  .standings td {
+    width: 90px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+  }
+
+  .byes {
+    margin: 0;
+    color: #5d6b63;
+    font-size: 12px;
+  }
+
+  :global(.readonly-focus-mode) .bracket-title {
+    font-size: clamp(20px, 1.6cqw, 40px);
+  }
+
+  :global(.readonly-focus-mode) .bracket-round {
+    min-width: clamp(220px, 18cqw, 420px);
+  }
+
+  :global(.readonly-focus-mode) .match,
+  :global(.readonly-focus-mode) .round-title,
+  :global(.readonly-focus-mode) .byes {
+    font-size: clamp(14px, 1.2cqw, 30px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .match {
+      border-color: #3d4b42;
+      background: #1c2520;
+    }
+
+    .round-title,
+    .byes {
+      color: #b4c5ab;
+    }
+
+    .standings th,
+    .standings td {
+      border-color: #3d4b42;
+    }
+  }
+}

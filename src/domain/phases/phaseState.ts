@@ -65,6 +65,14 @@ export const applyPhaseResolution = <T extends PhaseSnapshot>(snapshot: T): T =>
   return rounds === snapshot.rounds ? snapshot : { ...snapshot, rounds }
 }
 
+/** True when applying the resolution would change participants of matches that have scores. */
+export const hasResolutionConflict = (snapshot: PhaseSnapshot): boolean =>
+  snapshot.phases.some((phase) => {
+    const mode = getPhaseMode(phase.mode)
+    const p = mode?.hasResolveConflict && buildPhaseContext(snapshot, phase.id)
+    return Boolean(p && mode.hasResolveConflict!(p))
+  })
+
 /** The phase after the active one when it can be started now: the active phase is complete. */
 const getNextPhaseToStart = (snapshot: PhaseSnapshot) => {
   const active = getActivePhase(snapshot)
@@ -95,6 +103,21 @@ export const startNextPhase = <T extends PhaseSnapshot>(snapshot: T): T => {
   const firstRoundNumber = Math.max(0, ...snapshot.rounds.map((round) => round.number)) + 1
   const created = mode.initPhase(buildPhaseContext(started, next.id)!, firstRoundNumber)
   return applyPhaseResolution({ ...started, rounds: [...snapshot.rounds, ...created] })
+}
+
+/**
+ * Creates the rounds of the first phase for modes that plan everything up front (brackets).
+ * Returns the snapshot unchanged when the tournament has rounds already or the mode plans
+ * its rounds one by one (Swiss).
+ */
+export const startFirstPhase = <T extends PhaseSnapshot>(snapshot: T): T => {
+  const first = snapshot.phases[0]
+  const mode = first && getPhaseMode(first.mode)
+  if (!first || !mode || mode.capabilities.manualRounds || snapshot.rounds.length > 0) {
+    return snapshot
+  }
+  const created = mode.initPhase(buildPhaseContext(snapshot, first.id)!, 1)
+  return created.length === 0 ? snapshot : applyPhaseResolution({ ...snapshot, rounds: created })
 }
 
 const findRound = (snapshot: PhaseSnapshot, number: number) =>

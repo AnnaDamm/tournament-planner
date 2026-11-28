@@ -1,4 +1,4 @@
-import { buildPhaseContext, getActivePhase } from '../domain/phases/phaseState'
+import { buildPhaseContext, getActivePhase, startFirstPhase } from '../domain/phases/phaseState'
 import { getPhaseMode } from '../domain/phases/registry'
 import {
   assignCourtsToMatches,
@@ -47,11 +47,13 @@ export const startScheduledRound =
     )
       return
 
-    const phase = getActivePhase(state)
+    // A bracket is created completely when the tournament starts.
+    const bracket = startFirstPhase(state)
+    const phase = getActivePhase(bracket)
     const mode = getPhaseMode(phase.mode)
-    const p = buildPhaseContext(state, phase.id)
+    const p = buildPhaseContext(bracket, phase.id)
     if (!mode || !p) return
-    const existing = state.rounds[0]
+    const existing = bracket.rounds[0]
     const base: Round = existing ?? {
       number: 1,
       phaseId: phase.id,
@@ -69,7 +71,7 @@ export const startScheduledRound =
           standings: plan.standings,
         }
       : { ...base, bye: plan.bye, matches: plan.matches, standings: plan.standings }
-    const rounds = existing ? [firstRound, ...state.rounds.slice(1)] : [firstRound]
+    const rounds = existing ? [firstRound, ...bracket.rounds.slice(1)] : [firstRound]
     const { rules } = p.ctx
     const startedAt = new Date(startAt).toISOString()
     dispatch(
