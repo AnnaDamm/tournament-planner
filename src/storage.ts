@@ -351,6 +351,11 @@ export const createTournament = (name: string) => {
   if (!indexWritten) {
     // Never leave a snapshot behind that the library does not know about.
     localStorage.removeItem(snapshotStorageKey(state.snapshot.id))
+    const index = readIndex()
+    if (index) {
+      // Adding the entry may have worked although activating it did not: drop the entry again.
+      writeIndex({ ...index, items: index.items.filter((item) => item.id !== state.snapshot.id) })
+    }
     return null
   }
   notifyLibraryChanged()
@@ -422,8 +427,9 @@ export const subscribeToLibrary = (listener: (activeId: string) => void) => {
   libraryListeners.add(listener)
   const handleStorage = (event: StorageEvent) => {
     // Another tab changed the index: only this subscriber needs to hear about it.
+    if (event.key !== indexStorageKey) return
     const activeId = readIndex()?.activeId
-    if (event.key === indexStorageKey && activeId) listener(activeId)
+    if (activeId) listener(activeId)
   }
   if (typeof window !== 'undefined') window.addEventListener('storage', handleStorage)
   return () => {

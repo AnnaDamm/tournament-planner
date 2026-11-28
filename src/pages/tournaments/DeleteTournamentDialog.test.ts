@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { t } from '../../i18n'
 import { DeleteTournamentDialog } from './DeleteTournamentDialog'
 
 const render = (isLast: boolean) =>
@@ -23,6 +24,8 @@ describe('DeleteTournamentDialog', () => {
   })
 
   it('warns that a new empty tournament is created when the last one is deleted', () => {
-    expect(render(true).length).toBeGreaterThan(render(false).length)
+    const hint = t('libraryDeleteLastHint')
+    expect(render(true)).toContain(hint)
+    expect(render(false)).not.toContain(hint)
   })
 })

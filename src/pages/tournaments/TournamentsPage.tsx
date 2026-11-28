@@ -60,6 +60,10 @@ export function TournamentsPage() {
   useEffect(() => subscribeToLibrary(() => setVersion((value) => value + 1)), [])
 
   const nameOf = (id: string) => library.items.find((item) => item.id === id)?.name ?? ''
+  const fail = (message: string) => {
+    setNotice('')
+    setError(message)
+  }
   const announce = (message: string, remounts = false) => {
     setError('')
     if (remounts) pendingNotice = message
@@ -70,7 +74,7 @@ export function TournamentsPage() {
 
   const create = () => {
     const id = createTournament(newName)
-    if (!id) return setError(t('libraryCreateError'))
+    if (!id) return fail(t('libraryCreateError'))
     // The new tournament becomes the active one, which remounts the app.
     const name = listTournaments().items.find((item) => item.id === id)?.name ?? ''
     announce(tf('libraryCreated', { name }), true)
@@ -83,14 +87,14 @@ export function TournamentsPage() {
     const to = name.trim()
     if (!to) return
     if (renaming.id === library.activeId) dispatch(renameActiveTournament(to))
-    else if (!renameTournament(renaming.id, to)) return setError(t('libraryCreateError'))
+    else if (!renameTournament(renaming.id, to)) return fail(t('libraryCreateError'))
     announce(tf('libraryRenamed', { from: renaming.name, to }))
     setVersion((value) => value + 1)
   }
   const remove = () => {
     if (!deleting) return
     const wasActive = deleting.id === library.activeId
-    if (!deleteTournament(deleting.id)) return setError(t('libraryCreateError'))
+    if (!deleteTournament(deleting.id)) return fail(t('libraryCreateError'))
     announce(tf('libraryDeleted', { name: deleting.name }), wasActive)
     setVersion((value) => value + 1)
   }
@@ -107,7 +111,7 @@ export function TournamentsPage() {
       announce(tf('libraryCreated', { name: snapshot.tournamentName }))
       setVersion((value) => value + 1)
     } catch {
-      setError(t('libraryImportError'))
+      fail(t('libraryImportError'))
     }
   }
   const closeRename = (id: string) => {
