@@ -201,11 +201,7 @@ const writeEnvelope = (value: PersistedTournamentState, broadcast: boolean) => {
   } catch {
     return false
   }
-  try {
-    writeIndex(upsertIndexItem(readIndex(), value.snapshot))
-  } catch {
-    // The snapshot is stored; a missing index entry is rebuilt on the next load.
-  }
+  writeIndex(upsertIndexItem(readIndex(), value.snapshot))
   if (broadcast) channel?.postMessage({ tournamentId: value.snapshot.id, ...value })
   return true
 }

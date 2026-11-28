@@ -127,14 +127,34 @@ describe('storage migration', () => {
     }
     const first = loadTournamentState()
     expect(first.snapshot.tournamentName).toBe('Small Cup')
-    const index = data.get(`${prefix}tournaments`)
-    expect(index === undefined || !JSON.parse(index).activeId).toBe(true)
+    expect(data.has(`${prefix}tournaments`)).toBe(false)
 
     localStorage.setItem = original
     const second = loadTournamentState()
     expect(second.snapshot.tournamentName).toBe('Small Cup')
     expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
     expect(JSON.parse(data.get(`${prefix}tournaments`)!).activeId).toBe(second.snapshot.id)
+  })
+
+  it('keeps the legacy per-field keys when the snapshot could not be stored and migrates them later', () => {
+    const data = stubLocalStorage({
+      [`${prefix}players`]: JSON.stringify([
+        { id: 'p1', name: 'Legacy Anna', wins: 0, losses: 0, scored: 0, conceded: 0 },
+      ]),
+    })
+    const original = localStorage.setItem.bind(localStorage)
+    localStorage.setItem = (key: string, value: string) => {
+      if (key.startsWith(`${prefix}tournament:`)) throw new Error('quota')
+      original(key, value)
+    }
+    loadTournamentState()
+    expect(data.has(`${prefix}players`)).toBe(true)
+    expect(data.has(`${prefix}tournaments`)).toBe(false)
+
+    localStorage.setItem = original
+    const second = loadTournamentState()
+    expect(second.snapshot.players.map((player) => player.name)).toEqual(['Legacy Anna'])
+    expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
   })
 
   it('keeps the legacy per-field keys when the index could not be written', () => {
