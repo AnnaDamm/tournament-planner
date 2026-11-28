@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { twoPhaseSnapshot } from '../../test/phases'
+import { parseTournamentSnapshot } from '../snapshot'
+import { transitionResolvers } from './transitions'
 import { getStartablePhase } from './phaseState'
 import { getPhaseEntrants, getPhaseScope, isPhaseLocked, mergePhasesOnSave } from './scope'
 
@@ -32,6 +34,31 @@ describe('phase scope', () => {
       phases: [snapshot.phases[0], { ...snapshot.phases[1], startedAt: 'x', entrants: [] }],
     }
     expect(getStartablePhase(started)).toBeUndefined()
+  })
+})
+
+describe('top N transition', () => {
+  const placements = ['p1', 'p2', 'p3'].map((participantId, index) => ({
+    participantId,
+    place: index + 1,
+  }))
+  const prev = { entrants: [{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }] } as never
+
+  it('never yields fewer than two entrants', () => {
+    const resolve = transitionResolvers.topN!
+    expect(resolve(prev, placements, { kind: 'topN', count: 1 })).toEqual(['p1', 'p2'])
+    expect(resolve(prev, placements, { kind: 'topN', count: 0 })).toEqual(['p1', 'p2'])
+    expect(resolve(prev, placements, { kind: 'topN', count: 3 })).toEqual(['p1', 'p2', 'p3'])
+    expect(resolve(prev, placements.slice(0, 1), { kind: 'topN', count: 1 })).toEqual(['p1'])
+  })
+
+  it('is clamped to at least two when parsing a snapshot', () => {
+    const snapshot = twoPhaseSnapshot()
+    const raw = {
+      ...snapshot,
+      phases: [snapshot.phases[0], { ...snapshot.phases[1], entry: { kind: 'topN', count: 1 } }],
+    }
+    expect(parseTournamentSnapshot(raw)?.phases[1].entry).toEqual({ kind: 'topN', count: 2 })
   })
 })
 

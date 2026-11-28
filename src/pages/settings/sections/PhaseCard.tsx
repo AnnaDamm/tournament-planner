@@ -186,6 +186,7 @@ export function PhaseCard({
               </label>
               <NumberField
                 id={`${id}-entry-count`}
+                min={2}
                 value={phase.entry.count}
                 onChange={(count) =>
                   onChange({ ...phase, entry: { ...phase.entry, count } as PhaseTransition })

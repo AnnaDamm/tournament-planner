@@ -15,12 +15,12 @@ import { getActivePhase, getStartablePhase } from './domain/phases/phaseState'
 import { getPhaseScope } from './domain/phases/scope'
 import { rankingColumns } from './pages/rankings/columns'
 import { sortStats, type SortValue } from './tournamentStats'
+import type { TournamentSettings } from './tournamentTypes'
 
 /** Sort values of the ranking columns that are not fields of the ranking row. */
 const columnSortValues: Record<string, SortValue> = Object.fromEntries(
   rankingColumns.flatMap((column) => (column.sortValue ? [[column.id, column.sortValue]] : [])),
 )
-import type { TournamentSettings } from './tournamentTypes'
 
 export const selectTournamentSnapshot = (state: RootState) => state.tournament
 export const selectPlayers = (state: RootState) => state.tournament.players

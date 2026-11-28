@@ -102,7 +102,8 @@ const parseScoring = (raw: unknown): ScoringSettings => {
 
 const parseEntry = (raw: unknown): PhaseTransition => {
   if (isRecord(raw) && isFiniteNumber(raw.count)) {
-    const count = Math.max(1, Math.floor(raw.count))
+    // A phase needs at least two entrants to ever complete.
+    const count = Math.max(2, Math.floor(raw.count))
     if (raw.kind === 'topN') return { kind: 'topN', count }
     if (raw.kind === 'topNPerGroup') {
       return {
