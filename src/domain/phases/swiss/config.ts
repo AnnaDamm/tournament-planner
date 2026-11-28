@@ -12,7 +12,7 @@ export const parseSwissConfig = (raw: unknown): SwissConfig | null => {
   if (!variants.includes(variant as SwissConfig['variant'])) return null
   const config: SwissConfig = { variant: variant as SwissConfig['variant'] }
   if (typeof acceleratedRounds === 'number' && Number.isFinite(acceleratedRounds)) {
-    config.acceleratedRounds = Math.max(0, Math.floor(acceleratedRounds))
+    config.acceleratedRounds = Math.max(1, Math.floor(acceleratedRounds))
   }
   return config
 }

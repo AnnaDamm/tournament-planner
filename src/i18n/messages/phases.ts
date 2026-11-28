@@ -27,7 +27,6 @@ export const phasesEn = {
   phasesNoRounds: 'This phase has no rounds yet.',
   phasesStartNext: 'Start next phase: {name}',
   phasesSelector: 'Phase',
-  phasesSwissConfigHelp: 'Participants are paired by their current ranking in every round.',
   phasesSourceWinner: 'Winner of {match}',
   phasesSourceLoser: 'Loser of {match}',
   phasesSourceSeed: 'Seed {seed}',
@@ -69,8 +68,6 @@ export const phasesDe: { [Key in keyof typeof phasesEn]: string } = {
   phasesNoRounds: 'Diese Phase hat noch keine Runden.',
   phasesStartNext: 'Nächste Phase starten: {name}',
   phasesSelector: 'Phase',
-  phasesSwissConfigHelp:
-    'Die Teilnehmenden werden in jeder Runde nach ihrer aktuellen Platzierung gepaart.',
   phasesSourceWinner: 'Sieger von {match}',
   phasesSourceLoser: 'Verlierer von {match}',
   phasesSourceSeed: 'Setzplatz {seed}',

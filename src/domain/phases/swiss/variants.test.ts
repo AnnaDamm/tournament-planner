@@ -6,6 +6,7 @@ import type { Round } from '../../types'
 import { makePlayers } from '../../../test/fixtures'
 import { withSeed } from '../../../test/seededRandom'
 import { parseSwissConfig } from './config'
+import { getVirtualWins } from './accelerated'
 import { fillDanishUnknown } from './danish'
 import { getSwissPlanner } from './variants'
 
@@ -111,10 +112,35 @@ describe('Danish swiss', () => {
       ],
     }
     const filled = fillDanishUnknown(draft, players, rounds, ctx)
-    expect(
-      filled.matches.flatMap((match) => [match.a, match.b]).every((id) => !id.startsWith('__')),
-    ).toBe(true)
-    expect(new Set(filled.matches.flatMap((match) => [match.a, match.b])).size).toBe(4)
+    expect(ids(filled)).toEqual(['p1-p3', 'p2-p5'])
+  })
+})
+
+describe('accelerated hook', () => {
+  const players = makePlayers(8)
+  const rounds = [
+    finishedRound(1, [
+      ['p1', 'p3'],
+      ['p2', 'p4'],
+      ['p5', 'p7'],
+      ['p6', 'p8'],
+    ]),
+  ]
+  it('gives no virtual wins once the accelerated rounds are over', () => {
+    expect(getVirtualWins(players, 2, { variant: 'accelerated' })).toBeUndefined()
+    expect(getVirtualWins(players, 1, { variant: 'accelerated' })?.size).toBe(4)
+  })
+
+  it('uses match points (win value 3) for the virtual win and keeps the tie-breaker order', () => {
+    const ctx3 = {
+      ...ctx,
+      scoring: { ...ctx.scoring, matchPoints: { ...ctx.scoring.matchPoints, win: 3 } },
+    }
+    const plan = getSwissPlanner({ variant: 'accelerated' })
+    const second = withSeed(5, () =>
+      plan(players, rounds, { roundNumber: 2, isFirstRound: false }, undefined, ctx3),
+    )
+    expect(ids(second)).toEqual(['p1-p2', 'p3-p4', 'p5-p6', 'p7-p8'])
   })
 })
 

@@ -14,10 +14,10 @@ export const getVirtualWins = (
   players: Participant[],
   playedRounds: number,
   config: SwissConfig,
-): Map<string, number> => {
+): Map<string, number> | undefined => {
   const rounds = config.acceleratedRounds ?? DEFAULT_ACCELERATED_ROUNDS
   const active = players.filter((player) => !player.withdrawn)
-  if (playedRounds >= rounds) return new Map()
+  if (playedRounds >= rounds) return undefined
   const topSize = Math.ceil(active.length / 2)
   return new Map(active.slice(0, topSize).map((player) => [player.id, 1]))
 }

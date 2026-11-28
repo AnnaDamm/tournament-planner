@@ -9,7 +9,7 @@ import type { Match, Participant, Round } from '../../types'
 
 const randomItem = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)]
 
-export const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
+const selectBye = (candidateIds: string[], previousRounds: Round[]) => {
   const previousByeIds = new Set(previousRounds.filter(hasValidBye).map((round) => round.bye!))
   if (previousByeIds.size === 0) return randomItem(candidateIds)
 
@@ -165,17 +165,22 @@ export const createRoundPlan = (
   ctx: EvaluationContext,
   hooks: PairingHooks = {},
 ) => {
-  const virtualWins = hooks.virtualWins
+  const virtualWins = hooks.virtualWins?.size ? hooks.virtualWins : undefined
   const virtualOf = (id: string) => virtualWins?.get(id) ?? 0
   const activePlayers = players.filter((player) => !player.withdrawn)
   const standings = calculateStandings(activePlayers, previousRounds, ctx)
   const ranking = getRankingParticipants(activePlayers, previousRounds, ctx)
   if (!isFirstRound) {
     ranking.sort(compareRankingParticipants)
-    if (virtualWins)
+    // Stable: equal effective match points keep the tie-breaker order from above.
+    if (virtualWins) {
+      const effective = (id: string, matchPoints: number) =>
+        matchPoints + virtualOf(id) * ctx.scoring.matchPoints.win
       ranking.sort(
-        (first, second) => second.wins + virtualOf(second.id) - (first.wins + virtualOf(first.id)),
+        (first, second) =>
+          effective(second.id, second.matchPoints) - effective(first.id, first.matchPoints),
       )
+    }
   }
   const participantOrder = ranking.map((player) => player.id)
   const standingsById = new Map(ranking.map((standing) => [standing.id, standing]))
@@ -247,6 +252,7 @@ export const createRoundPlan = (
     }
   }
 
+  // NOTE: currently unreachable (both branches above return); kept draw-aware for later use.
   const groups = new Map<
     string,
     { wins: number; draws: number; losses: number; players: string[] }
