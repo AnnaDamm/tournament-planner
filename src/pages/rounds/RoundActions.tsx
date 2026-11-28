@@ -4,11 +4,13 @@ import { classNames } from '../../styles/classNames'
 import { ArrowDown, Calculator, ListPlus, Play, RefreshCw, Settings2, X } from 'lucide-react'
 import { t } from '../../i18n'
 import { hasEnteredScore, isUnknownParticipantId } from '../../tournament'
+import type { PhaseCapabilities } from '../../domain/phases/types'
 import type { Round } from '../../tournamentTypes'
 
 type Props = {
   round: Round
   canCalculatePairings: boolean
+  capabilities: PhaseCapabilities
   onSettings: () => void
   onStart: () => void
   onFillUnknown: () => void
@@ -21,6 +23,7 @@ type Props = {
 export function RoundActions({
   round,
   canCalculatePairings,
+  capabilities,
   onSettings,
   onStart,
   onFillUnknown,
@@ -53,20 +56,21 @@ export function RoundActions({
           <Play size={14} aria-hidden="true" />
         </button>
       )}
-      {round.matches.some(
-        (match) => isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
-      ) && (
-        <button
-          className={classNames(sharedStyles, styles, 'button ghost')}
-          type="button"
-          aria-label={t('fillMore')}
-          title={t('fillMore')}
-          onClick={onFillUnknown}
-        >
-          <ListPlus size={16} aria-hidden="true" />
-        </button>
-      )}
-      {needsPairing && canCalculatePairings ? (
+      {capabilities.fillUnknown &&
+        round.matches.some(
+          (match) => isUnknownParticipantId(match.a) || isUnknownParticipantId(match.b),
+        ) && (
+          <button
+            className={classNames(sharedStyles, styles, 'button ghost')}
+            type="button"
+            aria-label={t('fillMore')}
+            title={t('fillMore')}
+            onClick={onFillUnknown}
+          >
+            <ListPlus size={16} aria-hidden="true" />
+          </button>
+        )}
+      {!capabilities.reroll ? null : needsPairing && canCalculatePairings ? (
         <div className={classNames(sharedStyles, styles, 'header-tooltip')}>
           <button
             className={classNames(sharedStyles, styles, 'button ghost')}
@@ -117,7 +121,7 @@ export function RoundActions({
           </div>
         )
       )}
-      {round.bye && isUnstarted && (
+      {capabilities.rerollBye && round.bye && isUnstarted && (
         <div className={classNames(sharedStyles, styles, 'header-tooltip')}>
           <button
             className={classNames(sharedStyles, styles, 'button ghost')}
@@ -133,17 +137,18 @@ export function RoundActions({
           </div>
         </div>
       )}
-      {!round.matches.some((match) => match.scoreA || match.scoreB) && (
-        <button
-          className={classNames(sharedStyles, styles, 'button danger')}
-          type="button"
-          aria-label={t('deleteRound')}
-          title={t('deleteRound')}
-          onClick={onDelete}
-        >
-          <X size={16} aria-hidden="true" />
-        </button>
-      )}
+      {capabilities.manualRounds &&
+        !round.matches.some((match) => match.scoreA || match.scoreB) && (
+          <button
+            className={classNames(sharedStyles, styles, 'button danger')}
+            type="button"
+            aria-label={t('deleteRound')}
+            title={t('deleteRound')}
+            onClick={onDelete}
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+        )}
     </div>
   )
 }

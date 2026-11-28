@@ -7,7 +7,8 @@ import { parseTournamentSnapshot } from '../tournamentSnapshot'
 import { getRoundMatchResult, hasEnteredScore, isUnknownParticipantId } from '../tournament'
 import {
   selectCourtCount,
-  selectDefaultWinningGames,
+  selectActivePhaseId,
+  selectPhases,
   selectEvaluationContext,
   selectParticipantOrderByRound,
   selectParticipantType,
@@ -49,11 +50,16 @@ export function AppRoutes({
   const scheduledRounds = useAppSelector(selectScheduledRounds)
   const participantOrderByRound = useAppSelector(selectParticipantOrderByRound)
   const ctx = useAppSelector(selectEvaluationContext)
-  const defaultWinningGames = useAppSelector(selectDefaultWinningGames)
+  const phases = useAppSelector(selectPhases)
+  const activePhaseId = useAppSelector(selectActivePhaseId)
+  const [chosenPhaseId, setChosenPhaseId] = useState<string | null>(null)
+  const phaseId = phases.some((phase) => phase.id === chosenPhaseId)
+    ? chosenPhaseId!
+    : activePhaseId
   const courtCount = useAppSelector(selectCourtCount)
   const participantType = useAppSelector(selectParticipantType)
   const standingsBeforeRounds = useAppSelector(selectStandingsBeforeRounds)
-  const sorted = useAppSelector((state) => selectSortedParticipants(state, sort, desc))
+  const sorted = useAppSelector((state) => selectSortedParticipants(state, phaseId, sort, desc))
   const participantLabel = participantType === 'teams' ? t('teams') : t('players')
 
   const name = useCallback(
@@ -72,8 +78,9 @@ export function AppRoutes({
       const match = round?.matches.find((item) => item.a === id || item.b === id)
       const result = match ? getRoundMatchResult(ctx, round, match) : null
       const isBye = round?.bye === id
-      const nextWins = result?.winner === id || isBye ? player.wins + 1 : player.wins
-
+      const won = isBye || (result?.outcome !== 'draw' && result?.winner === id)
+      const nextWins = won ? player.wins + 1 : player.wins
+      // A draw is not a win: the number of wins stays, the match still counts as played.
       return result || isBye ? `${player.wins} → ${nextWins}` : String(player.wins)
     },
     [ctx, rounds, standingsBeforeRounds],
@@ -119,6 +126,9 @@ export function AppRoutes({
             defaultCourtCount={courtCount}
             ctx={ctx}
             participantLabel={participantLabel}
+            phases={phases}
+            phaseId={phaseId}
+            onPhaseChange={setChosenPhaseId}
             rounds={scheduledRounds}
             name={name}
             sort={sort}
@@ -127,6 +137,7 @@ export function AppRoutes({
             onAdd={onAdd}
             canSeed={
               !readOnly &&
+              phaseId === phases[0]?.id &&
               !rounds.some((round) => round.matches.some((match) => hasEnteredScore(match)))
             }
             readOnly={readOnly}
@@ -153,7 +164,6 @@ export function AppRoutes({
             name={name}
             record={record}
             defaultCourtCount={courtCount}
-            defaultWinningGames={defaultWinningGames}
             ctx={ctx}
             onKeyboardMoveActiveChange={onKeyboardMoveActiveChange}
             readOnly={readOnly}

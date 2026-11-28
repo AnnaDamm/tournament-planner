@@ -1,15 +1,21 @@
 import styles from './RoundsPage.module.css'
 import sharedStyles from '../../styles/shared.module.css'
 import { classNames } from '../../styles/classNames'
-import { Plus, Trophy } from 'lucide-react'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { ArrowRight, Plus, Trophy } from 'lucide-react'
+import { memo, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { PageTitle } from '../../shared/PageTitle'
 import { PlayerComparisonDialog } from './PlayerComparisonDialog'
 import { PlayerHistoryDialog } from '../../shared/PlayerHistoryDialog'
+import { MatchSettingsDialog } from './MatchSettingsDialog'
 import { RoundSettingsDialog } from './RoundSettingsDialog'
 import { RoundSection } from './RoundSection'
-import { t } from '../../i18n'
-import type { Match, Participant, Round } from '../../tournamentTypes'
+import { t, tf } from '../../i18n'
+import { getPhaseMode } from '../../domain/phases/registry'
+import { noCapabilities } from '../../domain/phases/types'
+import { phaseViews } from '../phaseViews/registry'
+import { getPhaseName } from '../phaseViews/phaseName'
+import { getSideLabel } from './sideLabel'
+import type { Match, MatchFormat, Participant, Round } from '../../tournamentTypes'
 import {
   getRunningMatchIdsByRound,
   isUnknownParticipantId,
@@ -22,12 +28,20 @@ import {
   fillUnknown,
   reroll,
   rerollByeCommand,
-  setRoundSettings,
+  setMatchFormat,
+  setRoundFormat,
+  startNextPhase,
   startRound,
   swapPlayers,
   updateRoundMatch,
 } from '../../tournamentCommands'
-import { useAppDispatch } from '../../storeHooks'
+import { useAppDispatch, useAppSelector } from '../../storeHooks'
+import {
+  selectActivePhaseId,
+  selectPhases,
+  selectScoring,
+  selectStartablePhase,
+} from '../../tournamentSelectors'
 
 type Props = {
   rounds: Round[]
@@ -36,7 +50,6 @@ type Props = {
   name: (id: string) => string
   record: (roundIndex: number, id: string) => string
   defaultCourtCount: number
-  defaultWinningGames: number
   ctx: EvaluationContext
   onKeyboardMoveActiveChange: (active: boolean) => void
   readOnly?: boolean
@@ -57,6 +70,8 @@ const getFirstRunningMatchId = (
 
 const emptyRunningMatchIds = new Set<string>()
 
+type ListItem = { key: string; roundIndex?: number; node: ReactNode }
+
 type ComparisonSelection = {
   playerIds: [string, string]
   roundIndex: number
@@ -70,7 +85,6 @@ export const RoundsPage = memo(function RoundsPage({
   name,
   record,
   defaultCourtCount,
-  defaultWinningGames,
   ctx,
   onKeyboardMoveActiveChange,
   readOnly = false,
@@ -79,12 +93,37 @@ export const RoundsPage = memo(function RoundsPage({
   const [historyPlayerId, setHistoryPlayerId] = useState<string | null>(null)
   const [comparisonSelection, setComparisonSelection] = useState<ComparisonSelection | null>(null)
   const [settingsRoundNumber, setSettingsRoundNumber] = useState<number | null>(null)
+  const [settingsMatch, setSettingsMatch] = useState<{ round: number; match: string } | null>(null)
+  const phases = useAppSelector(selectPhases)
+  const activePhaseId = useAppSelector(selectActivePhaseId)
+  const startablePhase = useAppSelector(selectStartablePhase)
+  const sportId = useAppSelector(selectScoring).sport
+  const capabilitiesByPhase = useMemo(
+    () =>
+      new Map(
+        phases.map((phase) => [phase.id, getPhaseMode(phase.mode)?.capabilities ?? noCapabilities]),
+      ),
+    [phases],
+  )
+  const activeCapabilities = capabilitiesByPhase.get(activePhaseId) ?? noCapabilities
+  const matchLabels = useMemo(
+    () =>
+      new Map(
+        rounds.flatMap((round) =>
+          round.matches.map((match) => [match.id, match.label ?? match.id]),
+        ),
+      ),
+    [rounds],
+  )
   const [keyboardMove, setKeyboardMove] = useState<{
     roundIndex: number
     participantId: string
   } | null>(null)
   const historyPlayer = players.find((player) => player.id === historyPlayerId) ?? null
   const settingsRound = rounds.find((round) => round.number === settingsRoundNumber) ?? null
+  const matchRound = rounds.find((round) => round.number === settingsMatch?.round) ?? null
+  const matchForSettings =
+    matchRound?.matches.find((match) => match.id === settingsMatch?.match) ?? null
   const runningMatchIdsByRound = useMemo(
     () => getRunningMatchIdsByRound(ctx.rules, rounds, defaultCourtCount),
     [ctx.rules, defaultCourtCount, rounds],
@@ -149,6 +188,11 @@ export const RoundsPage = memo(function RoundsPage({
     [dispatch],
   )
   const handleSettings = useCallback((number: number) => setSettingsRoundNumber(number), [])
+  const handleMatchSettings = useCallback(
+    (round: number, match: string) => setSettingsMatch({ round, match }),
+    [],
+  )
+  const closeMatchSettings = useCallback(() => setSettingsMatch(null), [])
   const handleStart = useCallback((number: number) => dispatch(startRound(number)), [dispatch])
   const handleFillUnknown = useCallback(
     (number: number) => dispatch(fillUnknown(number)),
@@ -174,6 +218,12 @@ export const RoundsPage = memo(function RoundsPage({
           roundIndex={roundIndex}
           nextRoundStarted={Boolean(rounds[roundIndex + 1]?.startedAt)}
           canCalculatePairings={roundIndex === 0 || rounds[roundIndex - 1].matches.length > 0}
+          capabilities={
+            capabilitiesByPhase.get(round.phaseId) ??
+            capabilitiesByPhase.get(phases[0]?.id ?? '') ??
+            noCapabilities
+          }
+          matchLabels={matchLabels}
           participantOrder={participantOrderByRound[roundIndex] ?? []}
           currentRoundNumber={currentRoundNumber}
           runningMatchIds={runningMatchIdsByRound.get(round.number) ?? emptyRunningMatchIds}
@@ -189,17 +239,21 @@ export const RoundsPage = memo(function RoundsPage({
           onRerollBye={handleRerollBye}
           onDelete={handleDelete}
           onSwapPlayers={handleSwapPlayers}
+          onMatchSettings={handleMatchSettings}
           keyboardMove={keyboardMove}
           onKeyboardSwap={handleKeyboardSwap}
           readOnly={readOnly}
+          headingLevel={phases.length >= 2 ? 3 : 2}
         />
       )),
     [
+      capabilitiesByPhase,
       currentRoundNumber,
       handleCompare,
       handleDelete,
       handleFillUnknown,
       handleKeyboardSwap,
+      handleMatchSettings,
       handlePlayerClick,
       handleReroll,
       handleRerollBye,
@@ -208,16 +262,64 @@ export const RoundsPage = memo(function RoundsPage({
       handleSwapPlayers,
       handleUpdate,
       keyboardMove,
+      matchLabels,
       name,
       participantOrderByRound,
+      phases,
       readOnly,
       record,
       rounds,
       runningMatchIdsByRound,
     ],
   )
-  const currentGroupStart = firstRunningRoundIndex ?? 0
-  const currentGroupEnd = lastRunningRoundIndex ?? -1
+  const matchLabelContext = {
+    name,
+    matchLabel: (id: string) => matchLabels.get(id) ?? id,
+  }
+  const items = useMemo(() => {
+    if (phases.length < 2) {
+      return renderedRounds.map<ListItem>((node, roundIndex) => ({
+        key: String(rounds[roundIndex].number),
+        roundIndex,
+        node,
+      }))
+    }
+    return phases.flatMap<ListItem>((phase, phaseIndex) => {
+      const phaseRounds = rounds.flatMap((round, roundIndex) =>
+        round.phaseId === phase.id ||
+        (phaseIndex === 0 && !phases.some((item) => item.id === round.phaseId))
+          ? [roundIndex]
+          : [],
+      )
+      if (phaseRounds.length === 0 && !phase.startedAt) return []
+      const RoundsView = phaseViews[phase.mode]?.RoundsView
+      return [
+        {
+          key: `phase-${phase.id}`,
+          node: (
+            <div key={`phase-${phase.id}`}>
+              <h2 className={classNames(sharedStyles, styles, 'phase-heading')}>
+                {tf('phasesHeading', { number: phaseIndex + 1, name: getPhaseName(phase) })}
+              </h2>
+              {RoundsView && <RoundsView phaseId={phase.id} />}
+              {phaseRounds.length === 0 && (
+                <p className={classNames(sharedStyles, styles, 'setting-status')}>
+                  {t('phasesNoRounds')}
+                </p>
+              )}
+            </div>
+          ),
+        },
+        ...phaseRounds.map<ListItem>((roundIndex) => ({
+          key: String(rounds[roundIndex].number),
+          roundIndex,
+          node: renderedRounds[roundIndex],
+        })),
+      ]
+    })
+  }, [phases, renderedRounds, rounds])
+  const itemStart = items.findIndex((item) => item.roundIndex === firstRunningRoundIndex)
+  const itemEnd = items.map((item) => item.roundIndex).lastIndexOf(lastRunningRoundIndex)
 
   return (
     <>
@@ -230,29 +332,41 @@ export const RoundsPage = memo(function RoundsPage({
         </div>
       ) : (
         <div className={classNames(sharedStyles, styles, 'round-list')}>
-          {groupRunningRounds ? (
+          {groupRunningRounds && itemStart >= 0 ? (
             <>
-              {renderedRounds.slice(0, currentGroupStart)}
+              {items.slice(0, itemStart).map((item) => item.node)}
               <div className={classNames(sharedStyles, styles, 'current-round-group')}>
-                {renderedRounds.slice(currentGroupStart, currentGroupEnd + 1)}
+                {items.slice(itemStart, itemEnd + 1).map((item) => item.node)}
               </div>
-              {renderedRounds.slice(currentGroupEnd + 1)}
+              {items.slice(itemEnd + 1).map((item) => item.node)}
             </>
           ) : (
-            renderedRounds
+            items.map((item) => item.node)
           )}
         </div>
       )}
-      {!readOnly && (
-        <button
-          className={classNames(sharedStyles, styles, 'button primary')}
-          inert={keyboardMove !== null}
-          onClick={() => dispatch(createRound())}
-          title={t('create')}
-        >
-          <Plus size={16} aria-hidden="true" /> {t('create')}
-        </button>
-      )}
+      <div className={classNames(sharedStyles, styles, 'round-list-actions')}>
+        {!readOnly && startablePhase && (
+          <button
+            className={classNames(sharedStyles, styles, 'button primary')}
+            inert={keyboardMove !== null}
+            onClick={() => dispatch(startNextPhase())}
+          >
+            <ArrowRight size={16} aria-hidden="true" />{' '}
+            {tf('phasesStartNext', { name: getPhaseName(startablePhase) })}
+          </button>
+        )}
+        {!readOnly && activeCapabilities.manualRounds && (
+          <button
+            className={classNames(sharedStyles, styles, 'button primary')}
+            inert={keyboardMove !== null}
+            onClick={() => dispatch(createRound())}
+            title={t('create')}
+          >
+            <Plus size={16} aria-hidden="true" /> {t('create')}
+          </button>
+        )}
+      </div>
       <p className={classNames(sharedStyles, styles, 'sr-only')} aria-live="polite">
         {keyboardMove ? t('moveInstructions') : ''}
       </p>
@@ -276,13 +390,29 @@ export const RoundsPage = memo(function RoundsPage({
       />
       {!readOnly && (
         <RoundSettingsDialog
+          key={settingsRound?.number}
           round={settingsRound}
+          sportId={sportId}
           defaultCourtCount={defaultCourtCount}
-          defaultWinningGames={defaultWinningGames}
-          onSave={(number, winningGames, courtCount) =>
-            dispatch(setRoundSettings(number, winningGames, courtCount))
+          onSave={(number: number, format: MatchFormat, courtCount: number) =>
+            dispatch(setRoundFormat(number, format, courtCount))
           }
           onClose={() => setSettingsRoundNumber(null)}
+        />
+      )}
+      {!readOnly && (
+        <MatchSettingsDialog
+          key={`${settingsMatch?.round}-${settingsMatch?.match}`}
+          round={matchRound}
+          match={matchForSettings}
+          title={
+            matchForSettings
+              ? `${getSideLabel(matchForSettings, 'a', matchLabelContext)} ${t('versus')} ${getSideLabel(matchForSettings, 'b', matchLabelContext)}`
+              : ''
+          }
+          sportId={sportId}
+          onSave={(number, matchId, format) => dispatch(setMatchFormat(number, matchId, format))}
+          onClose={closeMatchSettings}
         />
       )}
     </>

@@ -1,3 +1,4 @@
+import { mergePhasesOnSave } from '../domain/phases/scope'
 import { createEvaluationContext } from '../tournament'
 import { settingsSaved } from '../tournamentSlice'
 import type { TournamentSettings } from '../tournamentTypes'
@@ -8,11 +9,16 @@ export const saveTournamentSettings =
   (settings: TournamentSettings): TournamentCommand =>
   (dispatch, getState) => {
     const state = getState().tournament
-    const { rules } = createEvaluationContext(settings)
+    const saved = {
+      ...settings,
+      // Started phases stay as they are; the others keep their entrants and start time.
+      phases: mergePhasesOnSave(state.phases, settings.phases, state.rounds),
+    }
+    const { rules } = createEvaluationContext(saved)
     dispatch(
       settingsSaved({
-        settings,
-        rounds: updateRoundsForCourtCount(rules, state.rounds, settings.courtCount),
+        settings: saved,
+        rounds: updateRoundsForCourtCount(rules, state.rounds, saved.courtCount),
       }),
     )
   }

@@ -1,3 +1,4 @@
+import type { EvaluationContext } from './evaluation'
 import { isUnknownParticipantId } from './ids'
 import type { Match, ParticipantId, Round } from './types'
 
@@ -18,3 +19,10 @@ export const hasValidBye = (round: Round) =>
 
 export const isByeCounted = (round: Round, nextRound?: Round) =>
   Boolean(nextRound?.startedAt && hasValidBye(round))
+
+/** isByeCounted, also counting the bye of the last round of a phase whose successor started. */
+export const isRoundByeCounted = (
+  round: Round,
+  nextRound: Round | undefined,
+  ctx: Pick<EvaluationContext, 'countedByeRound'>,
+) => isByeCounted(round, nextRound) || (ctx.countedByeRound === round.number && hasValidBye(round))

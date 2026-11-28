@@ -12,6 +12,9 @@ export const transitionResolvers: Partial<Record<PhaseTransition['kind'], Transi
   topN: (prev, placements, transition) =>
     notWithdrawn(prev, placements, transition).slice(
       0,
-      transition.kind === 'topN' ? transition.count : undefined,
+      // Never fewer than two entrants (when that many are available): a phase with a single
+      // entrant could only play a bye and never complete. The parser and the editor clamp too,
+      // but a resolver must not trust the stored count (hand-edited or older data).
+      transition.kind === 'topN' ? Math.max(2, transition.count) : undefined,
     ),
 }

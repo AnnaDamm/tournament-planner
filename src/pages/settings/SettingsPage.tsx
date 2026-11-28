@@ -6,20 +6,11 @@ import { ArrowLeft, Download, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t } from '../../i18n'
 import type { TournamentSettings } from '../../tournamentTypes'
+import { clampFormat } from '../../domain/format'
+import { settingsSections } from './sections'
 import { saveTournamentSettings } from '../../tournamentCommands'
-import { selectTournamentSettings } from '../../tournamentSelectors'
+import { selectRounds, selectTournamentSettings } from '../../tournamentSelectors'
 import { useAppDispatch, useAppSelector } from '../../storeHooks'
-
-type SettingsDraft = {
-  tournamentName: string
-  participantType: TournamentSettings['participantType']
-  courtCount: string
-  defaultWinningGames: string
-  defaultSetPoints: string
-  scheduledStart: string
-  expectedDurationMinutes: string
-  breakBetweenMatchesMinutes: string
-}
 
 type Props = {
   onExport: () => void
@@ -27,21 +18,7 @@ type Props = {
   onDeleteAll: () => void
 }
 
-const clampWinningGames = (value: number) => Math.min(99, Math.max(1, Math.floor(value) || 1))
-const clampPositiveInteger = (value: number) => Math.max(1, Math.floor(value) || 1)
-const clampDuration = (value: number) => Math.max(1, Math.floor(value) || 1)
-const clampBreak = (value: number) => Math.max(0, Math.floor(value) || 0)
-
-const createDraft = (settings: TournamentSettings): SettingsDraft => ({
-  tournamentName: settings.tournamentName,
-  participantType: settings.participantType,
-  courtCount: String(settings.courtCount),
-  defaultWinningGames: String(settings.scoring.format.winningGames),
-  defaultSetPoints: String(settings.scoring.format.gamePoints ?? 21),
-  scheduledStart: settings.scheduledStart,
-  expectedDurationMinutes: String(settings.expectedDurationMinutes),
-  breakBetweenMatchesMinutes: String(settings.breakBetweenMatchesMinutes),
-})
+const sections = [...settingsSections].sort((first, second) => first.order - second.order)
 
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
@@ -50,13 +27,15 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
   const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
-  const [draft, setDraft] = useState<SettingsDraft>(() => createDraft(settings))
+  const rounds = useAppSelector(selectRounds)
+  const [draft, setDraft] = useState<TournamentSettings>(settings)
+  const started = rounds.some((round) => round.startedAt)
   const [importError, setImportError] = useState(false)
 
   useEffect(() => {
     // The draft mirrors committed settings after imports and live updates.
     // oxlint-disable-next-line react/set-state-in-effect
-    setDraft(createDraft(settings))
+    setDraft(settings)
   }, [settings])
 
   useEffect(() => {
@@ -82,21 +61,12 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
     event.preventDefault()
     dispatch(
       saveTournamentSettings({
-        ...settings,
+        ...draft,
         tournamentName: draft.tournamentName.trim() || 'Tourny',
-        participantType: draft.participantType,
-        courtCount: clampPositiveInteger(Number(draft.courtCount)),
-        scoring: {
-          ...settings.scoring,
-          format: {
-            ...settings.scoring.format,
-            winningGames: clampWinningGames(Number(draft.defaultWinningGames)),
-            gamePoints: clampPositiveInteger(Number(draft.defaultSetPoints)),
-          },
-        },
-        scheduledStart: draft.scheduledStart,
-        expectedDurationMinutes: clampDuration(Number(draft.expectedDurationMinutes)),
-        breakBetweenMatchesMinutes: clampBreak(Number(draft.breakBetweenMatchesMinutes)),
+        scoring: { ...draft.scoring, format: clampFormat(draft.scoring.format) },
+        phases: draft.phases.map((phase) =>
+          phase.format ? { ...phase, format: clampFormat(phase.format) } : phase,
+        ),
       }),
     )
     navigate(-1)
@@ -134,143 +104,9 @@ export function SettingsPage({ onExport, onImport, onDeleteAll }: Props) {
           className={classNames(sharedStyles, styles, 'round-card settings-card')}
           onSubmit={handleSave}
         >
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="expected-duration">
-              <b>{t('expectedDuration')}</b>
-              <small>{t('expectedDurationHelp')}</small>
-            </label>
-            <input
-              id="expected-duration"
-              type="number"
-              min="1"
-              value={draft.expectedDurationMinutes}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  expectedDurationMinutes: event.currentTarget.value,
-                }))
-              }
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="break-between-matches">
-              <b>{t('breakBetweenMatches')}</b>
-              <small>{t('breakBetweenMatchesHelp')}</small>
-            </label>
-            <input
-              id="break-between-matches"
-              type="number"
-              min="0"
-              value={draft.breakBetweenMatchesMinutes}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  breakBetweenMatchesMinutes: event.currentTarget.value,
-                }))
-              }
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="scheduled-start">
-              <b>{t('scheduledStart')}</b>
-              <small>{t('scheduledStartHelp')}</small>
-            </label>
-            <input
-              id="scheduled-start"
-              type="datetime-local"
-              value={draft.scheduledStart}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, scheduledStart: event.target.value }))
-              }
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="tournament-name">
-              <b>{t('tournamentName')}</b>
-              <small>{t('tournamentNameHelp')}</small>
-            </label>
-            <input
-              id="tournament-name"
-              type="text"
-              value={draft.tournamentName}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, tournamentName: event.target.value }))
-              }
-              maxLength={80}
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="participant-type">
-              <b>{t('type')}</b>
-              <small>{t('typeHelp')}</small>
-            </label>
-            <select
-              id="participant-type"
-              value={draft.participantType}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  participantType: event.target.value as SettingsDraft['participantType'],
-                }))
-              }
-            >
-              <option value="players">{t('players')}</option>
-              <option value="teams">{t('teams')}</option>
-            </select>
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="court-count">
-              <b>{t('courts')}</b>
-              <small>{t('courtsHelp')}</small>
-            </label>
-            <input
-              id="court-count"
-              type="number"
-              min="1"
-              value={draft.courtCount}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, courtCount: event.currentTarget.value }))
-              }
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="default-winning-games">
-              <b>{t('defaultWinningGames')}</b>
-              <small>{t('defaultWinningGamesHelp')}</small>
-            </label>
-            <input
-              id="default-winning-games"
-              type="number"
-              min="1"
-              max="99"
-              value={draft.defaultWinningGames}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  defaultWinningGames: event.currentTarget.value,
-                }))
-              }
-            />
-          </div>
-          <div className={classNames(sharedStyles, styles, 'settings-field')}>
-            <label htmlFor="default-set-points">
-              <b>{t('defaultSetPoints')}</b>
-              <small>{t('defaultSetPointsHelp')}</small>
-            </label>
-            <input
-              id="default-set-points"
-              type="number"
-              min="1"
-              step="1"
-              value={draft.defaultSetPoints}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  defaultSetPoints: event.currentTarget.value,
-                }))
-              }
-            />
-          </div>
+          {sections.map(({ id, Component }) => (
+            <Component key={id} draft={draft} setDraft={setDraft} started={started} />
+          ))}
           <div className={classNames(sharedStyles, styles, 'dialog-actions settings-form-actions')}>
             <button
               className={classNames(sharedStyles, styles, 'button ghost')}

@@ -1,7 +1,7 @@
 import type { EvaluationContext } from '../evaluation'
 import { getMatchFormat } from '../format'
 import { isUnknownParticipantId } from '../ids'
-import { getMatchSideIds, hasValidBye, isByeCounted } from '../participants'
+import { getMatchSideIds, hasValidBye, isRoundByeCounted } from '../participants'
 import type { CountedResult } from '../ranking/types'
 import type { Participant, ParticipantId, Round, RoundStanding } from '../types'
 
@@ -22,7 +22,7 @@ const applyRoundToStandings = (
   nextRound: Round | undefined,
   ctx: EvaluationContext,
 ) => {
-  if (isByeCounted(round, nextRound)) {
+  if (isRoundByeCounted(round, nextRound, ctx)) {
     const byeStanding = standings.get(round.bye!)
     if (byeStanding) {
       const credit = ctx.rules.getByeCredit(round.format, ctx.defaultFormat)
@@ -95,7 +95,7 @@ export const collectResults = (
   rounds.flatMap((round, index) => {
     const results: CountedResult[] = []
     if (
-      isByeCounted(round, rounds[index + 1]) &&
+      isRoundByeCounted(round, rounds[index + 1], ctx) &&
       hasValidBye(round) &&
       participantIds.has(round.bye!)
     ) {

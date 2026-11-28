@@ -10,6 +10,11 @@ export type EvaluationContext = {
   scoring: TournamentSettings['scoring']
   tieBreakers: TieBreakerId[]
   defaultFormat: MatchFormat
+  /**
+   * The bye of this round counts although no later round of the evaluated phase exists: the
+   * next phase has started (or is being started), so the phase is final.
+   */
+  countedByeRound?: number
 }
 
 /** Everything needed to evaluate results and rankings, optionally for one phase. */

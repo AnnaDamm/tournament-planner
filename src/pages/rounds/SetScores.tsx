@@ -3,7 +3,7 @@ import sharedStyles from '../../styles/shared.module.css'
 import { classNames } from '../../styles/classNames'
 import type { CSSProperties } from 'react'
 import type { SetScore } from '../../tournamentTypes'
-import { t } from '../../i18n'
+import { useTerm } from '../../i18n/useTerm'
 
 type Props = {
   draftSets: SetScore[]
@@ -28,6 +28,7 @@ export function SetScores({
   scheduleCommit,
   keyboardMoveActive = false,
 }: Props) {
+  const term = useTerm()
   const setScoresStyle = { '--set-count': setCount } as CSSProperties
 
   return (
@@ -50,7 +51,7 @@ export function SetScores({
             <input
               type="number"
               min="0"
-              aria-label={`${t('setScore')} ${setIndex + 1}: ${playerA}`}
+              aria-label={`${term('gameScore')} ${setIndex + 1}: ${playerA}`}
               value={set.a}
               onChange={(event) => updateSet(setIndex, 'a', event.target.value)}
               onKeyUp={scheduleCommit}
@@ -64,7 +65,7 @@ export function SetScores({
             <input
               type="number"
               min="0"
-              aria-label={`${t('setScore')} ${setIndex + 1}: ${playerB}`}
+              aria-label={`${term('gameScore')} ${setIndex + 1}: ${playerB}`}
               value={set.b}
               onChange={(event) => updateSet(setIndex, 'b', event.target.value)}
               onKeyUp={scheduleCommit}

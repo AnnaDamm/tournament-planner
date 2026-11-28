@@ -2,12 +2,13 @@ import styles from './MatchRow.module.css'
 import sharedStyles from '../../styles/shared.module.css'
 import { classNames } from '../../styles/classNames'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import { CalendarClock, Clock, GitCompareArrows, GripVertical } from 'lucide-react'
+import { CalendarClock, Clock, GitCompareArrows, GripVertical, Settings2 } from 'lucide-react'
 import type { Match, MatchFormat, SetScore } from '../../tournamentTypes'
 import type { ScoringRules } from '../../domain/scoring/types'
-import { t } from '../../i18n'
+import { t, tf } from '../../i18n'
 import { hasEnteredScore, isUnknownParticipantId } from '../../tournament'
 import { SetScores } from './SetScores'
+import { getSideLabel } from './sideLabel'
 
 type Props = {
   match: Match
@@ -20,6 +21,9 @@ type Props = {
   onCompare: (firstId: string, secondId: string) => void
   onUpdate: (match: Match) => void
   onSwap: (draggedId: string, targetId: string) => void
+  onMatchSettings: (matchId: string) => void
+  matchLabels: ReadonlyMap<string, string>
+  canSwap: boolean
   selectedParticipantId?: string | null
   onKeyboardSwap: (participantId: string) => void
   keyboardMoveActive?: boolean
@@ -85,6 +89,9 @@ export const MatchRow = memo(function MatchRow({
   onCompare,
   onUpdate,
   onSwap,
+  onMatchSettings,
+  matchLabels,
+  canSwap,
   selectedParticipantId = null,
   onKeyboardSwap,
   keyboardMoveActive = false,
@@ -108,7 +115,11 @@ export const MatchRow = memo(function MatchRow({
   }, [initialSets])
   const targetWins = Math.max(1, Math.min(99, Number(format.winningGames) || 1))
   const matchResult = rules.getResult(match, format)
-  const canReorder = !readOnly && !hasEnteredScore(match)
+  const canReorder = canSwap && !readOnly && !hasEnteredScore(match)
+  const canEditFormat = !readOnly && !hasEnteredScore(match)
+  const matchLabel = (id: string) => matchLabels.get(id) ?? id
+  const nameA = getSideLabel(match, 'a', { name, matchLabel })
+  const nameB = getSideLabel(match, 'b', { name, matchLabel })
   const canKeyboardDropA =
     keyboardMoveActive && selectedParticipantId !== null && selectedParticipantId !== match.a
   const canKeyboardDropB =
@@ -150,40 +161,73 @@ export const MatchRow = memo(function MatchRow({
       className={classNames(sharedStyles, styles, `match ${isRunning ? 'running' : ''}`)}
     >
       <legend className={classNames(sharedStyles, styles, 'sr-only')}>
-        {t('matchLabel')} {matchIndex + 1}: {name(match.a)} {t('versus')} {name(match.b)}
+        {t('matchLabel')} {matchIndex + 1}: {nameA} {t('versus')} {nameB}
         {match.court ? `, ${t('court')} ${match.court}` : ''}
         {isRunning ? `, ${t('running')}` : ''}
       </legend>
       <span className={classNames(sharedStyles, styles, 'match-court')} aria-hidden="true">
         {match.court ?? '–'}
       </span>
-      {(match.startedAt || match.predictedStart) && (
-        <time
-          className={classNames(sharedStyles, styles, 'match-start')}
-          dateTime={match.startedAt ?? match.predictedStart}
-          title={t(match.startedAt ? 'startedAt' : 'expectedStart')}
-        >
-          {match.startedAt ? (
-            <Clock size={12} aria-hidden="true" />
-          ) : (
-            <CalendarClock size={12} aria-hidden="true" />
-          )}{' '}
-          {formatStartTime(match.startedAt ?? match.predictedStart!)}
-        </time>
+      {(match.startedAt || match.predictedStart || match.label || match.group) && (
+        <span className={classNames(sharedStyles, styles, 'match-meta')}>
+          {(match.label || match.group) && (
+            <span className={classNames(sharedStyles, styles, 'match-badges')}>
+              {match.label && (
+                <span className={classNames(sharedStyles, styles, 'match-badge')}>
+                  {match.label}
+                </span>
+              )}
+              {match.group && (
+                <span className={classNames(sharedStyles, styles, 'match-badge')}>
+                  {tf('phasesGroupBadge', { group: match.group })}
+                </span>
+              )}
+            </span>
+          )}
+          {(match.startedAt || match.predictedStart) && (
+            <time
+              className={classNames(sharedStyles, styles, 'match-start')}
+              dateTime={match.startedAt ?? match.predictedStart}
+              title={t(match.startedAt ? 'startedAt' : 'expectedStart')}
+            >
+              {match.startedAt ? (
+                <Clock size={12} aria-hidden="true" />
+              ) : (
+                <CalendarClock size={12} aria-hidden="true" />
+              )}{' '}
+              {formatStartTime(match.startedAt ?? match.predictedStart!)}
+            </time>
+          )}
+        </span>
       )}
-      {!isUnknownParticipantId(match.a) && !isUnknownParticipantId(match.b) && (
-        <button
-          className={classNames(sharedStyles, styles, 'compare-button')}
-          type="button"
-          tabIndex={keyboardMoveActive ? -1 : undefined}
-          inert={keyboardMoveActive}
-          aria-label={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
-          title={`${t('comparePlayers')}: ${name(match.a)} ${t('versus')} ${name(match.b)}`}
-          onClick={() => onCompare(match.a, match.b)}
-        >
-          <GitCompareArrows size={16} aria-hidden="true" />
-        </button>
-      )}
+      <span className={classNames(sharedStyles, styles, 'match-tools')}>
+        {!isUnknownParticipantId(match.a) && !isUnknownParticipantId(match.b) && (
+          <button
+            className={classNames(sharedStyles, styles, 'compare-button')}
+            type="button"
+            tabIndex={keyboardMoveActive ? -1 : undefined}
+            inert={keyboardMoveActive}
+            aria-label={`${t('comparePlayers')}: ${nameA} ${t('versus')} ${nameB}`}
+            title={`${t('comparePlayers')}: ${nameA} ${t('versus')} ${nameB}`}
+            onClick={() => onCompare(match.a, match.b)}
+          >
+            <GitCompareArrows size={16} aria-hidden="true" />
+          </button>
+        )}
+        {canEditFormat && (
+          <button
+            className={classNames(sharedStyles, styles, 'compare-button')}
+            type="button"
+            tabIndex={keyboardMoveActive ? -1 : undefined}
+            inert={keyboardMoveActive}
+            aria-label={`${t('phasesMatchSettings')}: ${nameA} ${t('versus')} ${nameB}`}
+            title={`${t('phasesMatchSettings')}: ${nameA} ${t('versus')} ${nameB}`}
+            onClick={() => onMatchSettings(match.id)}
+          >
+            <Settings2 size={16} aria-hidden="true" />
+          </button>
+        )}
+      </span>
       <span
         className={classNames(
           styles,
@@ -208,8 +252,8 @@ export const MatchRow = memo(function MatchRow({
             disabled={keyboardMoveActive && !canKeyboardDropA}
             tabIndex={keyboardMoveActive ? (canKeyboardDropA ? 0 : -1) : undefined}
             data-keyboard-drop-target={canKeyboardDropA ? roundIndex : undefined}
-            aria-label={`${t('moveParticipant')}: ${name(match.a)}`}
-            title={`${t('moveParticipant')}: ${name(match.a)}`}
+            aria-label={`${t('moveParticipant')}: ${nameA}`}
+            title={`${t('moveParticipant')}: ${nameA}`}
             aria-pressed={selectedParticipantId === match.a}
             onClick={() => onKeyboardSwap(match.a)}
             onDragStart={(event) => {
@@ -237,9 +281,7 @@ export const MatchRow = memo(function MatchRow({
             >
               <GripVertical size={16} aria-hidden="true" />
               <span className={classNames(sharedStyles, 'drag-preview-info')}>
-                <span className={classNames(sharedStyles, 'drag-preview-name')}>
-                  {name(match.a)}
-                </span>
+                <span className={classNames(sharedStyles, 'drag-preview-name')}>{nameA}</span>
                 <small className={classNames(sharedStyles, styles, 'player-record')}>
                   {recordA}
                 </small>
@@ -251,12 +293,12 @@ export const MatchRow = memo(function MatchRow({
           <button
             type="button"
             className={classNames(sharedStyles, styles, 'match-player-name')}
-            title={`${t('history')}: ${name(match.a)}`}
+            title={`${t('history')}: ${nameA}`}
             tabIndex={keyboardMoveActive ? -1 : undefined}
             inert={keyboardMoveActive}
             onClick={() => onPlayerClick(match.a)}
           >
-            {name(match.a)}
+            {nameA}
           </button>
           <small className={classNames(sharedStyles, styles, 'player-record')}>{recordA}</small>
         </span>
@@ -297,8 +339,8 @@ export const MatchRow = memo(function MatchRow({
             disabled={keyboardMoveActive && !canKeyboardDropB}
             tabIndex={keyboardMoveActive ? (canKeyboardDropB ? 0 : -1) : undefined}
             data-keyboard-drop-target={canKeyboardDropB ? roundIndex : undefined}
-            aria-label={`${t('moveParticipant')}: ${name(match.b)}`}
-            title={`${t('moveParticipant')}: ${name(match.b)}`}
+            aria-label={`${t('moveParticipant')}: ${nameB}`}
+            title={`${t('moveParticipant')}: ${nameB}`}
             aria-pressed={selectedParticipantId === match.b}
             onClick={() => onKeyboardSwap(match.b)}
             onDragStart={(event) => {
@@ -326,9 +368,7 @@ export const MatchRow = memo(function MatchRow({
             >
               <GripVertical size={16} aria-hidden="true" />
               <span className={classNames(sharedStyles, 'drag-preview-info')}>
-                <span className={classNames(sharedStyles, 'drag-preview-name')}>
-                  {name(match.b)}
-                </span>
+                <span className={classNames(sharedStyles, 'drag-preview-name')}>{nameB}</span>
                 <small className={classNames(sharedStyles, styles, 'player-record')}>
                   {recordB}
                 </small>
@@ -340,12 +380,12 @@ export const MatchRow = memo(function MatchRow({
           <button
             type="button"
             className={classNames(sharedStyles, styles, 'match-player-name')}
-            title={`${t('history')}: ${name(match.b)}`}
+            title={`${t('history')}: ${nameB}`}
             tabIndex={keyboardMoveActive ? -1 : undefined}
             inert={keyboardMoveActive}
             onClick={() => onPlayerClick(match.b)}
           >
-            {name(match.b)}
+            {nameB}
           </button>
           <small className={classNames(sharedStyles, styles, 'player-record')}>{recordB}</small>
         </span>
@@ -355,8 +395,8 @@ export const MatchRow = memo(function MatchRow({
         visibleSetCount={visibleSetCount}
         setCount={setCount}
         readOnly={readOnly}
-        playerA={name(match.a)}
-        playerB={name(match.b)}
+        playerA={nameA}
+        playerB={nameB}
         updateSet={updateSet}
         scheduleCommit={scheduleCommit}
         keyboardMoveActive={keyboardMoveActive}

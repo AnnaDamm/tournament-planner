@@ -215,4 +215,9 @@
       background: #243026;
     }
   }
+
+  .round-title {
+    font-size: 14px;
+    font-weight: 800;
+  }
 }

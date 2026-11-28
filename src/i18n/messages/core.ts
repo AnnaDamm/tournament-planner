@@ -153,6 +153,10 @@ export const coreEn = {
   moveParticipant: 'Move participant',
   moveInstructions:
     'Participant selected. Choose another move button to swap positions, or press Escape to cancel.',
+  draw: 'Draw',
+  drawShort: 'D',
+  sport: 'Sport',
+  sportHelp: 'Sets the rules and the terminology used throughout the app.',
 } as const
 
 export const coreDe: { [Key in keyof typeof coreEn]: string } = {
@@ -310,4 +314,8 @@ export const coreDe: { [Key in keyof typeof coreEn]: string } = {
   moveParticipant: 'Teilnehmenden verschieben',
   moveInstructions:
     'Teilnehmender ausgewählt. Wähle eine andere Verschieben-Schaltfläche, um die Positionen zu tauschen, oder drücke Escape zum Abbrechen.',
+  draw: 'Unentschieden',
+  drawShort: 'U',
+  sport: 'Sportart',
+  sportHelp: 'Legt die Regeln und die Begriffe fest, die in der ganzen App verwendet werden.',
 }

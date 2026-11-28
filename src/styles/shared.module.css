@@ -153,7 +153,7 @@
   }
 
   :global(.section-head) h2,
-  :global(.round-head) h2,
+  :global(.round-head) :is(h2, h3),
   :global(.empty) h2 {
     font: 600 18px var(--font-family);
     margin: 0;
@@ -305,7 +305,7 @@
     margin-bottom: 8px;
   }
 
-  :global(.round-head) h2 {
+  :global(.round-head) :is(h2, h3) {
     margin-top: 7px;
   }
 
@@ -602,7 +602,7 @@
     font-size: clamp(24px, 1.5vw, 36px);
   }
 
-  :global(.readonly-focus-mode) :global(.round-head) h2 {
+  :global(.readonly-focus-mode) :global(.round-head) :is(h2, h3) {
     font-size: clamp(45px, 3.3vw, 69px);
   }
 
@@ -1012,7 +1012,7 @@
   }
 
   :global(.section-head) h2,
-  :global(.round-head) h2,
+  :global(.round-head) :is(h2, h3),
   :global(.empty) h2 {
     font-size: clamp(18px, 1.15vw, 27px);
   }
