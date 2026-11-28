@@ -54,7 +54,7 @@ contributors to install Node.js, npm, pnpm, or project dependencies on the host.
   - Implementation of a planned and scoped work package: a cheaper coding model (currently Sonnet).
   - Trivial mechanical tasks such as lookups or bulk renames: the smallest model (currently Haiku).
 - Every PR is reviewed by two independent review agents that use **different models** (for example Opus and Sonnet), so their blind spots do not overlap. At least one reviewer uses the most capable model. Blocking findings are applied by an implementation agent; afterwards both reviewers review the updated PR again until both approve.
-- A PR may be merged only after both reviewers approve the latest state, CI is green and, for UI changes, the change has been tested in the browser.
+- A PR may be merged only after both reviewers approve the latest state, CI is green, the Codex GitHub review (chatgpt-codex-connector) has finished on the latest commit with its sensible findings addressed (skip only if Codex is out of usage) and, for UI changes, the change has been tested in the browser.
 - Watch for merge conflicts between parallel PRs (especially `CHANGELOG.md`, the documentation page, i18n files and registries); merge in dependency order and rebase the remaining branches.
 - Browser tests with an automated browser (for example the Chrome DevTools MCP) must use an isolated browser context per test run and must not touch the owner's existing tabs.
 - Podman is an acceptable substitute for Docker in all commands above (for example through a `docker` → `podman` shim).

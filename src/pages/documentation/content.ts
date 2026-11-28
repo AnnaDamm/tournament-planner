@@ -314,7 +314,7 @@ const en: DocPage[] = [
       {
         title: 'JSON export and import',
         text: [
-          'Export downloads the complete version-1 state named after the tournament and may contain personal data.',
+          'Export downloads the complete state (format version 2) named after the tournament and may contain personal data. Import also accepts exports from older versions (format version 1).',
           'Import validates and replaces all tournament data. It cannot merge or undo. Invalid files leave the current state unchanged.',
         ],
       },
@@ -384,15 +384,15 @@ const en: DocPage[] = [
           {
             title: 'Features',
             items: [
-              'Link the footer version to the version history documentation.',
               'Store tournaments in a versioned format (v2) with automatic migration of existing data.',
+              'Link the footer version to the version history documentation.',
             ],
           },
           {
             title: 'Bugfixes',
             items: [
-              'Hide table and round action controls from print views.',
               'Live viewers on the local network receive tournament updates again when the app is installed or cached (the service worker no longer intercepts the live API).',
+              'Hide table and round action controls from print views.',
             ],
           },
         ],
@@ -872,7 +872,7 @@ const de: DocPage[] = [
       {
         title: 'JSON-Export und -Import',
         text: [
-          'Der Export enthält den vollständigen Stand in Version 1 und kann personenbezogene Daten enthalten.',
+          'Der Export enthält den vollständigen Stand im Format Version 2 und kann personenbezogene Daten enthalten. Der Import akzeptiert auch Exporte älterer Versionen (Format Version 1).',
           'Der Import validiert und ersetzt alles. Zusammenführen und Undo sind unmöglich; ungültige Dateien verändern nichts.',
         ],
       },
@@ -942,15 +942,15 @@ const de: DocPage[] = [
           {
             title: 'Funktionen',
             items: [
-              'Footer-Version mit der Versionshistorie verknüpft.',
               'Turniere werden in einem versionierten Format (v2) gespeichert; bestehende Daten werden automatisch migriert.',
+              'Footer-Version mit der Versionshistorie verknüpft.',
             ],
           },
           {
             title: 'Fehlerbehebungen',
             items: [
-              'Aktionsschaltflächen der Tabellen- und Rundenansicht in Druckansichten ausgeblendet.',
               'Live-Zuschauer im lokalen Netzwerk erhalten Turnier-Updates wieder, wenn die App installiert oder gecacht ist (der Service Worker fängt die Live-API nicht mehr ab).',
+              'Aktionsschaltflächen der Tabellen- und Rundenansicht in Druckansichten ausgeblendet.',
             ],
           },
         ],

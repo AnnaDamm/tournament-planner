@@ -118,6 +118,25 @@ describe('storage migration', () => {
     expect(second.snapshot.id).toBe(first.snapshot.id)
   })
 
+  it('does not activate a migrated tournament whose snapshot could not be stored', () => {
+    const data = stubLocalStorage({ [`${prefix}tournament`]: v1Envelope() })
+    const original = localStorage.setItem.bind(localStorage)
+    localStorage.setItem = (key: string, value: string) => {
+      if (key.startsWith(`${prefix}tournament:`)) throw new Error('quota')
+      original(key, value)
+    }
+    const first = loadTournamentState()
+    expect(first.snapshot.tournamentName).toBe('Small Cup')
+    const index = data.get(`${prefix}tournaments`)
+    expect(index === undefined || !JSON.parse(index).activeId).toBe(true)
+
+    localStorage.setItem = original
+    const second = loadTournamentState()
+    expect(second.snapshot.tournamentName).toBe('Small Cup')
+    expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
+    expect(JSON.parse(data.get(`${prefix}tournaments`)!).activeId).toBe(second.snapshot.id)
+  })
+
   it('keeps the legacy per-field keys when the index could not be written', () => {
     const data = stubLocalStorage({ [`${prefix}players`]: JSON.stringify([]) })
     const original = localStorage.setItem.bind(localStorage)

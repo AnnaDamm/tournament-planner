@@ -194,14 +194,20 @@ const removeLegacyKeys = () => {
   }
 }
 
+/** Returns whether the snapshot itself was stored; the index is only updated after that. */
 const writeEnvelope = (value: PersistedTournamentState, broadcast: boolean) => {
   try {
     localStorage.setItem(snapshotStorageKey(value.snapshot.id), JSON.stringify(value))
+  } catch {
+    return false
+  }
+  try {
     writeIndex(upsertIndexItem(readIndex(), value.snapshot))
   } catch {
-    return
+    // The snapshot is stored; a missing index entry is rebuilt on the next load.
   }
   if (broadcast) channel?.postMessage({ tournamentId: value.snapshot.id, ...value })
+  return true
 }
 
 const activate = (state: PersistedTournamentState) => {
@@ -227,8 +233,10 @@ const createFreshState = (snapshot: TournamentSnapshot, source: string) => {
     snapshot: withStartedRounds(snapshot),
     revision: { updatedAt: Date.now(), source },
   }
-  writeEnvelope(state, false)
-  return { state, indexWritten: activate(state) }
+  // Only point the index at the tournament once its snapshot is stored; otherwise the next load
+  // would find a dangling active id instead of retrying the preserved v1 backup.
+  const stored = writeEnvelope(state, false)
+  return { state, indexWritten: stored && activate(state) }
 }
 
 /** Rebuilds a lost or unreadable index from the per-tournament keys; the newest valid one is active. */
