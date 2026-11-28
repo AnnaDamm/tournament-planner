@@ -388,6 +388,7 @@ const en: DocPage[] = [
               'Configure several tournament phases with participant transitions.',
               'Set the match format per round and per match.',
               'Link the footer version to the version history documentation.',
+              'Choose a Swiss variant per phase: accelerated (Baker) or Danish pairing.',
             ],
           },
           {
@@ -948,6 +949,7 @@ const de: DocPage[] = [
               'Mehrere Turnierphasen mit Übergängen der Teilnehmenden konfigurieren.',
               'Das Spielformat pro Runde und pro Begegnung festlegen.',
               'Footer-Version mit der Versionshistorie verknüpft.',
+              'Schweizer-Variante pro Phase wählbar: beschleunigte (Baker) oder dänische Paarung.',
             ],
           },
           {

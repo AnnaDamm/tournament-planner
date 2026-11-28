@@ -8,6 +8,7 @@
 - Configure several tournament phases with participant transitions.
 - Set the match format per round and per match.
 - Link the footer version to the version history documentation.
+- Choose a Swiss variant per phase: accelerated (Baker) or Danish pairing.
 
 ### Bugfixes
 
