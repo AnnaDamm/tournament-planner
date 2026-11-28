@@ -1,0 +1,161 @@
+@layer components {
+  .library-card {
+    display: grid;
+    gap: 18px;
+    border: 1px solid #e4eae5;
+    border-radius: 12px;
+    background: #fff;
+    padding: 24px;
+  }
+
+  .library-intro {
+    margin: 0;
+    color: #68745f;
+    font-size: 14px;
+  }
+
+  .library-create {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+  }
+
+  .library-field {
+    display: grid;
+    gap: 6px;
+    flex: 1 1 260px;
+  }
+
+  .library-field label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .library-field input {
+    width: 100%;
+    border: 1px solid #b9c7bd;
+    border-radius: 7px;
+    background: #fff;
+    color: inherit;
+    padding: 10px;
+    font: inherit;
+  }
+
+  .library-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .library-list-title {
+    margin: 0;
+    font: 600 16px var(--font-family);
+  }
+
+  .tournament-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #e4eae5;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .tournament-row[data-active='true'] {
+    border-color: #90c74c;
+    background: #f4faea;
+  }
+
+  .tournament-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    min-width: 0;
+  }
+
+  .tournament-info b {
+    overflow-wrap: anywhere;
+  }
+
+  .tournament-info small {
+    flex-basis: 100%;
+    color: #7f8a85;
+  }
+
+  .tournament-badge {
+    border-radius: 999px;
+    background: #e9f6d7;
+    color: #385123;
+    padding: 2px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tournament-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .danger-text {
+    color: #b93636;
+  }
+
+  .library-status {
+    margin: 0;
+    font-size: 13px;
+    color: #385123;
+  }
+
+  .library-status.error {
+    color: #b94b4b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .library-card,
+    .tournament-row {
+      border-color: #2c3931;
+      background: #17201c;
+    }
+
+    .tournament-row[data-active='true'] {
+      border-color: #5f8a2f;
+      background: #1f2c1a;
+    }
+
+    .library-intro,
+    .tournament-info small {
+      color: #b4c5ab;
+    }
+
+    .library-field input {
+      border-color: #3d4b42;
+      background: #101713;
+    }
+
+    .tournament-badge {
+      background: #2b3f1b;
+      color: #c9ef86;
+    }
+
+    .danger-text {
+      color: #f08a82;
+    }
+
+    .library-status {
+      color: #c9ef86;
+    }
+
+    .library-status.error {
+      color: #f08a82;
+    }
+  }
+}

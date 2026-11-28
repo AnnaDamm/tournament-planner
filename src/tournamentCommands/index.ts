@@ -1,3 +1,4 @@
+export * from './library'
 export * from './lifecycle'
 export * from './participants'
 export * from './phases'

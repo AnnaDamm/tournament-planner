@@ -6,6 +6,7 @@ import {
   parseTournamentSnapshot,
 } from './domain/snapshot'
 import type { V1Participant, V1Round } from './domain/snapshot/v1'
+import { createId } from './domain/ids'
 import type { TournamentSnapshot } from './domain/types'
 
 export { createEmptyTournamentSnapshot }
@@ -321,7 +322,121 @@ export const persistTournamentState = (
   snapshot: TournamentSnapshot,
   revision: StateRevision,
   broadcast = true,
-) => writeEnvelope({ storageVersion: 2, snapshot, revision }, broadcast)
+) => {
+  // A tournament deleted from the library must not be resurrected by a late write of a stale tab.
+  const index = readIndex()
+  if (index && !index.items.some((item) => item.id === snapshot.id)) return false
+  return writeEnvelope({ storageVersion: 2, snapshot, revision }, broadcast)
+}
+
+// --- Tournament library: a local list of independent tournaments (one of them active). ---
+
+const libraryListeners = new Set<(activeId: string) => void>()
+
+const notifyLibraryChanged = () => {
+  const activeId = readIndex()?.activeId
+  if (activeId) for (const listener of [...libraryListeners]) listener(activeId)
+}
+
+export const listTournaments = (): TournamentIndex =>
+  readIndex() ?? { storageVersion: 2, activeId: '', items: [] }
+
+/** Creates an empty tournament and makes it the active one; returns its id. */
+export const createTournament = (name: string) => {
+  const tournamentName = name.trim() || createEmptyTournamentSnapshot().tournamentName
+  const { state, indexWritten } = createFreshState(
+    { ...createEmptyTournamentSnapshot(), tournamentName },
+    'library',
+  )
+  if (!indexWritten) {
+    // Never leave a snapshot behind that the library does not know about.
+    localStorage.removeItem(snapshotStorageKey(state.snapshot.id))
+    const index = readIndex()
+    if (index) {
+      // Adding the entry may have worked although activating it did not: drop the entry again.
+      writeIndex({ ...index, items: index.items.filter((item) => item.id !== state.snapshot.id) })
+    }
+    return null
+  }
+  notifyLibraryChanged()
+  return state.snapshot.id
+}
+
+/** Stores a snapshot as a new, inactive tournament (import); returns its id. */
+export const addTournament = (snapshot: TournamentSnapshot) => {
+  const state: PersistedTournamentState = {
+    storageVersion: 2,
+    snapshot: withStartedRounds({ ...snapshot, id: createId() }),
+    revision: { updatedAt: Date.now(), source: tabId },
+  }
+  const id = state.snapshot.id
+  const stored = writeEnvelope(state, false)
+  // The import only counts once the index entry is persisted too; otherwise remove the orphan.
+  if (!stored || !readIndex()?.items.some((item) => item.id === id)) {
+    localStorage.removeItem(snapshotStorageKey(id))
+    return null
+  }
+  notifyLibraryChanged()
+  return id
+}
+
+/** Makes a stored tournament the active one in every tab. */
+export const switchTournament = (id: string) => {
+  const index = readIndex()
+  if (!index || !index.items.some((item) => item.id === id) || !readStoredState(id)) return false
+  if (index.activeId !== id && !writeIndex({ ...index, activeId: id })) return false
+  notifyLibraryChanged()
+  return true
+}
+
+/** Renames a stored tournament. The active tournament is renamed through the store instead. */
+export const renameTournament = (id: string, name: string) => {
+  const tournamentName = name.trim()
+  const stored = readStoredState(id)
+  if (!tournamentName || !stored) return false
+  const renamed = writeEnvelope(
+    {
+      ...stored,
+      snapshot: { ...stored.snapshot, tournamentName },
+      revision: createNextRevision(stored.revision),
+    },
+    true,
+  )
+  if (renamed) notifyLibraryChanged()
+  return renamed
+}
+
+/** Deletes a tournament; deleting the active one activates another or a new empty tournament. */
+export const deleteTournament = (id: string) => {
+  const index = readIndex()
+  if (!index || !index.items.some((item) => item.id === id)) return false
+  const items = index.items.filter((item) => item.id !== id)
+  const next = [...items].sort((a, b) => b.updatedAt - a.updatedAt)[0]
+  const activeId = index.activeId === id ? (next?.id ?? '') : index.activeId
+  if (!writeIndex({ storageVersion: 2, activeId, items })) return false
+  localStorage.removeItem(snapshotStorageKey(id))
+  if (!activeId) createFreshState(createEmptyTournamentSnapshot(), 'library')
+  notifyLibraryChanged()
+  return true
+}
+
+export const getStoredSnapshot = (id: string) => readStoredState(id)?.snapshot ?? null
+
+/** Notifies with the active id after every library change, in this and in other tabs. */
+export const subscribeToLibrary = (listener: (activeId: string) => void) => {
+  libraryListeners.add(listener)
+  const handleStorage = (event: StorageEvent) => {
+    // Another tab changed the index: only this subscriber needs to hear about it.
+    if (event.key !== indexStorageKey) return
+    const activeId = readIndex()?.activeId
+    if (activeId) listener(activeId)
+  }
+  if (typeof window !== 'undefined') window.addEventListener('storage', handleStorage)
+  return () => {
+    libraryListeners.delete(listener)
+    if (typeof window !== 'undefined') window.removeEventListener('storage', handleStorage)
+  }
+}
 
 export const createNextRevision = (previous: StateRevision): StateRevision => ({
   updatedAt: Math.max(Date.now(), previous.updatedAt + 1),

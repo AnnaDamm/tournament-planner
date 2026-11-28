@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Library,
   LockOpen,
   Menu,
   RefreshCw,
@@ -282,6 +283,7 @@ export function AppLayout({
   const navigation = [
     { label: t('table'), target: '/table', icon: BarChart3 },
     { label: t('rounds'), target: '/rounds', icon: Trophy },
+    ...(readOnly ? [] : [{ label: t('libraryNav'), target: '/tournaments', icon: Library }]),
   ]
 
   const closeMobileNav = () => {

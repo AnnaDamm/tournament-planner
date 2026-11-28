@@ -25,6 +25,7 @@ import { RankingsPage } from '../pages/rankings/RankingsPage'
 import { RoundsPage } from '../pages/rounds/RoundsPage'
 import { SettingsPage } from '../pages/settings/SettingsPage'
 import { SharePage } from '../pages/share/SharePage'
+import { TournamentsPage } from '../pages/tournaments/TournamentsPage'
 
 export type AppRoutesProps = {
   localMaster: LocalMasterConfig | null
@@ -183,6 +184,10 @@ export function AppRoutes({
             />
           )
         }
+      />
+      <Route
+        path="/tournaments"
+        element={readOnly ? <Navigate to="/table" replace /> : <TournamentsPage />}
       />
       <Route path="/docs" element={<DocumentationPage />} />
       <Route path="/docs/:slug" element={<DocumentationPage />} />
