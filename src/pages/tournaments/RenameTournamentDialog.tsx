@@ -19,12 +19,12 @@ export function RenameTournamentDialog({ name, onSubmit, onClose }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(name)
 
-  useEffect(() => inputRef.current?.select(), [])
-
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
     if (!dialog.open) dialog.showModal()
+    inputRef.current?.focus()
+    inputRef.current?.select()
     dialog.addEventListener('close', onClose)
     return () => dialog.removeEventListener('close', onClose)
   }, [onClose])

@@ -19,12 +19,11 @@ export function DeleteTournamentDialog({ name, isLast, onConfirm, onClose }: Pro
   const dialogRef = useRef<HTMLDialogElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => cancelRef.current?.focus(), [])
-
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
     if (!dialog.open) dialog.showModal()
+    cancelRef.current?.focus()
     dialog.addEventListener('close', onClose)
     return () => dialog.removeEventListener('close', onClose)
   }, [onClose])
