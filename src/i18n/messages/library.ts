@@ -31,6 +31,7 @@ export const libraryEn = {
   libraryOpened: 'Opened "{name}".',
   libraryCreated: 'Created "{name}".',
   libraryDeleted: 'Deleted "{name}".',
+  libraryRenamed: 'Renamed "{from}" to "{to}".',
 } as const
 
 export const libraryDe: { [Key in keyof typeof libraryEn]: string } = {
@@ -66,4 +67,5 @@ export const libraryDe: { [Key in keyof typeof libraryEn]: string } = {
   libraryOpened: '„{name}“ geöffnet.',
   libraryCreated: '„{name}“ angelegt.',
   libraryDeleted: '„{name}“ gelöscht.',
+  libraryRenamed: '„{from}“ in „{to}“ umbenannt.',
 }

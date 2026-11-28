@@ -16,6 +16,11 @@ type Props = {
 /** Mount it only while renaming; it opens itself as a modal and starts with the current name. */
 export function RenameTournamentDialog({ name, onSubmit, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const onCloseRef = useRef(onClose)
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
   const inputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(name)
 
@@ -25,9 +30,10 @@ export function RenameTournamentDialog({ name, onSubmit, onClose }: Props) {
     if (!dialog.open) dialog.showModal()
     inputRef.current?.focus()
     inputRef.current?.select()
-    dialog.addEventListener('close', onClose)
-    return () => dialog.removeEventListener('close', onClose)
-  }, [onClose])
+    const handleClose = () => onCloseRef.current()
+    dialog.addEventListener('close', handleClose)
+    return () => dialog.removeEventListener('close', handleClose)
+  }, [])
 
   const submit = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -75,6 +81,7 @@ export function RenameTournamentDialog({ name, onSubmit, onClose }: Props) {
           <button
             className={classNames(sharedStyles, styles, 'button primary')}
             type="submit"
+            disabled={!value.trim()}
             title={t('libraryRename')}
           >
             {t('libraryRename')}

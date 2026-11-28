@@ -19,7 +19,7 @@ import { downloadTournament } from '../../tournamentExport'
 import { parseTournamentSnapshot } from '../../tournamentSnapshot'
 import { renameActiveTournament } from '../../tournamentCommands'
 import { selectTournamentName } from '../../tournamentSelectors'
-import { useAppDispatch, useAppSelector } from '../../storeHooks'
+import { useAppDispatch, useAppSelector, useAppStore } from '../../storeHooks'
 import { DeleteTournamentDialog } from './DeleteTournamentDialog'
 import { RenameTournamentDialog } from './RenameTournamentDialog'
 import { TournamentRow } from './TournamentRow'
@@ -32,10 +32,11 @@ type Target = { id: string; name: string }
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function TournamentsPage() {
   const dispatch = useAppDispatch()
+  const store = useAppStore()
   const activeName = useAppSelector(selectTournamentName)
   const [version, setVersion] = useState(0)
   const [newName, setNewName] = useState('')
-  const [notice, setNotice] = useState(pendingNotice ?? '')
+  const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [renaming, setRenaming] = useState<Target | null>(null)
   const [deleting, setDeleting] = useState<Target | null>(null)
@@ -44,8 +45,13 @@ export function TournamentsPage() {
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (pendingNotice) headingRef.current?.focus()
+    const message = pendingNotice
     pendingNotice = null
+    if (!message) return
+    headingRef.current?.focus()
+    // Set after mounting, so the live region announces the text as an addition.
+    const frame = requestAnimationFrame(() => setNotice(message))
+    return () => cancelAnimationFrame(frame)
   }, [])
 
   // The library lives in localStorage: re-read it after changes (also renames in the settings).
@@ -74,8 +80,11 @@ export function TournamentsPage() {
   }
   const rename = (name: string) => {
     if (!renaming) return
-    if (renaming.id === library.activeId) dispatch(renameActiveTournament(name))
-    else renameTournament(renaming.id, name)
+    const to = name.trim()
+    if (!to) return
+    if (renaming.id === library.activeId) dispatch(renameActiveTournament(to))
+    else if (!renameTournament(renaming.id, to)) return setError(t('libraryCreateError'))
+    announce(tf('libraryRenamed', { from: renaming.name, to }))
     setVersion((value) => value + 1)
   }
   const remove = () => {
@@ -86,7 +95,8 @@ export function TournamentsPage() {
     setVersion((value) => value + 1)
   }
   const exportOne = (id: string) => {
-    const snapshot = getStoredSnapshot(id)
+    // The active tournament is exported from the store, which is always the freshest copy.
+    const snapshot = id === library.activeId ? store.getState().tournament : getStoredSnapshot(id)
     if (snapshot) downloadTournament(snapshot)
   }
   const importFile = async (file: File | undefined) => {
@@ -137,11 +147,7 @@ export function TournamentsPage() {
               onChange={(event) => setNewName(event.target.value)}
             />
           </div>
-          <button
-            className={classNames(sharedStyles, styles, 'button primary')}
-            type="submit"
-            title={t('libraryCreateButton')}
-          >
+          <button className={classNames(sharedStyles, styles, 'button primary')} type="submit">
             <Plus size={16} aria-hidden="true" /> {t('libraryCreateButton')}
           </button>
           <button
@@ -164,11 +170,9 @@ export function TournamentsPage() {
             }}
           />
         </form>
-        <p
-          className={classNames(sharedStyles, styles, `library-status ${error ? 'error' : ''}`)}
-          role={error ? 'alert' : 'status'}
-        >
-          {error || notice}
+        <output className={classNames(sharedStyles, styles, 'library-status')}>{notice}</output>
+        <p className={classNames(sharedStyles, styles, 'library-status error')} role="alert">
+          {error}
         </p>
         <h2
           id="library-list-title"

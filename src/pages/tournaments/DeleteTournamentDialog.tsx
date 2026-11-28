@@ -17,6 +17,11 @@ type Props = {
 /** Mount it only while confirming; it opens itself as a modal and focuses the safe action. */
 export function DeleteTournamentDialog({ name, isLast, onConfirm, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const onCloseRef = useRef(onClose)
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
   const cancelRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -24,9 +29,10 @@ export function DeleteTournamentDialog({ name, isLast, onConfirm, onClose }: Pro
     if (!dialog) return
     if (!dialog.open) dialog.showModal()
     cancelRef.current?.focus()
-    dialog.addEventListener('close', onClose)
-    return () => dialog.removeEventListener('close', onClose)
-  }, [onClose])
+    const handleClose = () => onCloseRef.current()
+    dialog.addEventListener('close', handleClose)
+    return () => dialog.removeEventListener('close', handleClose)
+  }, [])
 
   return (
     <Dialog

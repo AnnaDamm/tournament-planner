@@ -362,4 +362,19 @@ describe('tournament library', () => {
     switchTournament(b)
     expect(seen).toEqual([b, a])
   })
+
+  it('does not keep an imported snapshot whose index entry could not be stored', () => {
+    const data = stubLocalStorage()
+    const a = loadTournamentState()
+    const setItem = localStorage.setItem
+    vi.spyOn(localStorage, 'setItem').mockImplementation((key: string, value: string) => {
+      if (key === prefix + 'tournaments') throw new Error('quota')
+      setItem.call(localStorage, key, value)
+    })
+    expect(addTournament({ ...a.snapshot, tournamentName: 'Imported' })).toBeNull()
+    expect(createTournament('B')).toBeNull()
+    expect([...data.keys()].filter((key) => key.startsWith(prefix + 'tournament:'))).toEqual([
+      prefix + 'tournament:' + a.snapshot.id,
+    ])
+  })
 })

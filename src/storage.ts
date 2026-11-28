@@ -348,7 +348,11 @@ export const createTournament = (name: string) => {
     { ...createEmptyTournamentSnapshot(), tournamentName },
     'library',
   )
-  if (!indexWritten) return null
+  if (!indexWritten) {
+    // Never leave a snapshot behind that the library does not know about.
+    localStorage.removeItem(snapshotStorageKey(state.snapshot.id))
+    return null
+  }
   notifyLibraryChanged()
   return state.snapshot.id
 }
@@ -360,9 +364,15 @@ export const addTournament = (snapshot: TournamentSnapshot) => {
     snapshot: withStartedRounds({ ...snapshot, id: createId() }),
     revision: { updatedAt: Date.now(), source: tabId },
   }
-  if (!writeEnvelope(state, false)) return null
+  const id = state.snapshot.id
+  const stored = writeEnvelope(state, false)
+  // The import only counts once the index entry is persisted too; otherwise remove the orphan.
+  if (!stored || !readIndex()?.items.some((item) => item.id === id)) {
+    localStorage.removeItem(snapshotStorageKey(id))
+    return null
+  }
   notifyLibraryChanged()
-  return state.snapshot.id
+  return id
 }
 
 /** Makes a stored tournament the active one in every tab. */
@@ -411,7 +421,9 @@ export const getStoredSnapshot = (id: string) => readStoredState(id)?.snapshot ?
 export const subscribeToLibrary = (listener: (activeId: string) => void) => {
   libraryListeners.add(listener)
   const handleStorage = (event: StorageEvent) => {
-    if (event.key === indexStorageKey) notifyLibraryChanged()
+    // Another tab changed the index: only this subscriber needs to hear about it.
+    const activeId = readIndex()?.activeId
+    if (event.key === indexStorageKey && activeId) listener(activeId)
   }
   if (typeof window !== 'undefined') window.addEventListener('storage', handleStorage)
   return () => {
