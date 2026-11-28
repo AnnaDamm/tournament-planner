@@ -49,7 +49,12 @@ export function GameWinnerEntry({
         return (
           <fieldset key={index} className={classNames(sharedStyles, styles, 'game-winner')}>
             <legend className={classNames(sharedStyles, 'sr-only')}>
-              {term('gameScore')} {index + 1}
+              {tf('sportsGameWinnerLegend', {
+                game: term('gameScore'),
+                number: index + 1,
+                a: playerA,
+                b: playerB,
+              })}
             </legend>
             {[
               { value: WIN_A, name: playerA, text: '1 : 0' },
@@ -60,7 +65,7 @@ export function GameWinnerEntry({
                 type="button"
                 className={classNames(sharedStyles, styles, 'game-winner-button')}
                 aria-pressed={game.a === option.value.a && game.b === option.value.b}
-                aria-label={`${term('gameScore')} ${index + 1}: ${tf('sportsOutcomeWins', { name: option.name })}`}
+                aria-label={`${option.text} – ${term('gameScore')} ${index + 1}: ${tf('sportsOutcomeWins', { name: option.name })}`}
                 title={tf('sportsOutcomeWins', { name: option.name })}
                 onClick={() => choose(option.value)}
               >

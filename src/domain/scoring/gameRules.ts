@@ -128,7 +128,7 @@ export const createGameRules = (kind: GameKind): ScoringRules => {
     getMaxGameCount,
     getVisibleGameCount,
     getByeCredit: (roundFormat, defaults) => {
-      const winningGames = Math.max(1, roundFormat.winningGames || 1)
+      const winningGames = getFixedGames(roundFormat) ?? Math.max(1, roundFormat.winningGames || 1)
       return { gamesWon: winningGames, points: winningGames * kind.byePointsPerGame(defaults) }
     },
   }

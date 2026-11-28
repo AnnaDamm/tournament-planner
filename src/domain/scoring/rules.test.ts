@@ -215,6 +215,29 @@ describe('countdown rules', () => {
     expect(result.pointsB).toBe(381 + 501 + 200)
   })
 
+  it('credits a bye with the fixed number of games', () => {
+    expect(
+      getScoringRules('sets').getByeCredit(
+        { winningGames: 1, fixedGames: 2 },
+        { winningGames: 1, gamePoints: 21 },
+      ),
+    ).toEqual({ gamesWon: 2, points: 42 })
+    expect(
+      getScoringRules('sets').getByeCredit(
+        { winningGames: 2 },
+        { winningGames: 1, gamePoints: 21 },
+      ),
+    ).toEqual({ gamesWon: 2, points: 42 })
+  })
+
+  it('reports invalid values with an error', () => {
+    expect(rules.getGameError?.({ a: '0', b: '0' }, format)?.key).toBe('sportsCountdownOneZero')
+    expect(rules.getGameError?.({ a: '-5', b: '0' }, format)?.key).toBe(
+      'sportsCountdownWholeNumbers',
+    )
+    expect(rules.isGameComplete({ a: '-5', b: '0' }, format)).toBe(false)
+  })
+
   it('rejects legs without exactly one side at 0 or above the start score', () => {
     expect(rules.isGameComplete({ a: '10', b: '120' }, format)).toBe(false)
     expect(rules.isGameComplete({ a: '0', b: '0' }, format)).toBe(false)

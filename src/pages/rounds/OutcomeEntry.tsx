@@ -53,7 +53,9 @@ export function OutcomeEntry({
           type="button"
           className={classNames(sharedStyles, styles, 'outcome-button')}
           aria-pressed={outcome === option.value}
-          aria-label={option.label}
+          aria-label={
+            option.short === option.label ? option.label : `${option.short} – ${option.label}`
+          }
           title={option.label}
           onClick={() => onChange(outcome === option.value ? undefined : option.value)}
         >
