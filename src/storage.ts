@@ -158,7 +158,16 @@ const readIndex = (): TournamentIndex | null => {
   const value = readJson<Partial<TournamentIndex> | null>(indexStorageKey, null)
   if (!value || value.storageVersion !== 2 || typeof value.activeId !== 'string') return null
   if (!Array.isArray(value.items)) return null
-  return value as TournamentIndex
+  // Drop malformed entries instead of failing later when the index is updated.
+  const items = value.items.filter(
+    (item): item is TournamentIndex['items'][number] =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof item.id === 'string' &&
+      typeof item.name === 'string' &&
+      typeof item.updatedAt === 'number',
+  )
+  return { storageVersion: 2, activeId: value.activeId, items }
 }
 
 /** Returns whether the index was actually written. */

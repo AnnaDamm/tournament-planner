@@ -157,6 +157,21 @@ describe('storage migration', () => {
     expect(data.has(`${prefix}tournament:${second.snapshot.id}`)).toBe(true)
   })
 
+  it('ignores malformed index entries instead of throwing on the next save', () => {
+    const data = stubLocalStorage({ [`${prefix}tournament`]: v1Envelope() })
+    const state = loadTournamentState()
+    const index = JSON.parse(data.get(`${prefix}tournaments`)!)
+    data.set(
+      `${prefix}tournaments`,
+      JSON.stringify({ ...index, items: [null, 42, { id: 1 }, ...index.items] }),
+    )
+    expect(() =>
+      persistTournamentState(state.snapshot, createNextRevision(state.revision), false),
+    ).not.toThrow()
+    const repaired = JSON.parse(data.get(`${prefix}tournaments`)!)
+    expect(repaired.items.map((item: { id: string }) => item.id)).toEqual([state.snapshot.id])
+  })
+
   it('keeps the legacy per-field keys when the index could not be written', () => {
     const data = stubLocalStorage({ [`${prefix}players`]: JSON.stringify([]) })
     const original = localStorage.setItem.bind(localStorage)
