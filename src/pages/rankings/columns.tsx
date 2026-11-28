@@ -11,6 +11,8 @@ import type { SortValue } from '../../tournamentStats'
 
 export type RankingRow = Participant & {
   wins: number
+  draws: number
+  matchPoints: number
   losses: number
   scored: number
   conceded: number
@@ -26,6 +28,8 @@ export type RankingColumnEnv = {
   rules: ScoringRules
   tieBreakers: TieBreakerId[]
   phaseMode: PhaseModeId
+  /** Some configured format of the tournament can end in a draw. */
+  drawsPossible: boolean
 }
 
 /** A sortable statistics column of the ranking table; `id` is the sort key of the row field. */
@@ -41,9 +45,15 @@ export type RankingColumn = {
 
 const formatDifference = (value: number) => (value > 0 ? `+${value}` : String(value))
 
-// Append-only: one entry line per column (a later package adds draws, Buchholz, ...).
+// Append-only: one entry line per column (a later package adds Buchholz, ...).
 export const rankingColumns: RankingColumn[] = [
   { id: 'wins', header: () => t('wins'), value: (row) => row.wins },
+  {
+    id: 'draws',
+    header: () => t('sportsDrawsHeader'),
+    value: (row) => row.draws,
+    visible: (env) => env.drawsPossible,
+  },
   {
     id: 'played',
     header: () => t('games'),
@@ -68,9 +78,18 @@ export const rankingColumns: RankingColumn[] = [
       `${row.setsWon}:${row.setsLost} (${formatDifference(row.setsWon - row.setsLost)})`,
   },
   {
+    id: 'matchPoints',
+    header: () => t('sportsMatchPointsHeader'),
+    value: (row) => row.matchPoints,
+    strong: true,
+    visible: (env) => env.drawsPossible,
+  },
+  {
     id: 'points',
     header: (term) => term('pointsHeader'),
     strong: true,
+    // One score line (football): the goals are already shown as the games column.
+    visible: (env) => env.rules.entry !== 'single',
     value: (row) =>
       `${row.scored}:${row.conceded} (${formatDifference(row.scored - row.conceded)})`,
   },

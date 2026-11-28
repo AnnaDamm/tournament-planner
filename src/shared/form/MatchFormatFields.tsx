@@ -2,8 +2,8 @@ import sharedStyles from '../../styles/shared.module.css'
 import { classNames } from '../../styles/classNames'
 import { tf } from '../../i18n'
 import { getTerm } from '../../i18n/useTerm'
-import { getScoringRules } from '../../domain/scoring/registry'
-import { getSport } from '../../domain/sports/registry'
+import type { ScoringRuleId } from '../../domain/scoring/types'
+import { getSport, resolveScoringRules } from '../../domain/sports/registry'
 import type { SportId } from '../../domain/sports/types'
 import type { MatchFormat } from '../../domain/types'
 import { NumberField } from './NumberField'
@@ -11,6 +11,8 @@ import { NumberField } from './NumberField'
 type Props = {
   idPrefix: string
   sportId: SportId
+  /** The rules the settings select for the sport (scoring.rules). */
+  rulesId?: ScoringRuleId
   format: MatchFormat
   onChange: (format: MatchFormat) => void
   /** 'settings': labelled fields with help text; 'dialog': compact labels without points. */
@@ -22,6 +24,7 @@ type Props = {
 export function MatchFormatFields({
   idPrefix,
   sportId,
+  rulesId,
   format,
   onChange,
   variant = 'settings',
@@ -29,8 +32,11 @@ export function MatchFormatFields({
 }: Props) {
   const sport = getSport(sportId)
   const term = (key: Parameters<typeof getTerm>[1]) => getTerm(sportId, key)
-  const has = (key: keyof MatchFormat) => sport.editable.includes(key)
-  const supportsFixed = getScoringRules(sport.rules).supportsFixedGames && has('fixedGames')
+  const rules = resolveScoringRules({ sport: sportId, rules: rulesId })
+  // Score-less rules (football, no sets) have no games to configure.
+  const has = (key: keyof MatchFormat) =>
+    rules.entry !== 'outcome' && rules.entry !== 'single' && sport.editable.includes(key)
+  const supportsFixed = rules.supportsFixedGames && has('fixedGames')
   const games = term('gamesHeader').toLocaleLowerCase()
   const field = (
     key: 'winningGames' | 'gamePoints',

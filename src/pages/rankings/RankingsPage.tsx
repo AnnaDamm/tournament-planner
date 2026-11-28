@@ -20,6 +20,7 @@ import { t } from '../../i18n'
 import { useTerm } from '../../i18n/useTerm'
 import type { Participant, Phase, Round } from '../../tournamentTypes'
 import type { EvaluationContext } from '../../tournament'
+import { canHaveDraws } from '../../domain/scoring/draws'
 import { rankingColumns, type RankingRow } from './columns'
 import { phaseViews } from '../phaseViews/registry'
 import { getPhaseName } from '../phaseViews/phaseName'
@@ -81,11 +82,19 @@ export function RankingsPage({
   const mostPlayed = Math.max(0, ...sorted.map((player) => player.played))
   const phase = phases.find((item) => item.id === phaseId)
   const standingsView = phase && phaseViews[phase.mode]?.StandingsView
+  const drawsPossible =
+    canHaveDraws(ctx.rules, { scoring: ctx.scoring, phases }, rounds) ||
+    sorted.some((player) => player.draws > 0)
   const columns = rankingColumns.filter(
     (column) =>
       !column.visible ||
       (phase &&
-        column.visible({ rules: ctx.rules, tieBreakers: ctx.tieBreakers, phaseMode: phase.mode })),
+        column.visible({
+          rules: ctx.rules,
+          tieBreakers: ctx.tieBreakers,
+          phaseMode: phase.mode,
+          drawsPossible,
+        })),
   )
   const phaseNotStarted = Boolean(phase) && phase !== phases[0] && !phase?.startedAt
   const handleTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {

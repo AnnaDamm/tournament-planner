@@ -1,0 +1,45 @@
+@layer components {
+  .outcome-entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    grid-area: scores;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .outcome-button {
+    min-width: 40px;
+    min-height: 32px;
+    padding: 4px 12px;
+    border: 1px solid #dfe7e0;
+    border-radius: 6px;
+    background: #fff;
+    color: #3f4d45;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .outcome-button:hover {
+    background: #f0f3f0;
+  }
+
+  .outcome-button:focus-visible {
+    outline: 2px solid #26331d;
+    outline-offset: 2px;
+  }
+
+  .outcome-button[aria-pressed='true'] {
+    border-color: #b9ea5b;
+    background: #b9ea5b;
+    color: #26331d;
+  }
+
+  .outcome-value {
+    font-weight: 800;
+  }
+}

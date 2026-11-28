@@ -97,7 +97,8 @@ export const RoundsPage = memo(function RoundsPage({
   const phases = useAppSelector(selectPhases)
   const activePhaseId = useAppSelector(selectActivePhaseId)
   const startablePhase = useAppSelector(selectStartablePhase)
-  const sportId = useAppSelector(selectScoring).sport
+  const scoring = useAppSelector(selectScoring)
+  const sportId = scoring.sport
   const capabilitiesByPhase = useMemo(
     () =>
       new Map(
@@ -393,6 +394,7 @@ export const RoundsPage = memo(function RoundsPage({
           key={settingsRound?.number}
           round={settingsRound}
           sportId={sportId}
+          rulesId={scoring.rules}
           defaultCourtCount={defaultCourtCount}
           onSave={(number: number, format: MatchFormat, courtCount: number) =>
             dispatch(setRoundFormat(number, format, courtCount))
@@ -411,6 +413,7 @@ export const RoundsPage = memo(function RoundsPage({
               : ''
           }
           sportId={sportId}
+          rulesId={scoring.rules}
           onSave={(number, matchId, format) => dispatch(setMatchFormat(number, matchId, format))}
           onClose={closeMatchSettings}
         />
