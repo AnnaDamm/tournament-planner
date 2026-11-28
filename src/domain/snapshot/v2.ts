@@ -93,10 +93,12 @@ const parseScoring = (raw: unknown): ScoringSettings => {
   const points = isRecord(raw.matchPoints) ? raw.matchPoints : {}
   const point = (key: 'win' | 'draw' | 'loss') =>
     isFiniteNumber(points[key]) ? points[key] : base.matchPoints[key]
+  const rules = getSport(sport).alternativeRules?.find((id) => id === raw.rules)
   return {
     sport,
     format: clampFormat(isRecord(raw.format) ? raw.format : undefined, base.format),
     matchPoints: { win: point('win'), draw: point('draw'), loss: point('loss') },
+    ...(rules ? { rules } : {}),
   }
 }
 

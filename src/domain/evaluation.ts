@@ -1,7 +1,6 @@
 import { getMatchFormat } from './format'
 import type { ScoringRules } from './scoring/types'
-import { getScoringRules } from './scoring/registry'
-import { getSport } from './sports/registry'
+import { resolveScoringRules } from './sports/registry'
 import type { TieBreakerId } from './ranking/types'
 import type { Match, MatchFormat, Round, TournamentSettings } from './types'
 
@@ -24,7 +23,7 @@ export const createEvaluationContext = (
 ): EvaluationContext => {
   const phase = phaseId ? settings.phases.find((item) => item.id === phaseId) : undefined
   return {
-    rules: getScoringRules(getSport(settings.scoring.sport).rules),
+    rules: resolveScoringRules(settings.scoring),
     scoring: settings.scoring,
     tieBreakers: phase?.tieBreakers ?? settings.tieBreakers,
     defaultFormat: settings.scoring.format,

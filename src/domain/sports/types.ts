@@ -24,4 +24,6 @@ export type Sport = {
   defaults: Omit<ScoringSettings, 'sport'>
   terms: Record<TermKey, MessageKey>
   editable: Array<keyof MatchFormat> // which format fields the UI shows
+  /** Other rules the user may choose instead of `rules` (stored in scoring.rules). */
+  alternativeRules?: ScoringRuleId[]
 }

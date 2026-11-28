@@ -1,29 +1,20 @@
+import { getScoringRules } from '../scoring/registry'
+import type { ScoringRules } from '../scoring/types'
+import type { ScoringSettings } from '../types'
+import { badminton, darts, esports, football, other, snooker, volleyball } from './presets'
 import type { Sport, SportId } from './types'
 
-const other: Sport = {
-  id: 'other',
-  labelKey: 'sportsOther',
-  rules: 'sets',
-  defaults: {
-    format: { winningGames: 1, gamePoints: 21 },
-    matchPoints: { win: 1, draw: 0.5, loss: 0 },
-  },
-  terms: {
-    gamesHeader: 'sets',
-    gameScore: 'setScore',
-    winningGames: 'winningGames',
-    winningGamesHelp: 'defaultWinningGamesHelp',
-    defaultWinningGames: 'defaultWinningGames',
-    defaultWinningGamesHelp: 'defaultWinningGamesHelp',
-    gamePoints: 'defaultSetPoints',
-    gamePointsHelp: 'defaultSetPointsHelp',
-    pointsHeader: 'points',
-    differenceHeader: 'difference',
-  },
-  editable: ['winningGames', 'gamePoints'],
-}
-
 // Append-only: one entry line per sport.
-export const sports: Sport[] = [other]
+export const sports: Sport[] = [other, badminton, volleyball, football, esports, snooker, darts]
 
 export const getSport = (id: SportId): Sport => sports.find((sport) => sport.id === id) ?? other
+
+/** The rules of the sport, or the alternative the sport offers and the settings select. */
+export const resolveScoringRules = (
+  scoring: Pick<ScoringSettings, 'sport' | 'rules'>,
+): ScoringRules => {
+  const sport = getSport(scoring.sport)
+  const id =
+    scoring.rules && sport.alternativeRules?.includes(scoring.rules) ? scoring.rules : sport.rules
+  return getScoringRules(id)
+}
